@@ -1,0 +1,27 @@
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Python cruft
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Large run artifacts (keep per-experiment decisions/metrics in git, not predictions blobs)
+*.npz
+*.npy
+*.pkl
+*.joblib
+*.parquet
+experiments/**/oof_predictions.csv
+experiments/**/predictions.csv
+experiments/**/*.zip
+
+# Secrets
+.env
+kaggle.json
+
+Oracle/

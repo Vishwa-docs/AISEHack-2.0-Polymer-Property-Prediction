@@ -1,0 +1,86 @@
+Overview
+Welcome to the Final Stage of AISEHack 2.0 — Polymer Property Prediction, Round 3!
+
+Having built strong predictive baselines in Round 2, we now raise the bar. In Round 3, the challenge moves beyond raw accuracy to robustness and trust — two qualities that separate a research prototype from a model that materials scientists can actually rely on.
+
+You'll continue working with the same seven target properties spanning thermal, electronic, optical, and structural behavior, using the same core datasets from Round 2.
+
+Additional Auxiliary Dataset
+
+This round introduces an additional molecular SMILES dataset containing approximately 5.97 million unique molecular structures. The dataset contains SMILES representations of molecules and does not include the target polymer properties.
+
+Participants are encouraged to explore this auxiliary dataset for approaches such as:
+
+Self-supervised or unsupervised pretraining of molecular representations
+SMILES-based representation learning
+Feature enrichment and molecular embedding generation
+Transfer learning to improve polymer property prediction models
+The use of the auxiliary dataset is optional, and participants are free to determine how, or whether, it can improve their modelling pipeline.
+
+This round is built around two central themes:
+
+Explainability of the models
+Polymer invariance
+The goal is not only to build accurate models, but also models whose predictions are interpretable, robust, and invariant to different valid representations of the same polymer structure.
+
+Start
+2 days ago
+Close
+8 days to go
+Description
+link
+keyboard_arrow_up
+Congratulations on qualifying for Round 3 of the Polymer Property Prediction Challenge!
+
+In the previous rounds, participants developed machine learning models to predict polymer properties from polymer structures represented as SMILES strings. In Round 3, the challenge continues with the prediction of seven fundamental polymer properties, while placing greater emphasis on robustness, explainability, and polymer invariance.
+
+Your task is to develop models capable of predicting the following seven polymer properties:
+
+Property    Description
+Chain Bandgap (Egc) Electronic bandgap of an isolated polymer chain.
+Bulk Bandgap (Egb)  Electronic bandgap of the polymer in the bulk phase.
+Ionisation Energy (Ei)  Energy required to remove an electron from the polymer.
+Electron Affinity (Eea) Energy released when the polymer accepts an electron.
+Dielectric Constant (EPS)   Ability of the polymer to store electrical energy in an electric field.
+Refractive Index (Nc)   Optical property describing how light propagates through the polymer.
+Glass Transition Temperature (Tg)   Temperature at which the polymer transitions from a glassy to a rubbery state.
+In addition to the core datasets used in Round 2, an additional auxiliary dataset containing approximately 5.97 million unique molecular SMILES is provided. Participants may optionally use this dataset for pretraining, representation learning, feature enrichment, or other auxiliary learning approaches.
+
+The goal is not only to develop accurate models, but also models that are robust, generalizable, interpretable, and invariant to different valid representations of the same polymer structure.
+
+We look forward to your innovative solutions and wish you the best of luck in Round 3!
+
+Evaluation
+link
+keyboard_arrow_up
+The evaluation metric for this competition is the mean coefficient of determination R2 across the seven targets:
+
+
+where R² is defined as:
+
+
+where yᵢ = ground truth, ŷᵢ = predictions, and ȳ = mean of ground truth values.
+
+Submission File
+link
+keyboard_arrow_up
+The submission file for this competition must be a csv file. For each id in the test set, you must predict based on the "target_type". The file should contain a header and have the following format.
+
+id  target
+1   220
+2   2.3
+3   110
+4   70
+Timeline
+link
+keyboard_arrow_up
+Start Date: 22 August 2026
+Final Submission Deadline: 3 September 2026
+Requirements
+link
+keyboard_arrow_up
+Submissions to this competition must be made through Notebooks. Please ensure the notebooks are shared with the competition hosts. In order for the "Submit" button to be active after a commit, the following conditions must be met:
+
+For this competition publicly available external data is not allowed, including pre-trained models. Instead participants can use the auxiliary data is provided in the data section
+
+Submission file must be named submission.csv
