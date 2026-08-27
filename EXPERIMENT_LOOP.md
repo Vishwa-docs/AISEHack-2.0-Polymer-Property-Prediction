@@ -156,6 +156,12 @@ continuing a hyperparameter crawl.
 
 ## Promotion gates (from Round 2, unchanged — they prevented false convergence)
 
+- **No-op rule (new, R3)**: a run whose output CSV is byte-identical to the
+  incumbent, or whose verified score is within 1e-5 of the incumbent without a
+  real model change, is a **no-op** — record `state=no_op`, never promote, and
+  the slot must be re-run with a real pipeline. (The first R3 batch of 100
+  experiments violated this — placeholder V52+noise scripts — and one no-op was
+  wrongly promoted; see PLAN.md §2.)
 - **Component gate**: grouped target gain ≥ `0.01`, at least 4 of 5 folds in the same
   direction, group-bootstrap lower bound above zero, adjacent/paired-target loss
   ≤ `0.003`, non-negative missing-auxiliary and low-similarity slices.

@@ -41,6 +41,7 @@ Working directory: `/Users/daver/Desktop/AISEHack 2.0 Polymr Property Prediction
 | `PLAN.md` | The experiment plan for this round — follow it |
 | `EXPERIMENT_LOOP.md` | The research→experiment→analysis loop with gates — follow it |
 | `TRIALS.md` | Catalog of everything tried in Round 1/2 and whether it worked — consult before proposing an experiment |
+| `CONTEXT.md` | Portable, self-contained context — paste it (with TRIALS.md) to any agent without repo access |
 | `FINAL_REPORT.md` | End-of-round deliverable (write at the end, not now) |
 
 **Everything for Round 3 lives in this repo on this Mac** — code, experiment
@@ -49,7 +50,7 @@ GPU laptop (§5).
 
 ## 3. Every-run checklist (do this at session start, every session)
 
-1. Read `AGENTS.md` (this file), `PLAN.md`, `EXPERIMENT_LOOP.md`, `TRIALS.md`.
+1. Read `AGENTS.md` (this file), `PLAN.md`, `EXPERIMENT_LOOP.md`, `TRIALS.md`, `CONTEXT.md`.
 2. Read `Competition_Details/Overview.txt` + `Competition_Details/Competition Rules.txt` (rules change — verify the deadline, submission limits, and host-sharing list are still as stated here).
 3. **Load your available skills and use them.** Previous agents ignored skills and burned context. At minimum: load any skill for context economy / long-task management (in past sessions these were named **headroom** and **ponytail**) and follow their instructions faithfully; load any skill for experiment hygiene, file management, or subagent orchestration that applies to this work. If a skill's description matches a task you are about to do, load it BEFORE acting.
 4. Verify the frozen data hashes (see `EXPERIMENT_LOOP.md` Stage 0) before trusting any cached feature or prediction.
@@ -62,14 +63,7 @@ score as evidence).
 
 ## 4. Rules compliance (violations = disqualification — non-negotiable)
 
-- **Official competition data only.** No external datasets (public or private), no
-  pretrained models/weights/embeddings/checkpoints, no artifacts created outside
-  notebook execution. `archive/` from Round 2 is NOT available in Round 3 and must
-  not be used. `smile_r3.csv` and `PI1M.csv` are official Round 3 data (user
-  confirmed both were provided by the organizers) and are allowed for
-  representation learning — from scratch, inside the notebook. At notebook time,
-  sanity-check that the files exist in the Round 3 Kaggle input dir before
-  relying on them.
+- **Official competition data only — NO external data, NO pretrained models.** No external datasets (public or private, including any Kaggle/other competition data, any web-scraped SMILES, any literature Tg/property datasets), no pretrained models/weights/embeddings/checkpoints/vocabularies (including HuggingFace, ChemBERTa, MolBERT, Uni-Mol, Graphormer, **TabPFN**, any LLM/VLM/GNN pretrained on molecules/polymers), no transfer learning from any model trained outside the notebook, no artifacts created outside notebook execution. `archive/` from Round 2 is NOT available in Round 3 and must not be used. `smile_r3.csv` (5,973,369 rows) and `PI1M.csv` (995,799 rows) are the **only** additional official Round 3 data (user confirmed both were provided by the organizers) and are allowed **only** for representation learning **from scratch, inside the notebook, with no external weights** — every embedding/vocabulary/SVD/MLM must be fitted from random initialization inside the single notebook run. At notebook time, sanity-check that `train.csv`, `test.csv`, `PI1M.csv`, `smile_r3.csv` exist in the Round 3 Kaggle input dir (`/kaggle/input/ppp-round-3` or `/kaggle/input/aisehack-2-0`) before relying on them; if any file is missing, fall back to training without it (still rules-compliant).
 - **Notebook/code-only.** The entire pipeline (load → features → train → infer →
   write `submission.csv`) must run in ONE Kaggle notebook run, no manual
   intervention, fixed seeds, reproducible.
@@ -241,8 +235,7 @@ It is the ONLY exception to external knowledge, and it is verification-only:
 - Never modify the GPU laptop's files. Never run Kaggle uploads/submissions or
   `kaggle kernels push` without explicit user authorization (authentication ≠
   permission; the user submits).
-- Never use external labeled data, pretrained weights, or oracle values in any
-  submitted artifact. Never submit without the matching end-to-end notebook.
+- **Never use external labeled data, pretrained weights, or oracle values in any submitted artifact.** This includes: no external SMILES, no literature Tg/property datasets, no pretrained ChemBERTa/MolBERT/Uni-Mol/Graphormer/TabPFN/LLM/VLM/GNN weights or vocabularies, no transfer learning from external models, no artifacts (weights, vocabularies, embeddings, SVD matrices) created outside the notebook execution. Every representation (TF-IDF, SVD, word2vec, MLM, contrastive) must be fitted **from scratch, inside the single notebook run**, on official data only. Never submit without the matching end-to-end notebook that regenerates all artifacts from scratch.
 - Never relax seeds, folds, or gates to make a number look better. Never report
   an oracle/proxy number as a public score.
 - Never exceed one GPU job on the laptop at a time; respect 20% RAM/VRAM headroom.

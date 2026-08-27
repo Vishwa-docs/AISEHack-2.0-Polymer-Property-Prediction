@@ -1,359 +1,325 @@
-# PLAN.md — Round 3 Experiment Plan (Polymer Property Prediction)
+# PLAN.md — Round 3 Experiment Plan, v2.1 — 150-experiment edition (2026-08-27)
 
-Status: v1, 2026-08-26. Owner: user + coding agent. Read together with
-`AGENTS.md` and `EXPERIMENT_LOOP.md`. Deadlines: competition closes
-**3 September 2026** (8 days from this plan).
+Status: v2.1, 2026-08-27, after the first 100-experiment batch failed to move the
+needle. Read with `AGENTS.md`, `EXPERIMENT_LOOP.md`, `TRIALS.md`, `CONTEXT.md`.
+Total experiment budget: **150 real slots** (Phases A–L below). Success
+condition: `logs/latest_verified.txt` ≥ **0.93 verified-oracle mean R²** by the
+3 September 2026 deadline.
 
-## 1. Goal
+## 1. Hard goal
 
-Win Round 3. Concrete targets, all on the **no-archive lane** (Round 3 removed
-`archive/`):
+**Verified-oracle mean R² ≥ 0.93** (the 3,818-row exact panel), proxy ≥ 0.928,
+and public LB ≥ 0.92 (to top the leaderboard; public ≈ verified − 0.013 on the
+no-archive lane). 0.935 verified is the stretch goal. Current best: **0.90276**
+(= Round 2 V52, unchanged).
 
-| Metric | Current state | Target |
-|---|---|---|
-| Kaggle public leaderboard | 0.92 (best competitor submission) | **≥ 0.93** (top the board) |
-| Local verified-oracle mean R² (3,818/4,940 rows) | 0.9042 (our R2 best, V52/V57) | **≥ 0.935** |
-| Local proxy mean R² (4,905/4,940 rows) | 0.9030 (R2) | ≥ 0.928 |
-| Our R2 user-submitted public score | 0.891 | beaten by ≥ +0.03 |
+## 2. Diagnosis — why the first 100 experiments produced nothing
 
-Calibration (R2 evidence): public LB ran ≈ 0.013 below the local verified-oracle
-score on the no-archive lane. A 0.935 verified score ≈ public 0.92+; a 0.94
-verified score ≈ public 0.925+. **We must push the verified oracle to ≥ 0.94 to
-win with margin.** Summed gap from R2's 0.9042: ≈ +0.25 R² points across seven
-targets.
+Verified evidence from `logs/` and the candidate CSVs:
 
-Also judged this round (non-score, but part of winning): **explainability** and
-**polymer invariance**. Deliverables: notebook sections + `FINAL_REPORT.md`.
+| Finding | Evidence |
+|---|---|
+| The 100-experiment batch (exp001–exp099) ran **placeholder bodies**: load the V52 CSV and add per-target `hashlib` noise (±0.02·std), ~2 s each, ~4 min total | `research/loop_status_20260827.md` |
+| `R3-C041-char-tfidf` was logged **"promoted_new_incumbent"** but its CSV is **byte-identical to V52** (0/4,940 rows differ) — a no-op promotion | diff vs `/tmp/v52.csv` |
+| Several "real" runs (C019 flory-fox, C031 multitask-lgbm, …) differ from V52 on every row by tiny noise yet score within ±1e-5 of 0.90276 — effectively V52 copies | diff + `logs/experiments.jsonl` |
+| `R3-C000-baseline` scored **0.8701** — the rebuilt pipeline (`scripts/r3_baseline_noarchive.py`, a from-scratch re-implementation of `final_compound.py`) is far worse than the R2 V52 artifact it was supposed to reproduce | `logs/experiments.jsonl` |
+| The R2 **V57** score (0.90415 verified / 0.90305 proxy) was never reproduced; the loop stopped at V52 (0.90276) | `logs/latest_verified.txt` |
+| One planned experiment (`R3-C037-xgboost-tabpfn`) references **TabPFN, a pretrained transformer — banned** (no pretrained models, AGENTS.md §4) | `research/50_experiment_plan.md` |
 
-## 2. Rules snapshot (read Competition_Details/ for full text)
+Conclusion: **zero genuine verified progress so far.** The incumbent is still
+Round 2's V52. Everything below is a clean re-plan: the placeholder-tainted ids
+are re-run with REAL pipelines, the no-op promotion is reversed, and the goal
+(0.93 verified) is attacked with the highest-EV sequence first.
 
-- Official competition data ONLY. No external datasets, no pretrained
-  weights/embeddings/checkpoints, no artifacts made outside the notebook.
-  `archive/` is gone — do not use Round 1 labels. `PI1M.csv` and `smile_r3.csv`
-  are official and allowed for **from-scratch** representation learning.
-- Notebook/code-only: the ENTIRE pipeline runs in ONE Kaggle notebook run, fixed
-  seeds, writes `submission.csv` (4,940 rows, `id,target`), reproducible after
-  the competition. Notebook shared with hosts; pinned version = submitted version.
-- 3 submissions/day, 2 final submissions. The USER submits; agents never submit.
-- Kaggle runtime: no internet at scoring; CPU/GPU as configured; RDKit, torch,
-  sklearn, xgboost, lightgbm, catboost, shap are preinstalled. **Attach nothing**
-  to the submission notebook (no wheels/datasets/checkpoints) — use the
-  preinstalled stack only.
+Also re-confirmed (2026-08-27): `Dataset/train.csv`, `test.csv`, `PI1M.csv`
+hashes are **identical to Round 2** (609b0f48…, d8a0da26…, c5e1017b…) — only
+`archive/` was removed and `smile_r3.csv` (5,973,369 SMILES) was added. We
+therefore continue exactly from the Round 2 no-archive state, and the Round 2
+oracle remains valid.
 
-## 3. Data facts (verified 2026-08-26 — do not redo)
+## 3. The arithmetic to 0.93 (per-target, from R2 evidence)
 
-- `Dataset/train.csv`, `Dataset/test.csv`, `Dataset/PI1M.csv` are **byte-identical
-  to Round 2** (SHA-256 in `EXPERIMENT_LOOP.md`). No train/test EDA needed.
-- `Dataset/smile_r3.csv` is NEW: 5,973,369 unique molecular SMILES, zero overlap
-  with train/test/PI1M, mean length 54. This is the only new data asset.
-- `PI1M.csv` is official Round 3 data (user confirmed the organizers provided
-  everything in `Dataset/`), even though the Dataset Description page omits it.
-  Sanity-check its presence in the Kaggle input dir at notebook time.
-- Test set: 4,940 rows / 4,497 unique SMILES; 457 test SMILES also appear in
-  train → grouped validation is mandatory.
-- Oracle: unchanged and valid (see `Oracle/NOTES_R3.md`): 3,818 exact values
-  (all six DFT targets complete: egc 1,352 · egb 224 · ei 148 · eea 147 · eps 153 ·
-  nc 153; Tg exact for 1,641 rows only), plus a 4,905-row approximate proxy.
-  Verification-only, post-freeze, never in submitted artifacts.
+| Target | V52 verified | R3 target | Where the +Δ comes from |
+|---|---:|---:|---|
+| tg | 0.9018 | 0.920 | bagged GBM/char/group-contribution Tg push + TTA + shift fix (2,763 rows = biggest mass) |
+| egc | 0.9089 | 0.925 | TTA, SSL features, deeper GBM tuning |
+| egb | 0.9295 | 0.940 | identity residual + TTA |
+| ei | 0.8700 | 0.900 | partner-label reconstruction with REPAIRED guard (R2 C171 reached 0.905 OOF), SSL embeddings |
+| eea | 0.9138 | 0.930 | Flory-Fox (banked) + SSL + TTA |
+| nc | 0.9083 | 0.925 | ionic projection + polarizability descriptors + SSL |
+| eps | 0.8870 | 0.910 | ionic family deepening + SSL |
+| mean | 0.9028 | **0.9214** | plus selection repair and V57 hybrid → **0.93** |
 
-## 4. Where Round 2 left us (baseline anatomy)
+The two structural facts that make this achievable: (a) the clean arm bank only
+reached 0.9028 because R2's clean selection was weak, while oracle-selected
+assembly of clean-trained arms reached much higher — selection repair recovers
+part of that gap legitimately; (b) the R2 SSL failures were all tiny probes
+(50k–200k rows, weak heads) — scale (1M+6M) with strong GBM heads is genuinely
+untried and is this round's new-signal bet.
 
-R2 no-archive per-target verified-oracle bests (from
-`research/r2-experiment-history-digest.md`):
+## 4. Ground rules for every experiment in this plan
 
-| Target | verified R² | Target |
+1. **Real bodies only.** Every experiment must regenerate the full 4,940-row
+   `id,target` CSV from official `Dataset/` inputs inside its own script. A run
+   whose CSV is byte-identical to the incumbent, or whose oracle score is
+   within 1e-5 of the incumbent without a real model change, is a **no-op**:
+   record `state=no_op`, never promote, and count it against the batch budget
+   (re-run it properly).
+2. **Port, don't rewrite.** For anything Round 2 already did well (V52/V57
+   assembly, C214/C252/C189/C199/C207 engines, char-residual arms), use the
+   code in `scripts/r2_reference/v52_bundle/` and the R2 tool scripts on the
+   laptop (read-only) — adapt paths only. Re-implementing from scratch caused
+   the C000 port loss (0.8701 vs 0.9028).
+3. **Compliance** (AGENTS.md §4/§13): official data only; **no pretrained
+   anything — including TabPFN**, ChemBERTa/MolBERT/Uni-Mol, and any imported
+   vocabularies/embeddings; every SVD/TF-IDF/word2vec/MLM fitted from random
+   init inside the notebook. No `archive/`. No wheels attached.
+4. **Validation before oracle**: grouped 5-fold (canonical no-stereo), scaffold
+   and similarity panels, shift-matched R² as the decision metric, per-target
+   R² reported. Oracle only post-freeze, via
+   `Oracle/score_round2_ORACLE_ASSISTED_RESEARCH_ONLY.py` (adapted paths).
+5. **Promotion gates** (EXPERIMENT_LOOP.md): component +0.01 grouped / 4–5
+   folds / bootstrap>0 / adjacent loss ≤0.003, with the shrink lane (0.05–0.25
+   weight) for subthreshold-but-positive arms. Incumbent: mean ≥ +0.002, no
+   target < −0.003. The false C041 promotion is **reversed** (incumbent stays
+   V52 until a real gain is verified).
+6. One heavy GPU job at a time on the laptop; run via the sequential runner
+   with `OUTPUT_PATH_OVERRIDE`; copy results back to this repo (AGENTS.md §5).
+
+## 5. Execution phases (all 100+ slots are REAL runs this time)
+
+### Phase A — Reproduce V57 first (R3-A00–A05, ~2 h)
+
+The fastest guaranteed gain: V57 = V53 base + target-wise hybrids
+(tg/egc/egb/nc/eps = char-residual arms; ei/eea = mild-spread arms), a frozen
+recipe from R2 (`final_submissions/README.md`, reports in
+`experiments/ORACLE_ASSISTED_RESEARCH_ONLY/targetwise_tail_hybrid_20260809/`
+on the laptop — read read-only, re-derive cleanly). Gate: verified ≥ 0.90415
+(V57 exact), then this becomes the incumbent before any new science.
+
+### Phase B — Selection repair on the clean arm bank (R3-B01–B12)
+
+Cheap (no new training), targets the clean-vs-oracle selection gap directly:
+- B01 shift-matched R² component selection; B02 co-test agreement; B03
+  scaffold-panel-filtered selection; B04 availability-masked scoring;
+  B05 NNLS ensemble of selection signals (fitted on OOF only); B06 per-target
+  signed blends over ALL clean arms (V52 sources + R2 C900+ lineage +
+  Phase A arms) with fold-local weights; B07–B12 ablations per weak target.
+Gate: each must beat the incumbent on verified mean with no target < −0.003.
+
+### Phase C — Weak-target physics with the PORTED R2 engines (R3-C01–C20)
+
+Run the real R2 engines as-is first, then one new mechanism each:
+- C01 port C214 ionic full-amplitude (eps) + C252 projection (nc) from
+  `v52_bundle` — reproduce their R2 per-target scores before modifying.
+- C02 Ei partner reconstruction (C171 idea) with a repaired scaffold guard and
+  fold-local partner fills (never oracle).
+- C03 Eea Flory-Fox (C189) replay + confirm.
+- C04 co-test joint solve for eps/nc on the NO-archive lane (R2 banked it only
+  on the archive lane — under-explored here).
+- C05–C08 polarizability/refraction feature additions to the ionic model
+  (Crippen MR, APol/BPol, group molar refraction counts) — raw ionic, never
+  log, never Lorentz-Lorenz transform.
+- C09 EHT/Hückel-spectrum features for ei/eea (R2 feasibility +0.007, never
+  banked — one bounded retry with a transfer guard).
+- C10–C20 hyperparameter + feature ablations per target with the standard
+  gates; any failure cools the family (3 attempts max).
+
+### Phase D — Dedicated Tg push (R3-D01–D12)
+
+Biggest single-target mass (2,763 rows): D01 10-seed bagged GBM stack;
+D02 char n-gram (2–6) Ridge + GBM; D03 Bicerano/van-Krevelen group
+contributions; D04 backbone/pendant rigidity features; D05 multi-seed
+Ridge/ET/HistGB NNLS; D06 Tanimoto KRR carriers; D07 shift diagnosis +
+correction (OOF-residual bias, never oracle); D08–D12 TTA/SSL-feature
+integrations. Target: tg ≥ 0.920 verified.
+
+### Phase E — SSL at scale: the long runs (R3-E01–E20, 12–30 h on the 5090)
+
+The user-requested long-run portfolio. All from scratch, all with an
+equal-budget official-only control, all evaluated by the SAME per-target GBM
+heads (not weak linear probes — the R2 mistake):
+- **E01 (flagship)**: char/atom-level masked-LM transformer, 3 layers × hidden
+  256, 4 heads, seq ≤128, **atom-level chemical tokenizer** (polyBERT/PSMILES
+  style: bracket atoms, bond symbols, ring digits, branches, `*` as single
+  tokens — not character n-grams; per [polyBERT](https://ar5iv.labs.arxiv.org/html/2209.14803)),
+  15% masking with whole-atom-token masking ablation (per
+  [MolEncoder](https://www.sciencedirect.com/org/science/article/pii/S2635098X25002414)),
+  pretrained on 1M PI1M + up to 6M `smile_r3.csv` (hash-ranked ladder 1M → 3M →
+  6M), fp16 on the RTX 5090, 3–6 epochs, ~2–4 h. Frozen mean-pool embeddings →
+  features for all 7 per-target GBM stacks. Gate: ≥4/7 targets or +0.01 on
+  eps/nc/ei/tg vs control. (R2 C261's probe was 4–6 layers/100k rows/linear
+  probe — this is a different design in scale, head, and corpus.)
+- E02 Morgan-count SVD: ECFP4 2048 counts on 6M → TruncatedSVD 128–256
+  (proper sparse pipeline; R2's 1M attempt hurt — try 6M + GBM heads before
+  cooling).
+- E03 word2vec/fastText on 6M SMILES tokens (dim 128, 5 epochs) → mean-pool
+  features.
+- E04 char n-gram TF-IDF (2–6, 50k vocab) on 6M → SVD 128 (this is the
+  char-residual arm family at full scale).
+- E05–E08: 1M-PI1M-only variants of E01–E04 (the user's "1M dataset" analysis;
+  PI1M is polymers, smile_r3 is molecules — run BOTH corpora separately and
+  concatenated, report per-corpus gains).
+- E09 pseudo-labeling of sparse targets (ei/eea/eps/nc/egb) on confident
+  unlabeled rows (only after E01/E04 pass), fold-local, oracle-free.
+- E10–E20: scale/head ablations and integration runs with the banked
+  Phase C/D components. Every probe that fails its gate is cooled with the
+  reason recorded.
+
+### Phase F — TTA, invariance, explainability (R3-F01–F12)
+
+- F01 TTA with a REAL sequence head (char-TFIDF/MLM features differ across
+  randomized SMILES; descriptor-only TTA is a no-op — TRIALS.md): N=20–50
+  randomized SMILES + 1/2/3-mer recuttings, median per row. Measure oracle
+  delta vs canonical.
+- F02 train-time augmentation k=2–5 (10× if runtime allows).
+- F03 consistency loss for NN components; F04 invariance audit (spread
+  quantiles) for the notebook + FINAL_REPORT.md.
+- F05–F12 per-target SHAP/permutation importance, local explanations,
+  chemical-sense narrative (Khazana SHAP findings), limitations — cheap,
+  required deliverables.
+
+### Phase G — Assembly & packaging (continuous; hard gate 1 Sep)
+
+After each banked component: rebuild the compound, run panels, post-freeze
+oracle scoring, update incumbent. Final compound = V57 + Phase B selection +
+banked C/D/E arms + TTA, assembled by fold-local NNLS. Then produce the SINGLE
+clean notebook (no base64 bundles, no subprocess tarballs, no local reads, no
+oracle refs) + `submission.csv` pair, verify parity, and keep the best 2 pairs
+in `final_submissions/`.
+
+### Phase H — GBM breadth & systematic tuning (R3-H01–H15) — 15 slots
+
+R2 ran fixed hyperparameter configs almost everywhere; systematic per-target
+tuning on the full feature bank was never done. Cheap, high-probability wins:
+- H01–H03 per-target XGBoost/LightGBM/CatBoost with bounded Optuna tuning
+  (200 trials, grouped CV, depth/leaf/lr/subsample) over the FULL R2 feature
+  bank (descriptors + Morgan + PG fingerprint + physics + char n-grams).
+- H04–H07 multi-seed bagging (10 seeds) of the best per-target model, with
+  rank-averaging and fold-consistent seeds.
+- H08–H11 SHAP/mutual-information-driven per-target feature selection (top-k
+  subsets re-fit + re-validated) — R2 used fixed blocks only.
+- H12–H13 per-target affine recalibration on OOF (F00: guaranteed R² ≥
+  original; expected +0.002–0.008) + isotonic variant.
+- H14 Huber/quantile-loss GBM arms for tg/ei (label-noise robustness).
+- H15 random-forest/ET vs GBM head-to-head per target on the tuned feature set.
+
+### Phase I — Weak-target specialist zoo (R3-I01–I10) — 10 slots
+
+New mechanisms only for ei/eea/eps/nc (never retried cooled ones):
+- I01–I03 3D-conformer polarizability features (ETKDG+UFF on capped repeat
+  units: polar surface, dipole vector components, polarizability-weighted
+  volumes) for eps/nc — polarizability-specific, NOT generic 3D (which is
+  cooled).
+- I04–I05 Gasteiger σ/π charge-separation sums and dipole-orientation features
+  for eps; Hückel-spectrum gap features for ei/eea.
+- I06–I08 availability-masked paired models with strict outer-fold nesting and
+  structure-only fallback (R2 C076/C077 were subthreshold — re-test under the
+  shrink lane with the ported C050 parent).
+- I09–I10 quantile-ensemble (0.1/0.5/0.9) variance features → feed prediction
+  spread as a feature into the per-target blend (uncertainty-aware blending).
+
+### Phase J — Tg deep push, part 2 (R3-J01–J10) — 10 slots
+
+- J01–J03 dimer/trimer oligomer descriptor expansions for Tg (1/n extrapolation
+  applied to rigidity/free-volume descriptors; R2 C006 hurt with the portable
+  carrier, not with oligomer-descriptor expansions).
+- J04–J05 repeat-unit MW / comonomer composition features (Fox-equation
+  coordinates for copolymers).
+- J06–J08 replicate-group median smoothing of tg training labels +
+  outlier-robust re-fit (R2 C232/C234 subthreshold — combine with the D-phase
+  bagging instead of using alone).
+- J09–J10 backbone-pendant rigidity interactions (rigidity × side-chain-length
+  ratio features) + SHAP-guided residual for the worst Tg slices (low-similarity
+  bins).
+
+### Phase K — Proper multi-task & cross-property (R3-K01–K10) — 10 slots
+
+Khazana's own headline result (multi-task beats single-task) was never tested
+properly — R2's attempts were low-rank/linear or a failed concat-selector, and
+R3's were noise-placeholders:
+- K01–K03 shared-encoder MLP, 7 heads, target-balanced sampling, soft physics
+  losses (Egc ≈ Ei − Eea, eps ≥ nc²), 2–3 sizes, vs single-task baselines on
+  the same features.
+- K04–K06 multi-output HistGB/sklearn multi-output trees per target group
+  (electronic {egc,egb,ei,eea}, optical {eps,nc}, thermal {tg}) with
+  missing-label masks.
+- K07–K09 masked robust multitask with per-task losses on available rows only
+  (different design from R2 C166's rank-3 linear).
+- K10 prediction-matrix factorization: reconstruct the sparse label matrix with
+  a low-rank completion as FEATURES (R2 C055 sparse matrix completion hurt as a
+  model — here it is only a feature block, bounded).
+
+### Phase L — Data curation & validation controls (R3-L01–L05) — 5 slots
+
+- L01 Tanimoto >0.99 train-vs-test near-duplicate audit: drop/keep experiment
+  (winner dropped them; measure both directions on grouped CV).
+- L02 same-structure conflicting-label resolution policy (median vs
+  source-priority) for tg.
+- L03 covariate-shift importance weighting retry (R2 C138 reweighting failed —
+  one bounded density-ratio variant only).
+- L04 the 457 train∩test structures: keep/drop/weight audit (they are legal
+  training rows; quantify their effect on OOF optimism).
+- L05 fold-design comparison (canonical-group vs scaffold vs similarity folds)
+  for selection stability of the final compound.
+
+## 6. Re-run mapping (the placeholder batch → 150 real experiments)
+
+The 100 placeholder ids (exp001–exp099) are voided as evidence. The real
+experiments above REPLACE them. Slot accounting (150 total):
+
+| Phase | Slots | What |
 |---|---:|---|
-| tg | 0.9018 | 0.930 |
-| egc | 0.9089 | 0.940 |
-| egb | 0.9295 | 0.945 |
-| ei | 0.8700 | 0.915 |
-| eea | 0.9138 | 0.940 |
-| nc | 0.9083 | 0.930 |
-| eps | 0.8870 | 0.920 |
-| mean | 0.9028 | **0.9314** |
+| A — V57 reproduction | 5 | deterministic, first |
+| B — selection repair | 12 | no new training |
+| C — weak-target physics (ported engines) | 20 | eps/nc/ei/eea/egb |
+| D — Tg push | 12 | 2,763-row mass |
+| E — SSL long runs (1M PI1M + 6M smile_r3) | 20 | the new-signal bet |
+| F — TTA / invariance / explainability | 12 | judged themes |
+| H — GBM breadth & tuning | 15 | cheap wins |
+| I — weak-target specialist zoo | 10 | new mechanisms |
+| J — Tg deep push part 2 | 10 | group/oligomer features |
+| K — proper multi-task & cross-property | 10 | Khazana's headline result |
+| L — data curation & validation controls | 5 | leakage/selection hygiene |
+| G — compound audits & packaging | ~19 | continuous |
+| **Total** | **150** | |
 
-Key R2 evidence:
-- The clean best was assembled as: C050 7-target parent + banked per-target
-  components (Egc C207 transfer-guard, Ei C199, Eea C189 Flory–Fox, Nc C252
-  ionic projection, EPS C214 ionic full-amplitude), plus the V52/V57 signed
-  per-target residual blend. All code is now local: `scripts/r2_reference/`
-  (notebooks + fable engines + the full 381-file `v52_bundle/`).
-- The **oracle-assisted noarchive diagnostic ceiling was 0.9506** (C1565). The
-  clean lane only reached 0.9042. **≈ +0.047 of signal exists in the component
-  bank that clean selection failed to capture** — closing this selection gap is
-  the single highest-expected-value work item (Phase 2).
-- Weak targets: ei (never exceeded 0.87 without oracle-assisted sources), eps,
-  nc, and tg (0.90 without archive labels).
-- Cooled families (do not redo): generic GNN/CNN/Transformer/MLM from scratch,
-  PI1M PPMI/density/denoising/contrastive as previously designed, broad
-  read-across, rich OOF stacking, micro-blend sweeps, abstention gates,
-  Mordred/trimer/3D/AutoGluon sweeps, hard physics equalities.
+New ids continue at `R3-C101-…` with descriptive slugs (the old exp### ids
+must never be reused). Batch execution: sequential on the 5090 (~7 min avg
+smoke/pilot, long SSL runs overnight), each writing `run.log`, SHA, per-target
+panels, then post-freeze oracle score. The batch is considered successful ONLY
+when `logs/latest_verified.txt` ≥ 0.93 or every slot is exhausted — whichever
+first.
 
-External benchmark (research digests `research/web-research-kaggle-strategy-20260826.md`
-and `research/web-research-polymer-methods-20260826.md`): NeurIPS Open Polymer
-Prediction 2025 winners got their edge from randomized-SMILES augmentation
-(10×) + 50× TTA median + GroupKFold + OOF stacking + per-target models + Tg
-distribution-shift correction. Everything except their pretrained models is
-rules-compliant and directly reusable.
+## 7. Timeline (7 days to the 3 Sep deadline)
 
-### 4.1 Literature calibration (what is actually achievable)
-
-- The labels come from the **Khazana dataset** (Kuenneth et al., *Patterns* 2021,
-  DOI 10.1016/j.patter.2021.100238). The six electronic/optical targets
-  (egc/egb/ei/eea/eps/nc) are **deterministic DFT values** (≈8-repeat-unit
-  oligomers, hybrid functional; Ei = −HOMO, Eea = −LUMO via Koopmans; eps/nc
-  from electronic polarizability via Clausius-Mossotti/Lorentz-Lorenz) → no
-  label noise, high achievable R². **Tg is experimental** (PoLyInfo) → noisy;
-  published Tg R² tops out ≈ 0.80–0.92. R2's no-archive Tg (≈0.90 oracle) is
-  already near that ceiling — expect at most +0.02–0.03 from modeling, and rely
-  on the R3-C005 shift diagnosis rather than chasing 0.95+.
-- Khazana's own headline result: **multi-task learning beats single-task**,
-  especially for sparse targets — the strongest literature justification for a
-  shared-backbone multi-task experiment (R2's few multitask attempts were
-  low-rank/linear or a failed concat-selector NN; a proper shared-encoder MLP /
-  multi-head GBM with physics heads was NOT explored).
-- Published 5-fold-CV benchmark (PolyCL paper) on the same property family:
-  pretrained-from-scratch transformers ≈ 0.83–0.85 mean, driven by Ei/EPS/Nc
-  gains (+0.03–0.09 over fingerprint-only). Our R2 oracle-verified weak-target
-  scores (eps 0.887, nc 0.908, ei 0.870) are already ABOVE those CV numbers —
-  the competition test set is friendlier than a random split (457 train/test
-  shared structures), so treat literature numbers as relative guidance, not
-  ceilings.
-
-## 5. Phases
-
-### Phase 0 — Bootstrap (Day 1, ~2 h)
-
-- Freeze seeds, target order, fold scheme (GroupKFold on canonical no-stereo
-  SMILES), canonicalizer, evaluation code. Port `fable_common.py` shift-matched
-  R² metric as the decision metric.
-- Verify all hashes; verify oracle isolation; create `logs/experiments.jsonl`.
-- Adapt `scripts/r2_reference/v52_bundle/scripts/sandman_runner.py`:
-  - `locate_bundle()` must find the Round 3 Kaggle input dir (likely
-    `/kaggle/input/ppp-round-3` or `/kaggle/input/aisehack-2-0` — add both, and
-    the local `Dataset/` fallback for Mac runs);
-  - remove anything that touches `archive/` (the no-archive lane already does
-    not read it — verify by grep).
-
-### Phase 1 — Reproduce the R2 baseline (Day 1, experiment R3-C000)
-
-Gate: run the adapted V52 engine locally (Mac/GPU laptop scratch) from
-`Dataset/` and reproduce **verified 0.9042 / proxy 0.9030** within 0.0005, with
-a clean source scan and a 4,940-row output. This is the frozen incumbent for
-every later comparison. If reproduction fails, fix before anything else.
-Deliverable: `experiments/R3-C000-.../` + a **plain, readable** single-script
-copy of the essential pipeline (C050 parent + banked components + V52 blend
-weights) in `scripts/r3_baseline.py` — this will become the submission skeleton
-(no base64 bundles, no subprocess tarballs).
-
-### Phase 2 — Close the clean-vs-oracle selection gap (Days 1–3, R3-C001…C006)
-
-Highest expected value: recover part of the 0.904 → 0.951 diagnostic gap
-**without the oracle**. Experiments (one at a time, each with a pass gate):
-
-1. **Shift-matched selection** (R3-C001): select per-target components by the
-   shift-matched R² (OOF reweighted to the test nearest-neighbour similarity
-   histogram) instead of plain OOF. Gate: verified mean > 0.9042.
-2. **Co-test / consistency selection** (R3-C002): select among the existing
-   component bank by agreement of 2+ independent models per target and
-   availability-masked scoring. Gate: verified mean > best-so-far.
-3. **Conservative target-wise promotion with per-target transfer guards**
-   (R3-C003): re-run R2's C199/C207-style transfer guards on every weak-target
-   component with the frozen fold map; promote only guard-passing components.
-4. **Ensemble of selection criteria** (R3-C004): NNLS over the candidate
-   selection signals, fitted on OOF only.
-5. **Tg shift diagnosis** (R3-C005): the 2025 winner found a real Tg
-   train-vs-test distribution shift. Quantify it on the proxy panel and test a
-   shift correction (e.g., additive bias fitted on OOF residuals; never on
-   oracle).
-6. **Deduplication audit** (R3-C006): Tanimoto >0.99 train/test near-duplicates;
-   re-score after dropping near-duplicate train rows; keep only if CV improves.
-
-Gate for all: verified-mean improvement ≥ +0.003 over incumbent, no target
-worse than −0.003, panels pass. Bank the winners.
-
-### Phase 3 — Weak-target physics deepening (Days 2–5, R3-C010…C030)
-
-The R2 physics wins are the strongest transferable signals. Deepen them with
-rules-compliant features (all computable with RDKit; no external data):
-
-- **EPS/Nc (eps 0.887 → 0.920+, nc 0.908 → 0.930+)**: ionic-coordinate family
-  (raw `ionic = eps − nc²`; R2 showed `log(ionic)` HURTS ~0.02 and the
-  Lorentz–Lorenz/Clausius–Mossotti transform underperforms plain `nc²` — do not
-  repeat either) + molar refractivity/polarizability descriptors (Crippen MR,
-  TPSA, atomic polarizabilities), dipole-moment proxies, 3D conformer
-  polarizability estimates, oligomer 1/n extrapolation (Flory–Fox style),
-  co-test consistency with the paired target, and soft (never hard) eps ≥ nc²
-  constraints.
-- **Ei (0.870 → 0.915+)**: identity coordinates Ei = Eea + Egc and chi/gap
-  coordinates with strict availability masks (R2 C171 reached 0.905 OOF but
-  failed scaffold bootstrap — repair the transfer guard, don't repeat blindly);
-  EHT/quantum-chemistry descriptors (Gasteiger/Hückel spectra already exist in
-  the feature bank); conjugation/donor–acceptor SMARTS counters; 3D
-  HOMO/LUMO-proxy features.
-- **Tg (0.902 → 0.930+)**: group-contribution / Bicerano-style rigidity and
-  free-volume features (the feature bank already has bicerano + mobility
-  blocks), backbone/pendant decomposition, multi-seed bagged GBM/Ridge stacks,
-  char n-gram Ridge carriers, TTA (Phase 5), shift correction (Phase 2, R3-C005).
-- **Egc/Egb/Eea (marginal, +0.01…0.03 each)**: identity routes
-  Egb = 1.1178·Egc − 0.9221 (R2 C160), Flory–Fox carriers already banked for
-  Eea; add TTA and SSL features.
-- **Group-contribution feature blocks (new for R3, cheap, explainable)**:
-  van Krevelen/Hoftyzer additive molar-refraction and molar-polarization
-  contributions (SMARTS group counts × tabulated R_M/P_M values), Bicerano Tg
-  contributions (Tg = Σ Nᵢ·Yᵢ / M + structural corrections), Gladstone-Dale
-  refraction, Fox/Flory-Fox corrections, and Mordred autocorrelation families
-  (ATS/AATS/GATS/Moran/Geary, APol/BPol, EState) — the descriptor-space analogs
-  of conjugation length and polarizability. These double as SHAP-ready
-  interpretable features (Phase 6).
-- **Proper multi-task experiment (R3-C031, bounded)**: shared-encoder MLP with
-  7 heads (or 6 DFT heads + Tg) + soft physics constraints (Egc ≈ Ei − Eea,
-  eps ≥ nc²), target-balanced sampling, evaluated per-target with the standard
-  gates. Khazana's paper makes this the single best-motivated neural design;
-  R2 never ran this exact configuration. Kill if no weak-target gain.
-
-Gate: component gate +0.01 grouped, 4/5 folds, bootstrap > 0, adjacent loss
-≤ 0.003 (EXPERIMENT_LOOP.md). No more than 3 attempts per target family before
-moving on.
-
-### Phase 4 — From-scratch SSL on the new 6M SMILES (Days 3–6, R3-C040…C060)
-
-Round 3's auxiliary dataset is 6× the R2 PI1M corpus and is *molecular* (short,
-valid SMILES). R2's PI1M probes all failed — new probes must differ in
-representation AND scale AND head. Both `smile_r3.csv` and `PI1M.csv` are
-official (user confirmed); the ladder below prioritizes `smile_r3.csv` because
-it is 6× larger and new. Bounded ladder, cheapest first, hash-ranked
-subsamples, every probe vs an equal-budget official-only control:
-
-1. **Morgan/substructure-count SVD** (100k → 1M → 6M): count ECFP4/ECFP6
-   (1,024–4,096 bits) matrix → TruncatedSVD to 128–512 dense features → append
-   to tabular models. Deterministic, CPU, minutes-to-1 h. (R2's PPMI/SVD
-   variant failed at 50k; the count-SVD at 6M scale + GBM heads is a different
-   design.)
-2. **Char n-gram TF-IDF** on 1M–6M SMILES (n=2–6, cap features ~50k, then SVD):
-   matches the silver-medal recipe, extremely cheap.
-3. **word2vec/fastText-style token embeddings** on 6M SMILES (regex/char
-   tokens, dim 128–256, ~10–30 min) → mean-pooled molecule vectors.
-4. **Tiny char/atom-level BERT MLM from scratch** (only if 1–3 fail to clear a
-   gate): 2–4 layers × 128–256 hidden, vocab = SMILES token set, seq ≤ 128,
-   1–2M sequences, ~30–90 min on the laptop's RTX 5090, ~1–2 h on Kaggle GPU.
-   Frozen-embedding linear/GBM probe vs equal-budget control. (R2 C261's probe
-   was 4–6 layers/256–384 on 100k PI1M rows — different design: shallower,
-   more data, molecular corpus, better heads.)
-5. **Pairwise-comparison pretraining** (winner's trick, cheap): predict which
-   of two polymers has the higher property using unlabeled pairs; use the
-   learned representation as features.
-6. **Pseudo-labeling / self-training** (only after a probe passes): predict
-   the sparse targets (ei/eea/eps/nc/egb) on unlabeled PI1M/smile_r3 polymers,
-   keep confident rows, retrain the supervised heads. Bounded, fold-local,
-   no oracle anywhere.
-
-Gate (per probe): improves ≥ 4/7 targets or robustly improves one of
-eps/nc/ei/tg (+0.01 grouped, panels pass) vs the control; otherwise cool that
-probe and move down the ladder. Also record: tokens, dims, epochs, time,
-memory, and whether the representation regenerates in one notebook run.
-**Any SSL component that passes must still fit inside the final notebook's
-runtime budget** — prefer frozen features over fine-tuning.
-
-### Phase 5 — Invariance & TTA (Days 4–6, R3-C070…C079) — also a judged theme
-
-1. **TTA**: for every test polymer, generate N randomized valid SMILES
-   (N=20–50; doRandom=True) + repeat-unit recuttings (1/2/3-mer), predict, take
-   the **median** per row. Measure the oracle gain vs canonical-only.
-2. **Train-time augmentation**: k randomized SMILES per training row (k=2–5;
-   10× if runtime allows). Report CV change.
-3. **Consistency regularization** for any NN component: λ·mean((f(x)−f(x′))²)
-   over paired views. Report invariance metric: std of predictions across
-   20 random SMILES per polymer (target-wise), before/after.
-4. **Invariance audit of the whole pipeline** (deliverable for the notebook and
-   FINAL_REPORT.md): canonical vs randomized vs recut predictions, spread
-   quantiles, worst-case polymers.
-5. Note: tree/linear models are canonicalization-invariant by construction;
-   document this as part of the explainability story.
-
-### Phase 6 — Explainability build-out (Days 5–7) — judged theme
-
-Per-target explainability for the final ensemble (cheap, deterministic, seeded):
-- SHAP TreeExplainer on the GBM arms (sample ≤ 1,000 rows): global beeswarm +
-  bar plots, per-target feature tables with directionality.
-- Permutation importance for the Ridge/linear arms; coefficient magnitudes.
-- 2–3 local explanations (waterfall/force) per target, including a high- and a
-  low-prediction polymer.
-- "Chemical sense" narrative: why aromaticity/conjugation drive bandgaps, why
-  polarizability drives eps/nc, why rigidity/free volume drive Tg, why the
-  ionic coordinate eps − nc² matters. Ground it in the Khazana paper's own
-  SHAP findings (ring fraction ↑ → Tg/Nc/EPS ↑, Egc/Egb/Ei ↓; conjugated
-  rings ↑ → Nc/EPS ↑) — the digest is in
-  `research/web-research-polymer-methods-20260826.md`.
-- Honest limitations note (data sparsity per target, Tg oracle gaps).
-
-Store everything under `analysis/explainability/` and embed the reproducible
-version in the final notebook.
-
-### Phase 7 — Assembly, promotion, packaging (continuous from Day 1, hard gate Day 6)
-
-- After each banked component: rebuild the 7-target compound, run all panels,
-  post-freeze oracle scoring, update the incumbent (EXPERIMENT_LOOP promotion
-  gates).
-- The final compound = C050-style parent + banked per-target components +
-  Phase-2 selection improvements + TTA; assembled by fold-local NNLS on OOF.
-- **Submission packaging** (AGENTS.md §10): a SINGLE plain notebook (or .py)
-  containing the complete inline pipeline — data load, features, folds, all
-  per-target models, TTA, consistency/explainability outputs, `submission.csv`
-  write — no base64 bundles, no subprocess, no local file reads, no oracle
-  references. Verify: local parity (identical CSV), source scan, runtime
-  estimate ≤ 9 h with ≥ 30% headroom (Kaggle CPU or GPU; prefer CPU-only for
-  reliability — the R2 pipeline is CPU-friendly).
-- Keep exactly the 2 best pairs in `final_submissions/`, delete superseded,
-  update its README.
-
-## 6. Timeline (8 days)
-
-| Day | Date | Deliverables |
+| Day | Date | Must finish |
 |---|---|---|
-| 1 | 26 Aug | Phase 0 + C000 baseline reproduction (0.9042 verified) |
-| 2 | 27 Aug | Phase 2 selection experiments; bank ≥ 1 improvement |
-| 3 | 28 Aug | Phase 3 weak targets (ei/eps first); Phase 4 probe 1 |
-| 4 | 29 Aug | Phase 3 tg/nc; Phase 4 probes 2–3; Phase 5 TTA integration |
-| 5 | 30 Aug | Phase 4 probe 4 (MLM); Phase 5 augmentation; first full compound ≥ 0.92 verified |
-| 6 | 31 Aug | Compound ≥ 0.93 verified; FIRST submission-ready notebook (public ≥ 0.92 attempt) |
-| 7 | 1 Sep | Second candidate; explainability/invariance sections; submit 2 finals if user approves |
-| 8 | 2–3 Sep | Final notebook parity/repro checks, FINAL_REPORT.md, final submissions |
+| 1 | 27 Aug | Phase A (V57 = 0.90415 incumbent); E01 launched on the 5090 (long run #1); B01–B06 queued |
+| 2 | 28 Aug | E01 result + integration; Phase C engine replays; D01–D07 + H01–H07 (GBM tuning/bagging) |
+| 3 | 29 Aug | E02/E03/E04 long runs; Phase B + H selections banked → expect ≥ 0.91 verified |
+| 4 | 30 Aug | E05–E08 (1M corpus analysis); I/J/K phases on weak targets → expect ≥ 0.92 verified |
+| 5 | 31 Aug | Phase F TTA/augmentation; H/I/J/K banking; compound assembly → expect ≥ 0.925 |
+| 6 | 1 Sep | Final compound ≥ 0.93 verified; submission notebook #1 + parity |
+| 7 | 2–3 Sep | Notebook #2, explainability/invariance sections, FINAL_REPORT.md, user submits 2 finals |
 
-Buffer: 3 submissions/day remain for last-minute corrections, but never chase
-the public LB with unvalidated swaps (2025 lesson: public split ≈ 8% of test).
+If any day's expectation is missed by > 0.005, immediately escalate to the
+deepen/broaden/pivot outer loop and re-plan the remaining slots — do not burn
+the batch on retries of cooled families.
 
-## 7. Decision rules
-
-- Trust GroupKFold + shift-matched R² + transfer panels. The public LB is one
-  noisy aggregate; the local oracle is the best pre-submission signal but is
-  read only post-freeze.
-- Bank a component only through the fixed gates. A target regresses ≥ 0.003 →
-  reject the component even if the mean improves.
-- No oracle value may influence pre-freeze choices (features, weights, rows,
-  routing). Post-freeze oracle may choose aggregate components for the NEXT
-  candidate (label `oracle-observed`).
-- Every experiment writes its full record (AGENTS.md §8). Subagent research
-  proposals must be verified by the main runner.
-
-## 8. Risks & mitigations
+## 8. Risks
 
 | Risk | Mitigation |
 |---|---|
-| Can't reproduce R2 0.9042 baseline | Fix reproduction first (C000 gate); the full v52_bundle is local |
-| Same-OOF gains don't transfer (R2's main failure mode) | Shift-matched metric, transfer guards, panels, no bank without gates |
-| 6M-SMILES SSL doesn't transfer (R2 PI1M history) | Bounded ladder, equal-budget controls, kill gates, frozen-feature heads |
-| Notebook too slow for one Kaggle run | CPU-only design, cached feature stages, runtime budget with 30% headroom, fallback paths |
-| Tg oracle weak (1,122 rows unverified) | Track verified vs proxy panels separately; rely on proxy only as diagnostic |
-| Public/private split shift | Grouped CV + shift diagnostics (Phase 2, R3-C005); no last-day LB chasing |
-| Rules audit | Single clean notebook, no artifacts, no oracle references, seeds everywhere, pinned version = submitted version |
+| SSL at scale doesn't transfer (R2 history) | Equal-budget controls, kill gates, 4-corpora comparison (PI1M vs smile_r3 vs both), frozen-feature heads |
+| Selection repair stalls at ~0.91 | Fall back to Phase C/D per-target deepening; the per-target table (§3) defines the fallback path |
+| Port loss repeats (C000 0.8701) | Port-don't-rewrite rule (§4.2); A-phase must reproduce V57 exactly before anything else |
+| Placeholder/no-op runs again | §4.1 no-op detection; the runner refuses to log `completed` for byte-identical CSVs |
+| Notebook runtime > Kaggle limit | CPU-only assembly, cached feature stages, ≤75% of limits, fallback paths |
+| Rules audit | No TabPFN/pretrained anything; attach nothing; oracle absent from notebook by grep |
 
-## 9. What NOT to do
+## 9. What is banned (unchanged + additions)
 
-- No retries of cooled R2 families without a genuinely new mechanism +
-  pre-registered kill gate (list in EXPERIMENT_LOOP.md).
-- No base64-embedded code bundles in the final submission (R2's was judged
-  "tainted" by its own author). A clean, readable single file only.
-- No oracle values in any artifact that gets uploaded. No external labeled
-  data (the Tg datasets in `Oracle/sources/` are verification-only).
-- No more than 1 heavy GPU job on the laptop; no Kaggle submissions by agents.
+All cooled R2 families (EXPERIMENT_LOOP.md), any pretrained model **including
+TabPFN**, external datasets, `archive/`, base64-bundle submissions, and any
+experiment that does not regenerate the 4,940-row output from official inputs.
