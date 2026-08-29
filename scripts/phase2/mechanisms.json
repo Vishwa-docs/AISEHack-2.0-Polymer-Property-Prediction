@@ -1,0 +1,1983 @@
+{
+ "A00": {
+  "desc": "A00: V57 reproduction",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "A01": {
+  "desc": "A01: V57 reproduction",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=16, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "A02": {
+  "desc": "A02: V57 reproduction",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=20, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "A03": {
+  "desc": "A03: V57 reproduction",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=3000)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "A04": {
+  "desc": "A04: V57 reproduction",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=18, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "B01": {
+  "desc": "B01: Selection repair on the clean arm bank",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(5)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 4
+ },
+ "B02": {
+  "desc": "B02: Selection repair on the clean arm bank",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "B03": {
+  "desc": "B03: Selection repair on the clean arm bank",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "B04": {
+  "desc": "B04: Selection repair on the clean arm bank",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 4
+ },
+ "B05": {
+  "desc": "B05: Selection repair on the clean arm bank",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "B06": {
+  "desc": "B06: Selection repair on the clean arm bank",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "B07": {
+  "desc": "B07: Selection repair on the clean arm bank",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "B08": {
+  "desc": "B08: Selection repair on the clean arm bank",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "B09": {
+  "desc": "B09: Selection repair on the clean arm bank",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "B10": {
+  "desc": "B10: Selection repair on the clean arm bank",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "B11": {
+  "desc": "B11: Selection repair on the clean arm bank",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(3)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "B12": {
+  "desc": "B12: Selection repair on the clean arm bank",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "C01": {
+  "desc": "C01: Weak-target physics with ported R2 engines",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 4
+ },
+ "C02": {
+  "desc": "C02: Weak-target physics with ported R2 engines",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "C03": {
+  "desc": "C03: Weak-target physics with ported R2 engines",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "C04": {
+  "desc": "C04: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "C05": {
+  "desc": "C05: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "C06": {
+  "desc": "C06: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "C07": {
+  "desc": "C07: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "C08": {
+  "desc": "C08: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "C09": {
+  "desc": "C09: Weak-target physics with ported R2 engines",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(5)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "C10": {
+  "desc": "C10: Weak-target physics with ported R2 engines",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 4
+ },
+ "C11": {
+  "desc": "C11: Weak-target physics with ported R2 engines",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "C12": {
+  "desc": "C12: Weak-target physics with ported R2 engines",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "C13": {
+  "desc": "C13: Weak-target physics with ported R2 engines",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 4
+ },
+ "C14": {
+  "desc": "C14: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "C15": {
+  "desc": "C15: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "C16": {
+  "desc": "C16: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "C17": {
+  "desc": "C17: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "C18": {
+  "desc": "C18: Weak-target physics with ported R2 engines",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "C19": {
+  "desc": "C19: Weak-target physics with ported R2 engines",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(3)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 4
+ },
+ "C20": {
+  "desc": "C20: Weak-target physics with ported R2 engines",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "D01": {
+  "desc": "D01: Dedicated Tg push",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "D02": {
+  "desc": "D02: Dedicated Tg push",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 4
+ },
+ "D03": {
+  "desc": "D03: Dedicated Tg push",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "D04": {
+  "desc": "D04: Dedicated Tg push",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "D05": {
+  "desc": "D05: Dedicated Tg push",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "D06": {
+  "desc": "D06: Dedicated Tg push",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "D07": {
+  "desc": "D07: Dedicated Tg push",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "D08": {
+  "desc": "D08: Dedicated Tg push",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "D09": {
+  "desc": "D09: Dedicated Tg push",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(5)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "D10": {
+  "desc": "D10: Dedicated Tg push",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "D11": {
+  "desc": "D11: Dedicated Tg push",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 4
+ },
+ "D12": {
+  "desc": "D12: Dedicated Tg push",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "E01": {
+  "desc": "E01: SSL at scale (long runs)",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "E02": {
+  "desc": "E02: SSL at scale (long runs)",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "E03": {
+  "desc": "E03: SSL at scale (long runs)",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "E04": {
+  "desc": "E04: SSL at scale (long runs)",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "E05": {
+  "desc": "E05: SSL at scale (long runs)",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "E06": {
+  "desc": "E06: SSL at scale (long runs)",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "E07": {
+  "desc": "E07: SSL at scale (long runs)",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(3)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "E08": {
+  "desc": "E08: SSL at scale (long runs)",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 4
+ },
+ "E09": {
+  "desc": "E09: SSL at scale (long runs)",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "E10": {
+  "desc": "E10: SSL at scale (long runs)",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "E11": {
+  "desc": "E11: SSL at scale (long runs)",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 4
+ },
+ "E12": {
+  "desc": "E12: SSL at scale (long runs)",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "E13": {
+  "desc": "E13: SSL at scale (long runs)",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "E14": {
+  "desc": "E14: SSL at scale (long runs)",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "E15": {
+  "desc": "E15: SSL at scale (long runs)",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "E16": {
+  "desc": "E16: SSL at scale (long runs)",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "E17": {
+  "desc": "E17: SSL at scale (long runs)",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(5)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 4
+ },
+ "E18": {
+  "desc": "E18: SSL at scale (long runs)",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "E19": {
+  "desc": "E19: SSL at scale (long runs)",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "E20": {
+  "desc": "E20: SSL at scale (long runs)",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 4
+ },
+ "F01": {
+  "desc": "F01: TTA, invariance, explainability",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "F02": {
+  "desc": "F02: TTA, invariance, explainability",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "F03": {
+  "desc": "F03: TTA, invariance, explainability",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "F04": {
+  "desc": "F04: TTA, invariance, explainability",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "F05": {
+  "desc": "F05: TTA, invariance, explainability",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "F06": {
+  "desc": "F06: TTA, invariance, explainability",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "F07": {
+  "desc": "F07: TTA, invariance, explainability",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(3)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "F08": {
+  "desc": "F08: TTA, invariance, explainability",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "F09": {
+  "desc": "F09: TTA, invariance, explainability",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 4
+ },
+ "F10": {
+  "desc": "F10: TTA, invariance, explainability",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "F11": {
+  "desc": "F11: TTA, invariance, explainability",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "F12": {
+  "desc": "F12: TTA, invariance, explainability",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "H01": {
+  "desc": "H01: GBM breadth & systematic tuning",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "H02": {
+  "desc": "H02: GBM breadth & systematic tuning",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "H03": {
+  "desc": "H03: GBM breadth & systematic tuning",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "H04": {
+  "desc": "H04: GBM breadth & systematic tuning",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "H05": {
+  "desc": "H05: GBM breadth & systematic tuning",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(5)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "H06": {
+  "desc": "H06: GBM breadth & systematic tuning",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 4
+ },
+ "H07": {
+  "desc": "H07: GBM breadth & systematic tuning",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "H08": {
+  "desc": "H08: GBM breadth & systematic tuning",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "H09": {
+  "desc": "H09: GBM breadth & systematic tuning",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 4
+ },
+ "H10": {
+  "desc": "H10: GBM breadth & systematic tuning",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "H11": {
+  "desc": "H11: GBM breadth & systematic tuning",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "H12": {
+  "desc": "H12: GBM breadth & systematic tuning",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "H13": {
+  "desc": "H13: GBM breadth & systematic tuning",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "H14": {
+  "desc": "H14: GBM breadth & systematic tuning",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "H15": {
+  "desc": "H15: GBM breadth & systematic tuning",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(3)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 4
+ },
+ "I01": {
+  "desc": "I01: Weak-target specialist zoo",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "I02": {
+  "desc": "I02: Weak-target specialist zoo",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "I03": {
+  "desc": "I03: Weak-target specialist zoo",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 4
+ },
+ "I04": {
+  "desc": "I04: Weak-target specialist zoo",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "I05": {
+  "desc": "I05: Weak-target specialist zoo",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "I06": {
+  "desc": "I06: Weak-target specialist zoo",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "I07": {
+  "desc": "I07: Weak-target specialist zoo",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "I08": {
+  "desc": "I08: Weak-target specialist zoo",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "I09": {
+  "desc": "I09: Weak-target specialist zoo",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "I10": {
+  "desc": "I10: Weak-target specialist zoo",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(5)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "J01": {
+  "desc": "J01: Tg deep push part 2",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "J02": {
+  "desc": "J02: Tg deep push part 2",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 4
+ },
+ "J03": {
+  "desc": "J03: Tg deep push part 2",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "J04": {
+  "desc": "J04: Tg deep push part 2",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "J05": {
+  "desc": "J05: Tg deep push part 2",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "J06": {
+  "desc": "J06: Tg deep push part 2",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "J07": {
+  "desc": "J07: Tg deep push part 2",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "J08": {
+  "desc": "J08: Tg deep push part 2",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "J09": {
+  "desc": "J09: Tg deep push part 2",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "J10": {
+  "desc": "J10: Tg deep push part 2",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(3)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "K01": {
+  "desc": "K01: Proper multi-task & cross-property",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 4
+ },
+ "K02": {
+  "desc": "K02: Proper multi-task & cross-property",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "K03": {
+  "desc": "K03: Proper multi-task & cross-property",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "K04": {
+  "desc": "K04: Proper multi-task & cross-property",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 4
+ },
+ "K05": {
+  "desc": "K05: Proper multi-task & cross-property",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "K06": {
+  "desc": "K06: Proper multi-task & cross-property",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "K07": {
+  "desc": "K07: Proper multi-task & cross-property",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "K08": {
+  "desc": "K08: Proper multi-task & cross-property",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "K09": {
+  "desc": "K09: Proper multi-task & cross-property",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "K10": {
+  "desc": "K10: Proper multi-task & cross-property",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(5)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 4
+ },
+ "L01": {
+  "desc": "L01: Data curation & validation controls",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "L02": {
+  "desc": "L02: Data curation & validation controls",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "L03": {
+  "desc": "L03: Data curation & validation controls",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 4
+ },
+ "L04": {
+  "desc": "L04: Data curation & validation controls",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "L05": {
+  "desc": "L05: Data curation & validation controls",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "G01": {
+  "desc": "G01: Compound audits & packaging",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "G02": {
+  "desc": "G02: Compound audits & packaging",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "G03": {
+  "desc": "G03: Compound audits & packaging",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "G04": {
+  "desc": "G04: Compound audits & packaging",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "G05": {
+  "desc": "G05: Compound audits & packaging",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(3)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "G06": {
+  "desc": "G06: Compound audits & packaging",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 5
+ },
+ "G07": {
+  "desc": "G07: Compound audits & packaging",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 4
+ },
+ "G08": {
+  "desc": "G08: Compound audits & packaging",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "G09": {
+  "desc": "G09: Compound audits & packaging",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 5
+ },
+ "G10": {
+  "desc": "G10: Compound audits & packaging",
+  "body": [
+   "    # char-resid: base + char n-gram block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        char = f.char_tfidf(texts, ngram_range=(2, 6), max_features=2500)",
+   "        char = np.asarray(char.todense(), dtype=np.float32)",
+   "        return np.hstack([base, char]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "G11": {
+  "desc": "G11: Compound audits & packaging",
+  "body": [
+   "    # physics-coordinate features (ionic, chi, identity residuals)",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=72)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        phys = np.zeros((n, 6), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            ri = m.GetRingInfo()",
+   "            phys[i, 0] = m.GetNumHeavyAtoms()",
+   "            phys[i, 1] = ri.NumRings()",
+   "            phys[i, 2] = sum(a.GetIsAromatic() for a in m.GetAtoms())",
+   "            phys[i, 3] = sum(1 for b in m.GetBonds() if b.GetIsAromatic())",
+   "            phys[i, 4] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.DOUBLE)",
+   "            phys[i, 5] = sum(1 for b in m.GetBonds() if b.GetBondType() == Chem.BondType.TRIPLE)",
+   "        return np.hstack([base, phys]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "G12": {
+  "desc": "G12: Compound audits & packaging",
+  "body": [
+   "    # polymer-genome fingerprint block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=64)",
+   "        mols = f.parse_mols(texts)",
+   "        pg = f.polymer_genome_block(mols, max_features=80)",
+   "        return np.hstack([base, pg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "G13": {
+  "desc": "G13: Compound audits & packaging",
+  "body": [
+   "    # Gasteiger charge-separation features for eps",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=96)",
+   "        mols = f.parse_mols(texts)",
+   "        n = len(mols)",
+   "        chg = np.zeros((n, 4), dtype=np.float32)",
+   "        for i, m in enumerate(mols):",
+   "            try:",
+   "                Chem.ComputeGasteigerCharges(m)",
+   "                vals = [float(a.GetProp('_GasteigerCharge')) for a in m.GetAtoms()]",
+   "                vals = [v for v in vals if np.isfinite(v)]",
+   "                if vals:",
+   "                    chg[i, 0] = min(vals); chg[i, 1] = max(vals)",
+   "                    chg[i, 2] = np.abs(vals).mean(); chg[i, 3] = np.std(vals)",
+   "            except Exception:",
+   "                pass",
+   "        return np.hstack([base, chg]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 4
+ },
+ "G14": {
+  "desc": "G14: Compound audits & packaging",
+  "body": [
+   "    # Crippen molar refractivity feature block",
+   "    def feature_fn(texts):",
+   "        texts = list(texts)",
+   "        base = f.full_feature_stack(texts, use_svd=True, svd_dim=128)",
+   "        mols = f.parse_mols(texts)",
+   "        mr = np.array([Crippen.MolMR(m) for m in mols], dtype=np.float32).reshape(-1, 1)",
+   "        return np.hstack([base, mr]).astype(np.float32)",
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED).fit(X, y)"
+  ],
+  "splits": 5
+ },
+ "G15": {
+  "desc": "G15: Compound audits & packaging",
+  "body": [
+   "    def model_fn(X, y):",
+   "        arms = [mo.PerTargetEnsemble(seed=SEED + j).fit(X, y) for j in range(5)]",
+   "        class _Bag:",
+   "            def __init__(self, arms): self.arms = arms",
+   "            def predict(self, X): return np.mean([a.predict(X) for a in self.arms], axis=0)",
+   "        return _Bag(arms)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=96)"
+  ],
+  "splits": 5
+ },
+ "G16": {
+  "desc": "G16: Compound audits & packaging",
+  "body": [
+   "    model_fn = lambda X, y: mo.PerTargetEnsemble(seed=SEED, ridge_alpha=18, et_estimators=140, gbm_rounds=300).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=80)"
+  ],
+  "splits": 4
+ },
+ "G17": {
+  "desc": "G17: Compound audits & packaging",
+  "body": [
+   "    model_fn = lambda X, y: mo.FastRidgeArm(alpha=16, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=56)"
+  ],
+  "splits": 5
+ },
+ "G18": {
+  "desc": "G18: Compound audits & packaging",
+  "body": [
+   "    model_fn = lambda X, y: mo.ExtraTreesArm(n_estimators=160, min_samples_leaf=2, seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=48)"
+  ],
+  "splits": 5
+ },
+ "G19": {
+  "desc": "G19: Compound audits & packaging",
+  "body": [
+   "    model_fn = lambda X, y: mo.HistGBArm(seed=SEED).fit(X, y)",
+   "    feature_fn = lambda texts: f.full_feature_stack(list(texts), use_svd=True, svd_dim=64)"
+  ],
+  "splits": 4
+ }
+}

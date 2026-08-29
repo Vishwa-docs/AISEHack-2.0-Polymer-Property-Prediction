@@ -185,6 +185,27 @@ It is the ONLY exception to external knowledge, and it is verification-only:
 
 ## 10. Submission file policy (hard requirement — this is what Round 2 failed)
 
+- **STANDALONE-REPRODUCTION RULE (user-mandated, 2026-08-27, non-negotiable):**
+  EVERY `.py` file that generates a submission — the V57 reproduction included —
+  must be a **single standalone file** that fully reproduces its output by itself:
+  it reads ONLY the official `Dataset/` inputs (`train.csv`, `test.csv`, and —
+  only when the experiment's protocol says so — `PI1M.csv` / `smile_r3.csv`),
+  trains every model from scratch with fixed seeds, and writes the 4,940-row
+  `id,target` `submission.csv` in one run. At runtime it must NEVER:
+  - read, open, or import any precomputed prediction CSV, model artifact, cached
+    feature file, old submission, or Round-2 CSV (including the R2 `v52_bundle`
+    CSVs, `v53_base.csv`, the V57 arm CSVs, or `latest_submission.csv`);
+  - reference, compare against, or depend on any historical file hash, experiment
+    id, manifest, or `logs/experiments.jsonl` record;
+  - reference any file under `Oracle/`, `experiments/`, `final_submissions/`
+    (other than writing its own output), or the GPU laptop's Round-2 tree.
+  In other words: **no old-file references at runtime, period** — the .py is the
+  complete recipe. Verification of "reproduces V57" is done by the agent/user
+  AFTER the run by scoring the freshly generated CSV against the oracle, never by
+  the .py reading old CSVs or hashes. (All R2 reference code may still be READ
+  and PORTED into the .py as source while building it — the prohibition is on
+  runtime references, not on reading reference material during development.)
+
 - Every candidate promoted to "best" must come with a **single, end-to-end,
   self-contained notebook (`.ipynb`) or `.py` file** that: reads only the official
   Kaggle data dir, trains everything from scratch with fixed seeds, predicts all
