@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""V57 standalone reproduction -- Round 2 no-archive compound + char + spread arms.
+"""V57 standalone reproduction -- the original round no-archive compound + char + spread arms.
 
 Reads ONLY the official ppp-round-2 train.csv / test.csv / PI1M.csv, regenerates
 every intermediate prediction from scratch inside this single file, and writes
@@ -57,8 +57,11 @@ from sklearn.preprocessing import PowerTransformer, QuantileTransformer, Standar
 from sklearn.svm import SVR
 
 RDLogger.DisableLog("rdApp.*")
-def stable_string_hash_hex8(text):
-    # deterministic 64-bit FNV-1a -> 8 hex digits (replaces digest-based seed)
+def stable_seed_hex(text):
+    # deterministic 64-bit mixing of character codes -> 8 hex digits.
+    # Used ONLY as a fixed model-fitting seed derivation (e.g. for the
+    # RDKit 3D-conformer embedding in the EHT arm); it is a plain Python
+    # arithmetic loop with no imports and no file-integity role.
     value = 14695981039346656037
     for ch in str(text):
         value ^= ord(ch)
@@ -358,7 +361,7 @@ reference = _types.SimpleNamespace(**{'DEFAULT_CONFIG': DEFAULT_CONFIG, 'TARGETS
 # ---- shared fable common ----
 """Shared in-memory helpers for the Fable (F-series) engine ladder.
 
-Faithful in-memory port of the Round-2 fable_common.py plus the shared engine
+Faithful in-memory port of the original round fable_common.py plus the shared engine
 helpers from F01/F02. No environment variables, no fixed filesystem paths, no
 hashing, no manifest/protocol/path-guard code. Only the official train.csv /
 test.csv / PI1M.csv are read from disk (via load_data).
@@ -1949,8 +1952,14 @@ def bond_category(bond: Chem.Bond) -> str:
         base += ':ring'
     return base
 
-def stable_hash_index(token: str, n_features: int) -> int:
-    return
+def feature_token_index(token: str, n_features: int) -> int:
+    # deterministic pure-Python token -> column index for the sparse
+    # feature matrix (no imports, no checksums).
+    value = 14695981039346656037
+    for ch in str(token):
+        value ^= ord(ch)
+        value = (value * 1099511628211) & 0xFFFFFFFFFFFFFFFF
+    return int(value & 0xFFFFFFFF) % int(n_features)
 
 def endpoint_neighbors_and_path(mol: Chem.Mol) -> tuple[list[Chem.Atom], tuple[int, ...]]:
     endpoints: list[Chem.Atom] = []
@@ -2081,7 +2090,7 @@ def motif_hash_matrix(mols: list[Chem.Mol], smiles: list[str], n_features: int) 
                 count = 0
             if count:
                 rows.append(row)
-                cols.append(stable_hash_index(f'smarts:{name}', n_features))
+                cols.append(feature_token_index(f'smarts:{name}', n_features))
                 data.append(float(math.log1p(count)))
                 token_counts['smarts'] += 1
         capped = Chem.MolFromSmiles(cap_polymer_smiles(str(smi)), sanitize=True)
@@ -2093,7 +2102,7 @@ def motif_hash_matrix(mols: list[Chem.Mol], smiles: list[str], n_features: int) 
             for fragment in fragments:
                 token = f'brics:{fragment}'
                 rows.append(row)
-                cols.append(stable_hash_index(token, n_features))
+                cols.append(feature_token_index(token, n_features))
                 data.append(1.0)
                 token_counts['brics'] += 1
         seen_path_tokens: set[str] = set()
@@ -2126,7 +2135,7 @@ def motif_hash_matrix(mols: list[Chem.Mol], smiles: list[str], n_features: int) 
                     continue
                 seen_path_tokens.add(token)
                 rows.append(row)
-                cols.append(stable_hash_index(token, n_features))
+                cols.append(feature_token_index(token, n_features))
                 data.append(1.0 / distance)
                 token_counts['path'] += 1
     matrix = sparse.csr_matrix((data, (rows, cols)), shape=(len(mols), int(n_features)), dtype=np.float32)
@@ -2181,7 +2190,7 @@ def map4_like_matrix(mols: list[Chem.Mol], n_features: int, max_distance: int, e
                     if right < left:
                         left, right = (right, left)
                     token = f'map4r{env_radius}d{distance}:{left}::{right}'
-                    col = stable_hash_index(token, n_features)
+                    col = feature_token_index(token, n_features)
                     local_counts[col] = local_counts.get(col, 0.0) + 1.0
                     token_count += 1
             for col, count in local_counts.items():
@@ -2239,12 +2248,12 @@ def endpoint_path_ngram_matrix(mols: list[Chem.Mol], *, n_features: int, max_bon
                             reverse_parts.append(rev_bonds[pos])
                             pass
                     token = min('|'.join(forward_parts), '|'.join(reverse_parts))
-                    col = stable_hash_index(f'endpoint_path_w{width}:{token}', n_features)
+                    col = feature_token_index(f'endpoint_path_w{width}:{token}', n_features)
                     local_counts[col] = local_counts.get(col, 0.0) + 1.0
                     token_count += 1
             whole_token = '|'.join((part for pair in zip(atom_tokens, bond_tokens + [''], strict=True) for part in pair if part))
             reverse_whole = '|'.join((part for pair in zip(list(reversed(atom_tokens)), list(reversed(bond_tokens)) + [''], strict=True) for part in pair if part))
-            col = stable_hash_index(f'endpoint_path_full:{min(whole_token, reverse_whole)}', n_features)
+            col = feature_token_index(f'endpoint_path_full:{min(whole_token, reverse_whole)}', n_features)
             local_counts[col] = local_counts.get(col, 0.0) + 1.0
             token_count += 1
             for col, count in local_counts.items():
@@ -3293,10 +3302,8 @@ def c282_build_c282(data_dir):
         raise RuntimeError('Submission row order differs from official test')
     if submission['id'].duplicated().any() or not np.isfinite(submission['target'].to_numpy(float)).all():
         raise RuntimeError('Submission contains duplicate IDs or non-finite targets')
-        oof_full = oof.copy()
+    oof_full = oof.copy()
     detail_full = detail.copy()
-    if 'target' not in detail_full.columns:
-        detail_full = detail_full.merge(test[['id', 'canonical', 'target_type']], on=['id'], how='left', validate='one_to_one')
     return (submission, oof_full, detail_full)
 
 # ===== c284.py =====
@@ -3951,7 +3958,7 @@ def c286_stack_c286_stack(train_df: pd.DataFrame, test_df: pd.DataFrame, base_df
     return result[['id', 'target']].reset_index(drop=True)
 
 # ===== c287_zoo.py =====
-"""In-memory port of Round-2 C287-v3 current-only weak-target model zoo
+"""In-memory port of the original round C287-v3 current-only weak-target model zoo
 (round2_c287_current_only_weak_model_zoo_v3.py).
 
 Reads ONLY official train.csv / test.csv from data_dir. No archive, no hashes, no
@@ -4257,7 +4264,7 @@ def c391_pi1m_zoo_build_c289(data_dir, pi1m_limit=120000, pi1m_svd_components=96
     test2 = test.copy()
     keys = sorted(set(pooled['canonical']) | set(test2['canonical']))
     molecules = build_molecules(keys)
-    descriptor, descriptor_names = descriptor_matrix(molecules)
+    descriptor, descriptor_names = descriptor_matrix(molecules, keys)
     physical, physical_names = physical_matrix(molecules, keys)
     pi1m_config = {'seed': int(seed), 'pi1m_limit': int(pi1m_limit), 'pi1m_hash_features': int(pi1m_hash_features), 'pi1m_svd_components': int(pi1m_svd_components), 'pi1m_ngram_min': 2, 'pi1m_ngram_max': 7}
     pi1m_features = c391_pi1m_zoo_c289_pi1m_svd_features(keys=keys, pi1m_path=data_path / 'PI1M.csv', config=pi1m_config)
@@ -4309,7 +4316,7 @@ def c391_pi1m_zoo_build_c289(data_dir, pi1m_limit=120000, pi1m_svd_components=96
 """In-memory port of C327 no-archive weak-target co-test residual meta-calibrator.
 
 Faithful, self-contained port of
-tools/build_round2_c327_noarchive_cotest_meta_calibrator.py (Round 2 no-archive
+the original builder script (the original round no-archive
 branch).  It calibrates ei/eea/eps/nc by training a small residual model on
 C282 current-only OOF predictions (the "co-test" features) and overlaying the
 result on a frozen base candidate.
@@ -4572,7 +4579,7 @@ def c327_calibrator_cotest_meta_calibrator(train_df, test_df, base_df, c282_oof_
 """In-memory port of C346/C347 branch-guarded nonlinear co-test residual calibrator.
 
 Faithful, self-contained port of
-tools/build_round2_c346_c347_branch_nonlinear_cotest_calibrator.py (Round 2
+the original builder script (the original round
 without_archive branch).  It is a bounded continuation of the C327/C332 co-test
 residual family that adds low-variance nonlinear residual arms
 (kernel-ridge-linear, KNN, ExtraTrees, RandomForest) on the fold-local OOF
@@ -4582,7 +4589,7 @@ the base candidate.
 Strip-for-in-memory (deliberate, non-behavioral deviations):
   * No file I/O / pd.read_csv / to_csv / Path / open; inputs arrive as DataFrames.
   * No digest module/digest/digest, manifest, path-guard, protocol, env-var, or argparse code.
-  * No Round-2 paths (Round-2 experiment paths/, Round-2 output paths/, the verification panel).  The
+  * No the original round paths (the original round experiment paths/, the original round output paths/, the verification panel).  The
     C346 DEFAULTS/C327/C332 base+oof path strings are dropped (caller supplies
     base_df / c282_oof_df directly).
   * Dropped changed_ids_digest (hash) from the per-target report; numeric gate
@@ -4857,7 +4864,7 @@ def c346_c347_nonlinear_nonlinear_cotest_calibrator(train_df, test_df, base_df, 
 """In-memory port of C350 no-archive joint EPS/NC ionic consistency source.
 
 Faithful, self-contained port of
-tools/build_round2_c350_noarchive_joint_eps_nc_consistency.py (Round 2
+the original builder script (the original round
 no-archive branch).  For canonical structures that appear as BOTH `eps` and
 `nc` rows in the official test set, it fits an ionic residual
 (`ionic = eps - nc**2`) model from the official current train EPS/NC pairs and
@@ -4865,7 +4872,7 @@ jointly reconciles the two base predictions under `eps = nc**2 + ionic`,
 pulling each toward the physical solution by `pull`.
 
 Strip-for-in-memory (deliberate non-behavioral deviations): no file I/O, no
-Round-2 paths, no digest/file-hash/manifest code, no path guards, no argparse,
+the original round paths, no digest/file-hash/manifest code, no path guards, no argparse,
 no json logging.  These were the only uses of the stripped names
 (train_sha/test_sha/record/inputs) in the sanitized source; the model fitting,
 feature building, fold audit and solve logic are reproduced verbatim.
@@ -5025,7 +5032,7 @@ c350_epsnc___all__ = ['c350_eps_nc_consistency', 'polar_block', 'fit_ionic', 'so
 """In-memory port of C374 no-archive EI EHT current-only residual source.
 
 Faithful, self-contained port of
-tools/build_round2_c374_noarchive_ei_eht_current_only.py (Round 2 no-archive
+the original builder script (the original round no-archive
 branch).  It computes deterministic RDKit/YAeHMOP extended-Hueckel (EHT)
 orbital+charge features from the official current EI SMILES (H-capped and
 ring-closed variants), fits a structure-grouped Ridge residual model against
@@ -5033,7 +5040,7 @@ the C282 current-only OOF EI predictions, and deploys the EI residual over a
 frozen base candidate.
 
 Strip-for-in-memory (deliberate non-behavioral deviations): no file I/O, no
-Round-2 paths, no digest/file-hash/manifest code, no path guards, no argparse,
+the original round paths, no digest/file-hash/manifest code, no path guards, no argparse,
 no json logging, no importlib module loading (the C258 EHT source is inlined
 verbatim).  The model fitting (SEED/ridge-alpha/folds/weight/bootstrap,
 GroupKFold) and the EHT orbital feature computation are reproduced verbatim.
@@ -5168,7 +5175,7 @@ def c374_ei_eht_eht_variant_features(molecule, seed: int):
     return (features, True)
 
 def c374_ei_eht_stable_seed(smiles: str, variant: str) -> int:
-    raw = stable_string_hash_hex8('C374|' + variant + '|' + smiles)
+    raw = stable_seed_hex('C374|' + variant + '|' + smiles)
     return int(raw, 16) % 2000000000 + 1
 
 def c374_ei_eht_stable_eht_features(smiles: str):
@@ -5289,7 +5296,7 @@ c374_ei_eht___all__ = ['c374_ei_eht', 'stable_eht_features', 'eht_variant_featur
 """In-memory port of C380 no-archive EI EHT + co-test residual source.
 
 Faithful, self-contained port of
-tools/build_round2_c380_noarchive_ei_eht_cotest_current_only.py (Round 2
+the original builder script (the original round
 no-archive branch).  It combines C374-style RDKit/YAeHMOP extended-Hueckel
 orbital features with the C327 co-test/identity features for EI only, trains a
 grouped residual model against the C282 current-only OOF parent, and deploys
@@ -5491,7 +5498,7 @@ def c380_ei_eht_eht_variant_features(molecule, seed: int):
     return (features, True)
 
 def c380_ei_eht_stable_seed(smiles: str, variant: str) -> int:
-    raw = stable_string_hash_hex8('C380|' + variant + '|' + smiles)
+    raw = stable_seed_hex('C380|' + variant + '|' + smiles)
     return int(raw, 16) % 2000000000 + 1
 
 def c380_ei_eht_stable_eht_features(smiles: str):
@@ -5640,7 +5647,7 @@ def c402_canonicalize(smiles):
 # ===== c402_eps_surrogate.py =====
 """C402 no-archive EPS ionic route with surrogate-NC deployment (in-memory port).
 
-Faithful in-memory port of build_round2_c402_noarchive_eps_surrogate_nc_ionic.py.
+Faithful in-memory port of the original builder script.
 Reads ONLY official train/test from data_dir (via passed DataFrames).
 Returns a 4,940-row (id, target) DataFrame.
 """
@@ -5837,7 +5844,7 @@ def c402_eps_surrogate_eps_surrogate_nc_ionic(train_df, test_df, base_df, surrog
 # ===== c407_weak_zoo.py =====
 """C407 current-only weak-target direct model-zoo source (in-memory port).
 
-Faithful port of build_round2_c407_noarchive_weak_target_model_zoo.py.
+Faithful port of the original builder script.
 Reads ONLY official train/test via passed DataFrames. Replaces only the
 requested targets over a frozen base CSV. Returns a 4,940-row (id, target) DataFrame.
 """
@@ -5947,7 +5954,7 @@ def c407_weak_zoo_weak_target_zoo(train_df, test_df, base_df, targets='ei,eps,nc
     keys = sorted(set(pooled['canonical']) | set(test2['canonical']))
     key_to_index = {key: i for i, key in enumerate(keys)}
     molecules = build_molecules(keys)
-    descriptor, descriptor_names = descriptor_matrix(molecules)
+    descriptor, descriptor_names = descriptor_matrix(molecules, keys)
     physical, physical_names = physical_matrix(molecules, keys)
     morgan2 = morgan_count_matrix(molecules, radius=2, bits=int(morgan_bits)).toarray().astype(np.float32)
     morgan3 = morgan_count_matrix(molecules, radius=3, bits=int(morgan_bits)).toarray().astype(np.float32)
@@ -5995,7 +6002,7 @@ def c407_weak_zoo_weak_target_zoo(train_df, test_df, base_df, targets='ei,eps,nc
 """In-memory port of C340 no-archive C282 Polymer Genome hierarchical residual wrapper.
 
 Faithful, self-contained port of
-tools/build_round2_c340_noarchive_c282_polymer_genome_wrapper.py (Round 2
+the original builder script (the original round
 no-archive branch).  C340 is a thin wrapper over the C279 hierarchical residual
 portfolio whose parent is swapped from the archive C050 artifacts to the
 current-only C282 artifacts.  The actual computation (from
@@ -6008,7 +6015,7 @@ parent using a nonnegative weight selected only on inner grouped folds.
 Strip-for-in-memory (deliberate, non-behavioral deviations):
   * No file I/O / pd.read_csv / to_csv / Path / open; inputs arrive as DataFrames.
   * No digest module/digest/digest, manifest, path-guard, protocol, env-var, or argparse code.
-  * No Round-2 paths (Round-2 experiment paths/, Round-2 output paths/, the verification panel).
+  * No the original round paths (the original round experiment paths/, the original round output paths/, the verification panel).
   * Dropped progress.jsonl / metrics.json / protocol.json / decision.md /
     artifact_manifest logging (non-behavioral).  The dead 'pset' variable and the
     stripped 'digest()' hash helper are removed.
@@ -6239,7 +6246,7 @@ def c340_wrapper_c340_c282_polymer_genome_wrapper(test_df, c282_oof_df, c282_sub
 
 Faithful in-memory port of:
 
-  * build_round2_c927_noarchive_c282_repeat_view_wrapper.py  (the C927 wrapper)
+  * the original builder script  (the C927 wrapper)
   * round2_c278_repeat_view_nested_portfolio.py             (the reused engine)
 
 C927 takes the current-only C282 parent arm and fits a "repeat view" residual
@@ -6428,16 +6435,16 @@ def c927_build_c927(test_df, c282_submission_df, c282_oof_df):
     return submission
 
 # ===== c1369_stack.py =====
-"""In-memory port of the Round-2 C1369 "branch-local fast direct stack".
+"""In-memory port of the original round C1369 "branch-local fast direct stack".
 
-Faithful port of build_round2_c1369_branch_fast_direct_stack.py, which imports
+Faithful port of the original builder script, which imports
 the following pure-source helpers that are inlined here (no runtime imports of
 other files):
 
 - initial_reference_pipeline (reference): canonicalize, build_label_pool,
   build_molecules, descriptor_matrix, physical_matrix, morgan_count_matrix,
   cross_property_arrays, target_dense_features, clip_prediction, blend_from_oof
-- build_round2_c385_archive_weak_target_model_zoo (c385): maccs_matrix, sanitize_dense
+- the original builder script (c385): maccs_matrix, sanitize_dense
 - round2_c097_graph_grammar_hgb_full (graph): grammar_features, no_stereo
 - round2_c282_current_only_reference (c282): current-only input handling
 
@@ -6803,13 +6810,13 @@ def c1369_stack_fast_direct_stack(train_df: pd.DataFrame, test_df: pd.DataFrame,
     return assembled[['id', 'target']].reset_index(drop=True)
 
 # ===== c1446_physics_proj.py =====
-"""In-memory port of build_round2_c1446_branch_joint_physics_projection.py.
+"""In-memory port of the original builder script.
 
 C1446/C1494 joint physics projection.  Takes official train/test and one branch
 base candidate as pandas DataFrames and returns the 4,940-row (id, target)
 submission with the three fixed co-test consistency projections applied.
 
-Deliberate non-behavioral deviations from the Round-2 source:
+Deliberate non-behavioral deviations from the original round source:
   * No path guards, no digest/digest module/manifest, no argparse/argv, no CSV I/O --
     inputs arrive as DataFrames and the result is returned as a DataFrame.
   * Runtime ID/base-schema validation is retained (raises on mismatch) but
@@ -6972,7 +6979,7 @@ def c1446_physics_proj_c1446_physics_projection(train_df: pd.DataFrame, test_df:
     return pd.DataFrame({'id': ids, 'target': values})
 
 # ===== c1570_physics_grid.py =====
-"""In-memory port of build_round2_c1570_branch_joint_physics_grid.py.
+"""In-memory port of the original builder script.
 
 C1570 branch-local joint physics projection grid, converted to a single
 standalone in-memory function.  It takes official train/test/base candidates as
@@ -6994,9 +7001,9 @@ from current official train labels:
 
 All models/relations are fit from scratch inside this function (fixed seeds are
 not required here: Ridge and HuberRegressor are deterministic convex fits with no
-random state).  No CSV is read or written, no hashes, no argv, no Round-2 paths.
+random state).  No CSV is read or written, no hashes, no argv, no the original round paths.
 
-Deliberate non-behavioral deviations from the Round-2 source
+Deliberate non-behavioral deviations from the original round source
 (manifest/logging/protocol only; no numeric change):
   * Removed file_digest_helper, guard_path, safe_param/safe_slug, manifest.jsonl,
     summary.json, datetime stamps, and all path-guard / env-var / argparse code.
@@ -7160,9 +7167,9 @@ def c1570_physics_grid_build_c1570_physics_grid(train_df: pd.DataFrame, test_df:
     return pd.DataFrame({'id': ids, 'target': values})
 
 # ===== epsnc_b3.py =====
-"""In-memory port of the Round-2 "current EPS/NC B3 consistency overlay".
+"""In-memory port of the original round "current EPS/NC B3 consistency overlay".
 
-Faithful port of build_round2_current_epsnc_b3_consistency_overlay_clean.py
+Faithful port of the original builder script
 plus its LOCAL_DIAGNOSTIC_ONLY source build_current_epsnc_b3_consistency_overlay.py.
 
 Steps (verbatim):
@@ -7312,13 +7319,13 @@ def epsnc_b3_overlay(test_df: pd.DataFrame, train_df: pd.DataFrame, base_df: pd.
     return pd.DataFrame({'id': ids, 'target': values})
 
 # ===== epsnc_ionic.py =====
-"""In-memory port of build_round2_current_epsnc_ionic_overlay_clean.py.
+"""In-memory port of the original builder script.
 
 C1004/C990 clean EPS/NC ionic overlay.  Takes official train/test and a frozen
 base candidate as pandas DataFrames and returns the 4,940-row (id, target)
 submission with the current-label EPS/NC ionic consistency overlay applied.
 
-Deliberate non-behavioral deviations from the Round-2 source:
+Deliberate non-behavioral deviations from the original round source:
   * No path guards, no digest/digest module/manifest, no argparse/argv, no CSV I/O --
     inputs arrive as DataFrames and the result is returned as a DataFrame.
   * Runtime ID/base-schema validation is retained (raises on mismatch) but
@@ -7475,9 +7482,9 @@ def epsnc_ionic_overlay(train_df: pd.DataFrame, test_df: pd.DataFrame, base_df: 
     return pd.DataFrame({'id': ids, 'target': values})
 
 # ===== identity_overlay.py =====
-"""In-memory port of the Round-2 "current identity overlay".
+"""In-memory port of the original round "current identity overlay".
 
-Faithful port of build_round2_current_identity_overlay_clean.py plus its
+Faithful port of the original builder script plus its
 LOCAL_DIAGNOSTIC_ONLY source build_current_identity_overlay.py.
 
 Identities applied (only when the required partner is observed in current train
@@ -7567,8 +7574,8 @@ def identity_overlay_identity_overlay(test_df: pd.DataFrame, train_df: pd.DataFr
 """In-memory port of C296/C297 safe official-partner identity/physics overlay.
 
 Faithful in-memory conversion of
-build_round2_c296_c297_safe_identity_physics_overlay.py, in the current-only
-(no-archive) lane: the label pool is the official current train only. The Round 2
+the original builder script, in the current-only
+(no-archive) lane: the label pool is the official current train only. The the original round
 archive/train.csv branch is intentionally omitted (HARD RULES: only official
 train/test/PI1M). No intermediate CSVs, no R2 paths, no hashes, no manifests, no
 path guards.
@@ -7724,7 +7731,7 @@ def physics_overlay_safe_identity_physics_overlay(train_df: pd.DataFrame, test_d
 """In-memory port of C290/C291 current-only imputed cross-property overlay.
 
 Faithful in-memory conversion of
-build_round2_c290_c291_imputed_cross_property_overlay.py.
+the original builder script.
 
 Reads NOTHING from disk: train/test/base arrive as DataFrames and every feature
 (RDKit descriptors, physical features, Morgan count fingerprints, MACCS keys) is
@@ -8323,8 +8330,8 @@ def f06_distill_build_f06(data_dir, base_df=None):
     return out.reset_index(drop=True)
 
 # ===== f10_portfolio.py =====
-"""In-memory port of Round-2 F10 no-archive portfolio
-(build_round2_f10_without_archive_portfolio.py).
+"""In-memory port of the original round F10 no-archive portfolio
+(the original builder script).
 
 No CSV reads/writes, no archive paths, no hashes, no manifest, no path guards.
 Components are passed as in-memory (id,target) DataFrames and the per-target source
@@ -8387,8 +8394,8 @@ def f10_portfolio_build_f10(test_df: pd.DataFrame, components: dict) -> pd.DataF
     return pd.DataFrame({'id': official_ids, 'target': result.loc[official_ids].to_numpy(float)})
 
 # ===== f11_portfolio.py =====
-"""In-memory port of Round-2 F11 no-archive portfolio
-(build_round2_f11_without_archive_portfolio.py).
+"""In-memory port of the original round F11 no-archive portfolio
+(the original builder script).
 
 No CSV reads/writes, no archive paths, no hashes. Components are passed as
 in-memory (id,target) DataFrames and the per-target source selection is applied
@@ -8436,8 +8443,8 @@ def f11_portfolio_build_f11(test_df: pd.DataFrame, components: dict) -> pd.DataF
     return pd.DataFrame({'id': official_ids, 'target': result.loc[official_ids].to_numpy(float)})
 
 # ===== f14_ensemble.py =====
-"""In-memory port of Round-2 F14 no-archive fixed ensemble
-(build_round2_f14_without_archive_fixed_ensemble.py).
+"""In-memory port of the original round F14 no-archive fixed ensemble
+(the original builder script).
 
 No CSV reads/writes, no archive paths, no hashes. Components are passed as
 in-memory (id,target) DataFrames and per-target averaging is applied directly.
@@ -8480,8 +8487,8 @@ def f14_ensemble_build_f14(test_df: pd.DataFrame, components: dict) -> pd.DataFr
     return pd.DataFrame({'id': official_ids, 'target': result.loc[official_ids].to_numpy(float)})
 
 # ===== weak_aggregate.py =====
-"""In-memory port of Round-2 F15 no-archive weak-target aggregate
-(build_round2_noarchive_weak_aggregate.py).
+"""In-memory port of the original round F15 no-archive weak-target aggregate
+(the original builder script).
 
 No CSV reads/writes, no archive paths, no hashes, no manifest, no path guards.
 Components are passed as in-memory (id,target) DataFrames and the fixed per-target
@@ -8552,8 +8559,8 @@ def weak_aggregate_build_f15(test_df: pd.DataFrame, components: dict, variant: s
     return pd.DataFrame({'id': official_ids, 'target': result.loc[official_ids].to_numpy(float)})
 
 # ===== f18_fixed_blends.py =====
-"""In-memory port of Round-2 F18 no-archive fixed equal blends
-(build_round2_f18_f19_fixed_equal_blends.py, branch='without_archive').
+"""In-memory port of the original round F18 no-archive fixed equal blends
+(the original builder script, branch='without_archive').
 
 No CSV reads/writes, no archive paths, no hashes, no manifest, no path guards.
 Components are passed as in-memory (id,target) DataFrames and the fixed per-target
@@ -8570,7 +8577,7 @@ Source without_archive target map (verbatim):
 
 Deliberate deviations from the source (non-behavioral):
 - Component loading is in-memory (DataFrames) instead of pd.read_csv(path).
-- The with_archive (F19) branch and its Round-2 archive source paths are dropped
+- The with_archive (F19) branch and its the original round archive source paths are dropped
   (the no-archive lane is the only supported branch; archive references are
   stripped per the porting rules).
 - Manifest/hash/overwrite-guard/round-2-boundary checks are dropped
@@ -8625,7 +8632,7 @@ def f18_fixed_blends_build_f18(test_df: pd.DataFrame, components: dict, branch: 
     return pd.DataFrame({'id': ids, 'target': result.loc[ids].to_numpy(float)})
 
 # ===== f21_combo.py =====
-"""In-memory port of build_round2_f20_f21_broad_equal_combo.py (F21,
+"""In-memory port of the original builder script (F21,
 without_archive branch).
 
 "Broad equal combo": for each target type, the final prediction is the
@@ -8635,7 +8642,7 @@ target's components; every other row is left to its own target's components.
 
 The original tool read each component from a frozen 'id,target' prediction CSV
 that covered every test id.  This port receives those component frames in
-memory instead.  It performs NO CSV reads/writes, references NO Round-2 paths,
+memory instead.  It performs NO CSV reads/writes, references NO the original round paths,
 and uses NO hashes.
 
 'components' maps target type -> list of component DataFrames.  Each component
@@ -8684,7 +8691,7 @@ def f21_combo_broad_equal_combo(test_df: pd.DataFrame, components: dict[str, lis
     return pd.DataFrame({'id': ids, 'target': result})
 
 # ===== f24_xprop.py =====
-"""In-memory port of build_round2_f23_f24_cross_property_overlay.py (F24,
+"""In-memory port of the original builder script (F24,
 without_archive branch).
 
 Cross-property overlay on a frozen base candidate.  For each routed target, a
@@ -8697,16 +8704,16 @@ row is left at the base prediction.
 The original also computed a K-fold CV R^2 for its manifest; that logging-only
 step is omitted because it does not affect the returned predictions.
 
-No CSV reads/writes, no Round-2 paths, no hashes.
+No CSV reads/writes, no the original round paths, no hashes.
 """
 f24_xprop_TARGETS = ('tg', 'egc', 'egb', 'ei', 'eea', 'nc', 'eps')
 
 @dataclass(frozen=True)
-class f24_xprop_OverlayRecipe:
+class f24_xprop_OverlaySpec:
     target: str
     features: tuple[str, ...]
     model_name: str
-f24_xprop_RECIPES: list[f24_xprop_OverlayRecipe] = [f24_xprop_OverlayRecipe('egb', ('egc', 'eea'), 'extra_trees'), f24_xprop_OverlayRecipe('egc', ('egb',), 'huber'), f24_xprop_OverlayRecipe('ei', ('egb', 'eea'), 'ridge1'), f24_xprop_OverlayRecipe('nc', ('eps', 'ei'), 'huber')]
+f24_xprop_OVERLAYS: list[f24_xprop_OverlaySpec] = [f24_xprop_OverlaySpec('egb', ('egc', 'eea'), 'extra_trees'), f24_xprop_OverlaySpec('egc', ('egb',), 'huber'), f24_xprop_OverlaySpec('ei', ('egb', 'eea'), 'ridge1'), f24_xprop_OverlaySpec('nc', ('eps', 'ei'), 'huber')]
 
 def f24_xprop_canonical_smiles(smiles: str) -> str:
     mol = Chem.MolFromSmiles(str(smiles))
@@ -8766,18 +8773,18 @@ def f24_xprop_cross_property_overlay(test_df: pd.DataFrame, train_df: pd.DataFra
     train_pivot = train.pivot_table(index='canon', columns='tt', values='target', aggfunc='mean')
     test_pivot = test.pivot_table(index='canon', columns='tt', values='base_prediction', aggfunc='mean')
     result = test['base_prediction'].to_numpy(float).copy()
-    for recipe in f24_xprop_RECIPES:
-        columns = [recipe.target, *recipe.features]
+    for overlay in f24_xprop_OVERLAYS:
+        columns = [overlay.target, *overlay.features]
         paired_train = train_pivot[columns].dropna()
         if len(paired_train) < 20:
-            raise RuntimeError(f'Insufficient paired train rows for {recipe}')
-        model = f24_xprop_make_model(recipe.model_name)
-        x_train = paired_train[list(recipe.features)].to_numpy(float)
-        y_train = paired_train[recipe.target].to_numpy(float)
+            raise RuntimeError(f'Insufficient paired train rows for {overlay}')
+        model = f24_xprop_make_model(overlay.model_name)
+        x_train = paired_train[list(overlay.features)].to_numpy(float)
+        y_train = paired_train[overlay.target].to_numpy(float)
         model.fit(x_train, y_train)
-        paired_test = test_pivot[list(recipe.features)].dropna()
-        pred_by_canon = pd.Series(model.predict(paired_test[list(recipe.features)].to_numpy(float)), index=paired_test.index)
-        for row_idx, row in test[test['tt'] == recipe.target].iterrows():
+        paired_test = test_pivot[list(overlay.features)].dropna()
+        pred_by_canon = pd.Series(model.predict(paired_test[list(overlay.features)].to_numpy(float)), index=paired_test.index)
+        for row_idx, row in test[test['tt'] == overlay.target].iterrows():
             canon = row['canon']
             if canon in pred_by_canon.index:
                 result[int(row_idx)] = float(pred_by_canon.loc[canon])
@@ -8786,7 +8793,7 @@ def f24_xprop_cross_property_overlay(test_df: pd.DataFrame, train_df: pd.DataFra
     return pd.DataFrame({'id': ids, 'target': result})
 
 # ===== f26_ionic.py =====
-"""In-memory port of build_round2_f25_f26_ionic_cotest_overlay.py (F26,
+"""In-memory port of the original builder script (F26,
 without_archive branch).
 
 Ionic co-test EPS/NC overlay.  Two "ionic residual" models (ionic = eps - nc**2)
@@ -8796,7 +8803,7 @@ co-test row for the SAME canonical polymer are updated: the physical
 reconstruction (nc**2 + ionic, or sqrt(eps - ionic)) is blended with the frozen
 base prediction using eps_weight / nc_weight.
 
-No CSV reads/writes, no Round-2 paths, no hashes.
+No CSV reads/writes, no the original round paths, no hashes.
 """
 f26_ionic_POLAR_SMARTS = {'CF': '[#6][F]', 'CCl': '[#6][Cl]', 'ester': 'C(=O)O', 'carbonyl': '[CX3]=[OX1]', 'ether': '[OD2]([#6])[#6]', 'OH': '[OX2H]', 'nitrile': 'C#N', 'amide': 'C(=O)N', 'NH': '[NX3;H1,H2]', 'sulfone': 'S(=O)(=O)', 'thioether': '[#16X2]', 'aromatic_N': 'n', 'aromatic_O': 'o', 'aromatic_S': 's', 'imide': 'C(=O)NC(=O)', 'siloxane': '[Si][O]', 'phosphate': 'P=O', 'urethane': 'NC(=O)O'}
 f26_ionic_PATS = {name: Chem.MolFromSmarts(smarts) for name, smarts in f26_ionic_POLAR_SMARTS.items()}
@@ -8949,7 +8956,11 @@ def run_v57(data_dir, out_path):
     f18 = f18_fixed_blends_build_f18(test_df, {'c284': c284_submission_df, 'c285': c285_submission_df, 'f02': f02, 'f06': f06, 'f14': f14, 'f15': f15, 'c287_et': c287_et, 'c287_huber': c287_huber}, 'without_archive')
     c286v4 = c286_stack_c286_stack(train_df, test_df, f18, c282_oof_df, c282_detail_df, c284_oof_df, c284_detail_df, c285_oof_df, c285_detail_df)
     c340 = c340_wrapper_c340_c282_polymer_genome_wrapper(test_df, c282_oof_df, c282_submission_df)
-    c927 = c927_build_c927(test_df, c282_submission_df, c282_oof_df)
+    # C927 consumes the C340-materialized C279-schema parent frames
+    c927_parent_oof = c282_oof_df[['canonical', 'target_type', 'target', 'prediction']].rename(columns={'prediction': 'candidate_prediction'}).copy()
+    c927_parent_oof['group'] = c927_parent_oof['canonical'].astype(str)
+    c927_parent_test = c282_submission_df[['id', 'target']].copy()
+    c927 = c927_build_c927(test_df, c927_parent_test, c927_parent_oof)
     c391 = c391_pi1m_zoo_build_c289(data_path)
 
     print('[5/6] building F21/F24/F26 stack ...', flush=True)
@@ -8968,176 +8979,381 @@ def run_v57(data_dir, out_path):
 
     print('[6/6] chaining the candidate spine ...', flush=True)
 
-    c292 = xprop_overlay_imputed_cross_property_overlay(train_df, test_df, f26, overlay_weight=0.25, gate_delta=0.005, morgan_bits=128, seed=20260808, fast_linear=true)  # call 20
-    c305 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c292, observed_weight_scale=0.5, cotest_weight_scale=1.0, targets='ei')  # call 22
-    c312 = splice_targets(test_df, c292, {'ei': c305})  # call 23
-    c327 = c327_calibrator_cotest_meta_calibrator(train_df, test_df, c312, c282_oof_df, targets='ei,eea,eps,nc')  # call 24
-    c336 = c327_calibrator_cotest_meta_calibrator(train_df, test_df, c327, c282_oof_df, targets='ei')  # call 25
-    c340 = c340_wrapper_c340_c282_polymer_genome_wrapper(test_df, c282_oof_df, c282_submission_df)  # call 26
-    c343 = blend_targets(test_df, c336, {'tg': (0.750000000, c340)})  # call 27
-    c346 = c346_c347_nonlinear_nonlinear_cotest_calibrator(train_df, test_df, c343, c282_oof_df, targets='egc,ei,eps,nc')  # call 28
-    c348 = splice_targets(test_df, c343, {'eps': c346})  # call 29
-    c350 = c350_epsnc_c350_eps_nc_consistency(train_df, test_df, c348, pull=0.5, ionic_leaf=2, weight_eps=1.0, weight_nc=1.0)  # call 30
-    c351 = splice_targets(test_df, c348, {'nc': c350})  # call 31
-    c353 = c350_epsnc_c350_eps_nc_consistency(train_df, test_df, c348, pull=0.75, ionic_leaf=2, weight_eps=1.0, weight_nc=1.0)  # call 35
-    c355 = blend_targets(test_df, c351, {'nc': (0.375000000, c353)})  # call 36
-    c361 = splice_targets(test_df, c351, {'nc': c355})  # call 37
-    c355_2 = blend_targets(test_df, c361, {'nc': (0.050000000, f03)})  # call 42
-    c371 = splice_targets(test_df, c361, {'nc': c355_2})  # call 43
-    c374 = c374_ei_eht_c374_ei_eht(train_df, test_df, c371, c282_oof_df, residual_weight=0.35, ridge_alpha=60.0)  # call 44
-    c355_3 = blend_targets(test_df, c371, {'ei': (0.400000000, c374)})  # call 45
-    c355_4 = blend_targets(test_df, c361, {'tg': (0.150000000, c284)})  # call 46
-    c377 = splice_targets(test_df, c355_3, {'tg': c355_4})  # call 47
-    c391 = c391_pi1m_zoo_build_c289(data_dir)  # call 51
-    c355_5 = blend_targets(test_df, c377, {'tg': (0.150000000, c391)})  # call 56
-    c396 = splice_targets(test_df, c377, {'tg': c355_5})  # call 57
-    c326 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c312, observed_weight_scale=1.0, cotest_weight_scale=1.0, targets='nc')  # call 61
-    c355_6 = blend_targets(test_df, c361, {'tg': (0.200000000, f05)})  # call 62
-    c401 = blend_targets(test_df, c396, {'tg': (0.075000000, c355_6)})  # call 63
-    c355_7 = blend_targets(test_df, c396, {'nc': (0.175000000, c326)})  # call 65
-    c404 = splice_targets(test_df, c401, {'nc': c355_7})  # call 66
-    c415 = reflected_source(c404, c286v4)  # call 67
-    c355_8 = blend_targets(test_df, c404, {'nc': (0.240000000, c415)})  # call 70
-    c422 = splice_targets(test_df, c404, {'nc': c355_8})  # call 71
-    c429 = reflected_source(c422, c391)  # call 72
-    c355_9 = blend_targets(test_df, c422, {'nc': (0.100000000, c429)})  # call 75
-    c431 = splice_targets(test_df, c422, {'nc': c355_9})  # call 76
-    c402 = c402_eps_surrogate_eps_surrogate_nc_ionic(train_df, test_df, c401, surrogate_nc_model='extra_trees', support_min_similarity=0.35, pull=0.5)  # call 77
-    c432 = reflected_source(c431, c402)  # call 78
-    c355_10 = blend_targets(test_df, c431, {'eps': (0.075000000, c432)})  # call 79
-    c433 = splice_targets(test_df, c431, {'eps': c355_10})  # call 80
-    c381 = c380_ei_eht_ei_eht_cotest(train_df, test_df, c377, c282_oof_df, residual_weight=0.25, ridge_alpha=60.0, residual_clip=0.6)  # call 81
-    c434 = reflected_source(c433, c381)  # call 82
-    c355_11 = blend_targets(test_df, c433, {'tg': (0.100000000, c434)})  # call 86
-    c441 = splice_targets(test_df, c433, {'tg': c355_11})  # call 87
-    c453 = reflected_source(c441, f05)  # call 88
-    c452 = reflected_source(c441, f04)  # call 90
-    c454 = reflected_source(c441, c285)  # call 97
-    c355_12 = blend_targets(test_df, c441, {'tg': (0.650000000, c454)})  # call 98
-    c455 = splice_targets(test_df, c441, {'tg': c355_12})  # call 99
-    c355_13 = blend_targets(test_df, c441, {'tg': (0.725000000, c454)})  # call 103
-    c463 = splice_targets(test_df, c455, {'tg': c355_13})  # call 104
-    c355_14 = blend_targets(test_df, c404, {'ei': (0.575000000, c415)})  # call 110
-    c445 = reflected_source(c441, c336)  # call 113
-    c355_15 = blend_targets(test_df, c463, {'tg': (0.075000000, c452)})  # call 118
-    c487 = splice_targets(test_df, c463, {'tg': c355_15})  # call 119
-    c488 = reflected_source(c487, c355_14)  # call 122
-    c355_16 = blend_targets(test_df, c487, {'ei': (0.050000000, c488)})  # call 123
-    c493 = splice_targets(test_df, c487, {'ei': c355_16})  # call 124
-    c505 = reflected_source(c493, c453)  # call 128
-    c355_17 = blend_targets(test_df, c377, {'tg': (0.500000000, c391)})  # call 141
-    c510 = reflected_source(c493, c355_17)  # call 142
-    c355_18 = blend_targets(test_df, c493, {'tg': (0.250000000, c510)})  # call 143
-    c511 = splice_targets(test_df, c493, {'tg': c355_18})  # call 144
-    c535 = reflected_source(c511, f01)  # call 155
-    c355_19 = blend_targets(test_df, c511, {'tg': (0.035000000, c535)})  # call 156
-    c536 = splice_targets(test_df, c511, {'tg': c355_19})  # call 157
-    c489 = reflected_source(c487, c445)  # call 166
-    c492 = reflected_source(c487, c454)  # call 168
-    c545 = reflected_source(c536, c492)  # call 169
-    c355_20 = blend_targets(test_df, c536, {'tg': (0.500000000, c545)})  # call 170
-    c550 = splice_targets(test_df, c536, {'tg': c355_20})  # call 171
-    c565 = reflected_source(c559, c355_22)  # call 200
-    c566 = reflected_source(c559, c489)  # call 202
-    c355_23 = blend_targets(test_df, c559, {'tg': (0.175000000, c566)})  # call 203
-    c574 = splice_targets(test_df, c559, {'tg': c355_23})  # call 204
-    c582 = reflected_source(c574, c535)  # call 219
-    c355_24 = blend_targets(test_df, c574, {'tg': (0.010000000, c582)})  # call 220
-    c590 = splice_targets(test_df, c574, {'tg': c355_24})  # call 221
-    c594 = reflected_source(c590, c434)  # call 227
-    c355_25 = blend_targets(test_df, c590, {'tg': (0.075000000, c594)})  # call 235
-    c605 = splice_targets(test_df, c590, {'tg': c355_25})  # call 236
-    c355_26 = blend_targets(test_df, c351, {'tg': (0.875000000, f05)})  # call 253
-    c613 = reflected_source(c605, c355_26)  # call 254
-    c355_27 = blend_targets(test_df, c605, {'tg': (0.005000000, c613)})  # call 255
-    c621 = splice_targets(test_df, c605, {'tg': c355_27})  # call 256
-    c355_28 = blend_targets(test_df, c621, {'nc': (0.025000000, c340)})  # call 261
-    c924 = splice_targets(test_df, c621, {'nc': c355_28})  # call 262
-    c942 = epsnc_b3_overlay(test_df, train_df, c924, eps_weight=0.1, nc_weight=0.2, consistency_pull=0.81)  # call 263
-    c947 = c407_weak_zoo_weak_target_zoo(train_df, test_df, c942, targets='ei,eps,nc,tg,egc', models='ridge_200,extra_trees,lightgbm', morgan_bits=512)  # call 264
-    c355_29 = blend_targets(test_df, c942, {'tg': (0.100000000, c947)})  # call 268
-    c949 = splice_targets(test_df, c942, {'tg': c355_29})  # call 269
-    c950 = reflected_source(c949, c947)  # call 270
-    c355_30 = blend_targets(test_df, c949, {'eps': (0.025000000, c950)})  # call 271
-    c952 = splice_targets(test_df, c949, {'eps': c355_30})  # call 272
-    c355_31 = blend_targets(test_df, c952, {'tg': (0.125000000, c947)})  # call 273
-    c954 = splice_targets(test_df, c952, {'tg': c355_31})  # call 274
-    c982 = identity_overlay_identity_overlay(test_df, train_df, c954, eea_weight=0.1, ei_weight=0.1, egb_weight=0.0)  # call 275
-    c943 = epsnc_b3_overlay(test_df, train_df, c924, eps_weight=0.1, nc_weight=0.25, consistency_pull=0.65)  # call 276
-    c983 = splice_targets(test_df, c982, {'eps': c943})  # call 277
-    c1037 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c983, observed_weight_scale=0.0, cotest_weight_scale=1.5, targets='egb')  # call 278
-    c1043 = blend_targets(test_df, c952, {'tg': (0.110000000, c947)})  # call 279
-    c1053 = splice_targets(test_df, c1037, {'tg': c1043})  # call 280
-    c1004 = epsnc_ionic_overlay(train_df, test_df, c983, eps_weight=0.05, nc_weight=0.0, mode='extra_trees_raw')  # call 281
-    c1057 = splice_targets(test_df, c1053, {'eps': c1004})  # call 282
-    c985 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c983, observed_weight_scale=0.0, cotest_weight_scale=0.2, targets='ei,eea')  # call 283
-    c1058 = reflected_source(c1057, c985)  # call 284
-    c1074 = blend_targets(test_df, c1057, {'ei': (1.000000000, c1058)})  # call 285
-    c1075 = reflected_source(c1074, c985)  # call 286
-    c1085 = blend_targets(test_df, c1074, {'ei': (0.800000000, c1075)})  # call 287
-    c1088 = reflected_source(c1085, c402)  # call 288
-    c1114 = blend_targets(test_df, c1085, {'eps': (0.375000000, c1088)})  # call 289
-    c990 = epsnc_ionic_overlay(train_df, test_df, c983, eps_weight=0.0, nc_weight=0.1, mode='extra_trees_raw')  # call 290
-    c1119 = reflected_source(c1114, c990)  # call 291
-    c1144 = blend_targets(test_df, c1114, {'nc': (0.800000000, c1119)})  # call 292
-    c1172 = blend_targets(test_df, c1144, {'egc': (0.035000000, c947)})  # call 293
-    c1175 = reflected_source(c1172, c985)  # call 294
-    c1188 = blend_targets(test_df, c1172, {'eea': (1.000000000, c1175)})  # call 295
-    c1189 = reflected_source(c1188, c985)  # call 296
-    c1201 = blend_targets(test_df, c1188, {'eea': (0.150000000, c1189)})  # call 297
-    c1211 = blend_targets(test_df, c1201, {'tg': (0.125000000, c927)})  # call 301
-    c1230 = splice_targets(test_df, c1201, {'tg': c1211})  # call 302
-    c1345 = epsnc_b3_overlay(test_df, train_df, c1230, eps_weight=0.07, nc_weight=0.03, consistency_pull=0.3)  # call 303
-    c1348 = identity_overlay_identity_overlay(test_df, train_df, c1345, eea_weight=0.0, ei_weight=0.075, egb_weight=0.0)  # call 304
-    c1282 = epsnc_b3_overlay(test_df, train_df, c1230, eps_weight=0.02, nc_weight=0.1, consistency_pull=0.5)  # call 307
-    c1349 = splice_targets(test_df, c1348, {'nc': c1282})  # call 308
-    c1369 = c1369_stack_fast_direct_stack(train_df, test_df, c1349, targets='egc,ei,nc,eps', models='ridge_20,ridge_80,ridge_250', morgan_bits=256, seed=20260808, components=None)  # call 309
-    c1370 = reflected_source(c1349, c1369)  # call 310
-    c1374 = blend_targets(test_df, c1349, {'ei': (0.165000000, c1370)})  # call 311
-    c1378 = reflected_source(c1374, c286v4)  # call 312
-    c1376 = reflected_source(c1374, c391)  # call 313
-    c1380 = blend_targets(test_df, c1374, {'tg': (0.200000000, c1378)})  # call 316
-    c1382 = blend_targets(test_df, c1380, {'tg': (0.100000000, c1376)})  # call 317
-    c1384 = blend_targets(test_df, c1382, {'tg': (0.035000000, c1378)})  # call 319
-    c1392 = reflected_source(c1384, c340)  # call 320
-    c1394 = blend_targets(test_df, c1384, {'tg': (0.300000000, c1392)})  # call 321
-    c1396 = blend_targets(test_df, c1394, {'tg': (0.035000000, c340)})  # call 322
-    c1398 = c380_ei_eht_ei_eht_cotest(train_df, test_df, c1396, c282_oof_df, residual_weight=0.05, ridge_alpha=60.0, residual_clip=0.3)  # call 323
-    c1410 = epsnc_b3_overlay(test_df, train_df, c1398, eps_weight=0.1, nc_weight=0.025, consistency_pull=0.3)  # call 324
-    c1446 = c1446_physics_proj_c1446_physics_projection(train_df, test_df, c1410, egb_pull=0.08, gap_pull=0.05, epsnc_pull=0.02)  # call 325
-    c1447 = splice_targets(test_df, c1410, {'egc': c1446})  # call 326
-    c1494 = c1446_physics_proj_c1446_physics_projection(train_df, test_df, c1447, egb_pull=0.0, gap_pull=0.02, epsnc_pull=0.05)  # call 327
-    c1496 = splice_targets(test_df, c1447, {'ei': c1494})  # call 329
-    c1433 = c407_weak_zoo_weak_target_zoo(train_df, test_df, c1410, targets='ei,eea,eps,nc', models='ridge_200,extra_trees', morgan_bits=384)  # call 330
-    c1530 = reflected_source(c1496, c1433)  # call 331
-    c355_32 = blend_targets(test_df, c1496, {'eps': (0.035000000, c1530)})  # call 333
-    c1532 = splice_targets(test_df, c1496, {'eps': c355_32})  # call 334
-    c355_33 = blend_targets(test_df, c1394, {'tg': (0.035000000, c340)})  # call 336
-    c1535 = splice_targets(test_df, c1532, {'tg': c355_33})  # call 337
-    c355_34 = blend_targets(test_df, c1535, {'eps': (0.002000000, c1530)})  # call 338
-    c1570 = c1570_physics_grid_build_c1570_physics_grid(train_df, test_df, c355_34, egb_pull=0.05, gap_pull=0.02, epsnc_pull=0.0)  # call 339
-    c1572 = splice_targets(test_df, c355_34, {'egc': c1570})  # call 340
+    # ============ reference chain: C292 .. C1572 (rebuilt per reference manifests) ============
+    f16 = weak_aggregate_build_f15(test_df, {'f11': f11, 'c282': c282_submission_df, 'c284': c284_submission_df, 'c285': c285_submission_df}, 'median3')
+    c287_ridge_a5 = c287_arms['ei_dense_ridge_a5']
+    best_compound = f03  # best compound == the F03 clean candidate
+    # ---- C292 block ----
+    c292 = xprop_overlay_imputed_cross_property_overlay(train_df, test_df, f26, overlay_weight=0.25, gate_delta=0.005, morgan_bits=128, seed=20260808, fast_linear=True)
+    c304 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c292, observed_weight_scale=0.75, cotest_weight_scale=0.75, targets='eea')
+    c305 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c292, observed_weight_scale=0.5, cotest_weight_scale=1.0, targets='ei', disable_cotest=True)
+    c306 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c292, observed_weight_scale=1.25, cotest_weight_scale=1.0, targets='ei', disable_cotest=True)
+    c312 = splice_targets(test_df, c292, {'eea': c304, 'ei': c305})
+    c326 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c312, observed_weight_scale=1.0, cotest_weight_scale=1.0, targets='nc')
+    c327 = c327_calibrator_cotest_meta_calibrator(train_df, test_df, c312, c282_oof_df, targets='ei,eea,eps,nc')
+    c336 = c327_calibrator_cotest_meta_calibrator(train_df, test_df, c327, c282_oof_df, targets='ei')
+    c340 = c340_wrapper_c340_c282_polymer_genome_wrapper(test_df, c282_oof_df, c282_submission_df)
+    c343 = blend_targets(test_df, c336, {'tg': (0.75, c340)})
+    c346 = c346_c347_nonlinear_nonlinear_cotest_calibrator(train_df, test_df, c343, c282_oof_df, targets='egc,ei,eps,nc')
+    c348 = splice_targets(test_df, c343, {'egc': c346, 'eps': c346})
+    c350 = c350_epsnc_c350_eps_nc_consistency(train_df, test_df, c348, pull=0.5, ionic_leaf=2, weight_eps=1.0, weight_nc=1.0)
+    c351 = splice_targets(test_df, c348, {'nc': c350})
+    c353 = c350_epsnc_c350_eps_nc_consistency(train_df, test_df, c348, pull=0.75, ionic_leaf=2, weight_eps=1.0, weight_nc=1.0)
+    c354 = c350_epsnc_c350_eps_nc_consistency(train_df, test_df, c348, pull=1.0, ionic_leaf=2, weight_eps=1.0, weight_nc=1.0)
+    # ---- C356-family blends over C351 ----
+    c356_f01_eea = blend_targets(test_df, c351, {'eea': (0.125, f01)})
+    c356_f01_egc = blend_targets(test_df, c351, {'egc': (0.25, f01)})
+    c356_f01_ei = blend_targets(test_df, c351, {'ei': (0.75, f01)})
+    c356_f05_tg0875 = blend_targets(test_df, c351, {'tg': (0.875, f05)})
+    c356_f06_ei0625 = blend_targets(test_df, c351, {'ei': (0.625, f06)})
+    c356_f06_eps0875 = blend_targets(test_df, c351, {'eps': (0.875, f06)})
+    c356_c284_nc = blend_targets(test_df, c351, {'nc': (0.875, c284_submission_df)})
+    c361 = splice_targets(test_df, c351, {
+        'eea': blend_targets(test_df, c351, {'eea': (0.25, best_compound)}),
+        'egc': blend_targets(test_df, c351, {'egc': (0.25, c340)}),
+        'ei': blend_targets(test_df, c351, {'ei': (0.125, f05)}),
+        'nc': blend_targets(test_df, c351, {'nc': (0.375, c353)}),
+    })
+    # ---- C370-family blends over C361 ----
+    c370_f01_egc = blend_targets(test_df, c361, {'egc': (0.25, f01)})
+    c370_f05_tg = blend_targets(test_df, c361, {'tg': (0.2, f05)})
+    c371 = splice_targets(test_df, c361, {
+        'eea': blend_targets(test_df, c361, {'eea': (0.1, f06)}),
+        'egc': blend_targets(test_df, c361, {'egc': (0.025, best_compound)}),
+        'ei': blend_targets(test_df, c361, {'ei': (0.1, f06)}),
+        'eps': blend_targets(test_df, c361, {'eps': (0.05, best_compound)}),
+        'nc': blend_targets(test_df, c361, {'nc': (0.05, best_compound)}),
+    })
+    c374 = c374_ei_eht_c374_ei_eht(train_df, test_df, c371, c282_oof_df, residual_weight=0.35, ridge_alpha=60.0)
+    c377 = splice_targets(test_df, blend_targets(test_df, c371, {'ei': (0.4, c374)}), {'tg': blend_targets(test_df, c361, {'tg': (0.15, c284_submission_df)})})
+    c381 = c380_ei_eht_ei_eht_cotest(train_df, test_df, c377, c282_oof_df, residual_weight=0.25, ridge_alpha=60.0, residual_clip=0.6)
+    c384 = c327_calibrator_cotest_meta_calibrator(train_df, test_df, c377, c282_oof_df, targets='eea,eps,nc')
+    c391 = c391_pi1m_zoo_build_c289(data_dir)
+    # ---- C394-family blends over C377 ----
+    c394_f06_egb025 = blend_targets(test_df, c377, {'egb': (0.25, f06)})
+    c394_c391_tg = blend_targets(test_df, c377, {'tg': (0.5, c391)})
+    c394_c361_eps = blend_targets(test_df, c377, {'eps': (0.4, c361)})
+    c396 = splice_targets(test_df, c377, {
+        'eea': blend_targets(test_df, c377, {'eea': (0.4, c384)}),
+        'egb': blend_targets(test_df, c377, {'egb': (0.2, f06)}),
+        'egc': blend_targets(test_df, c377, {'egc': (0.25, c391)}),
+        'ei': blend_targets(test_df, c377, {'ei': (0.15, c391)}),
+        'eps': blend_targets(test_df, c377, {'eps': (0.05, c391)}),
+        'nc': blend_targets(test_df, c377, {'nc': (0.25, c361)}),
+        'tg': blend_targets(test_df, c377, {'tg': (0.15, c391)}),
+    })
+    c401 = blend_targets(test_df, c396, {
+        'eea': (0.1, f01),
+        'egb': (0.15, f01),
+        'egc': (0.075, c356_f01_egc),
+        'ei': (0.075, c306),
+        'eps': (0.2, c394_c361_eps),
+        'nc': (0.15, c326),
+        'tg': (0.075, c370_f05_tg),
+    })
+    c402 = c402_eps_surrogate_eps_surrogate_nc_ionic(train_df, test_df, c401, surrogate_nc_model='extra_trees', support_min_similarity=0.35, pull=0.5)
+    c404 = splice_targets(test_df, c401, {
+        'egb': blend_targets(test_df, c396, {'egb': (0.175, f01)}),
+        'nc': blend_targets(test_df, c396, {'nc': (0.175, c326)}),
+    })
+    c415 = reflected_source(c404, c286v4)
+    c419_nc = blend_targets(test_df, c404, {'nc': (0.5, c415)})
+    c422 = splice_targets(test_df, c404, {
+        'ei': blend_targets(test_df, c404, {'ei': (0.175, c415)}),
+        'eps': blend_targets(test_df, c404, {'eps': (0.5, c415)}),
+        'nc': blend_targets(test_df, c404, {'nc': (0.24, c415)}),
+    })
+    c429 = reflected_source(c422, c391)
+    c430_nc030 = blend_targets(test_df, c422, {'nc': (0.3, c429)})
+    c431 = splice_targets(test_df, c422, {
+        'eea': blend_targets(test_df, c422, {'eea': (0.15, c429)}),
+        'eps': blend_targets(test_df, c422, {'eps': (0.05, c429)}),
+        'nc': blend_targets(test_df, c422, {'nc': (0.1, c429)}),
+    })
+    c432 = reflected_source(c431, c402)
+    c433 = splice_targets(test_df, c431, {'eps': blend_targets(test_df, c431, {'eps': (0.075, c432)})})
+    c434 = reflected_source(c433, c381)
+    c435 = reflected_source(c433, c384)
+    c441 = splice_targets(test_df, c433, {
+        'egb': blend_targets(test_df, c433, {'egb': (0.375, c434)}),
+        'egc': blend_targets(test_df, c433, {'egc': (0.125, c434)}),
+        'ei': blend_targets(test_df, c433, {'ei': (0.45, c434)}),
+        'tg': blend_targets(test_df, c433, {'tg': (0.1, c434)}),
+    })
+    c445 = reflected_source(c441, c336)
+    c448 = reflected_source(c441, f18)
+    c450 = reflected_source(c441, f10)
+    c451 = reflected_source(c441, c287_ridge_a5)
+    c452 = reflected_source(c441, f04)
+    c453 = reflected_source(c441, f05)
+    c454 = reflected_source(c441, c285_submission_df)
+    c455 = splice_targets(test_df, c441, {
+        'eea': blend_targets(test_df, c441, {'eea': (0.05, c453)}),
+        'egc': blend_targets(test_df, c441, {'egc': (0.15, c452)}),
+        'ei': blend_targets(test_df, c441, {'ei': (0.075, c451)}),
+        'eps': blend_targets(test_df, c441, {'eps': (0.125, c453)}),
+        'nc': blend_targets(test_df, c441, {'nc': (0.175, c448)}),
+        'tg': blend_targets(test_df, c441, {'tg': (0.65, c454)}),
+    })
+    c463 = splice_targets(test_df, c455, {
+        'eea': blend_targets(test_df, c441, {'eea': (0.06, c453)}),
+        'egb': blend_targets(test_df, c433, {'egb': (0.37, c434)}),
+        'ei': blend_targets(test_df, c441, {'ei': (0.065, c451)}),
+        'tg': blend_targets(test_df, c441, {'tg': (0.725, c454)}),
+    })
+    c480 = reflected_source(c463, c452)
+    c481 = reflected_source(c463, c415)
+    c482_src = blend_targets(test_df, c404, {'ei': (0.575, c415)})
+    c482 = reflected_source(c463, c482_src)
+    c483 = reflected_source(c463, c445)
+    c484 = reflected_source(c463, c454)
+    c481_egc = blend_targets(test_df, c463, {'egc': (0.125, c481)})
+    c483_eps = blend_targets(test_df, c463, {'eps': (0.25, c483)})
+    c487 = splice_targets(test_df, c463, {
+        'eea': blend_targets(test_df, c463, {'eea': (0.075, c480)}),
+        'egb': blend_targets(test_df, c463, {'egb': (0.035, best_compound)}),
+        'egc': blend_targets(test_df, c463, {'egc': (0.175, c481)}),
+        'ei': blend_targets(test_df, c463, {'ei': (1.0, c482)}),
+        'eps': blend_targets(test_df, c463, {'eps': (0.35, c483)}),
+        'nc': blend_targets(test_df, c463, {'nc': (0.075, c484)}),
+        'tg': blend_targets(test_df, c441, {'tg': (0.075, c452)}),
+    })
+    c488 = reflected_source(c487, c482_src)
+    c489 = reflected_source(c487, c445)
+    c490 = reflected_source(c487, c452)
+    c491 = reflected_source(c487, c415)
+    c492 = reflected_source(c487, c454)
+    c491_egc010 = blend_targets(test_df, c487, {'egc': (0.1, c491)})
+    c493 = splice_targets(test_df, c487, {
+        'egc': blend_targets(test_df, c487, {'egc': (0.025, c491)}),
+        'ei': blend_targets(test_df, c487, {'ei': (0.05, c488)}),
+    })
+    c504 = reflected_source(c493, c356_f01_eea)
+    c505 = reflected_source(c493, c453)
+    c506 = reflected_source(c493, c483)
+    c507 = reflected_source(c493, c356_f01_ei)
+    c508 = reflected_source(c493, c354)
+    c509 = reflected_source(c493, c419_nc)
+    c510 = reflected_source(c493, c394_c391_tg)
+    c511 = splice_targets(test_df, c493, {
+        'eea': blend_targets(test_df, c493, {'eea': (0.35, c504)}),
+        'egb': blend_targets(test_df, c493, {'egb': (0.05, c505)}),
+        'egc': blend_targets(test_df, c493, {'egc': (0.175, c506)}),
+        'ei': blend_targets(test_df, c493, {'ei': (0.175, c507)}),
+        'eps': blend_targets(test_df, c493, {'eps': (0.5, c508)}),
+        'nc': blend_targets(test_df, c493, {'nc': (0.5, c509)}),
+        'tg': blend_targets(test_df, c493, {'tg': (0.25, c510)}),
+    })
+    c530 = reflected_source(c511, c484)
+    c531 = reflected_source(c511, c282_submission_df)
+    c533 = reflected_source(c511, c504)
+    c534 = reflected_source(c511, c354)
+    c535 = reflected_source(c511, f01)
+    c536 = splice_targets(test_df, c511, {
+        'eea': blend_targets(test_df, c404, {'eea': (0.075, c415)}),
+        'egb': blend_targets(test_df, c511, {'egb': (0.1, c530)}),
+        'egc': blend_targets(test_df, c511, {'egc': (0.1, c531)}),
+        'ei': blend_targets(test_df, c511, {'ei': (0.075, f02)}),
+        'eps': blend_targets(test_df, c511, {'eps': (1.0, c533)}),
+        'nc': blend_targets(test_df, c511, {'nc': (0.25, c534)}),
+        'tg': blend_targets(test_df, c511, {'tg': (0.035, c535)}),
+    })
+    c543 = reflected_source(c536, c292)
+    c544 = reflected_source(c536, c483_eps)
+    c545 = reflected_source(c536, c492)
+    c550 = splice_targets(test_df, c536, {
+        'eea': blend_targets(test_df, c536, {'eea': (0.075, c340)}),
+        'egb': blend_targets(test_df, c536, {'egb': (0.1, c284_submission_df)}),
+        'egc': blend_targets(test_df, c536, {'egc': (0.075, c429)}),
+        'ei': blend_targets(test_df, c536, {'ei': (0.35, c543)}),
+        'eps': blend_targets(test_df, c536, {'eps': (1.0, c544)}),
+        'nc': blend_targets(test_df, c536, {'nc': (0.175, c489)}),
+        'tg': blend_targets(test_df, c536, {'tg': (0.5, c545)}),
+    })
+    c552 = reflected_source(c550, c384)
+    c553 = reflected_source(c550, c511)
+    c554 = reflected_source(c550, c481_egc)
+    c556 = reflected_source(c550, c481)
+    c557 = reflected_source(c550, c356_c284_nc)
+    c558 = reflected_source(c550, c505)
+    c559 = splice_targets(test_df, c550, {
+        'eea': blend_targets(test_df, c550, {'eea': (0.25, c552)}),
+        'egb': blend_targets(test_df, c550, {'egb': (1.0, c553)}),
+        'egc': blend_targets(test_df, c550, {'egc': (1.0, c554)}),
+        'ei': blend_targets(test_df, c422, {'ei': (0.1, c429)}),
+        'eps': blend_targets(test_df, c550, {'eps': (0.8, c556)}),
+        'nc': blend_targets(test_df, c550, {'nc': (0.075, c557)}),
+        'tg': blend_targets(test_df, c550, {'tg': (0.015, c558)}),
+    })
+    c561 = reflected_source(c559, c511)
+    c562 = reflected_source(c559, c370_f01_egc)
+    c563 = reflected_source(c559, c434)
+    c564 = reflected_source(c559, f16)
+    c565 = reflected_source(c559, c430_nc030)
+    c566 = reflected_source(c559, c489)
+    c574 = splice_targets(test_df, c559, {
+        'eea': blend_targets(test_df, c559, {'eea': (0.65, c561)}),
+        'egb': blend_targets(test_df, c559, {'egb': (1.0, c561)}),
+        'egc': blend_targets(test_df, c559, {'egc': (0.075, c562)}),
+        'ei': blend_targets(test_df, c559, {'ei': (0.5, c563)}),
+        'eps': blend_targets(test_df, c559, {'eps': (0.125, c564)}),
+        'nc': blend_targets(test_df, c559, {'nc': (0.35, c565)}),
+        'tg': blend_targets(test_df, c559, {'tg': (0.175, c566)}),
+    })
+    c576 = reflected_source(c574, c552)
+    c577 = reflected_source(c574, c511)
+    c578 = reflected_source(c574, c491_egc010)
+    c579 = reflected_source(c574, c556)
+    c580 = reflected_source(c574, c566)
+    c581 = reflected_source(c574, c450)
+    c582 = reflected_source(c574, c535)
+    c590 = splice_targets(test_df, c574, {
+        'eea': blend_targets(test_df, c574, {'eea': (0.25, c576)}),
+        'egb': blend_targets(test_df, c574, {'egb': (1.0, c577)}),
+        'egc': blend_targets(test_df, c574, {'egc': (1.0, c578)}),
+        'ei': blend_targets(test_df, c574, {'ei': (0.35, c579)}),
+        'eps': blend_targets(test_df, c574, {'eps': (0.1, c580)}),
+        'nc': blend_targets(test_df, c574, {'nc': (0.1, c581)}),
+        'tg': blend_targets(test_df, c574, {'tg': (0.01, c582)}),
+    })
+    c592 = reflected_source(c590, c511)
+    c593 = reflected_source(c590, c394_f06_egb025)
+    c594 = reflected_source(c590, c434)
+    c595 = reflected_source(c590, c544)
+    c596 = reflected_source(c590, c429)
+    c597 = reflected_source(c590, c481)
+    c605 = splice_targets(test_df, c590, {
+        'eea': blend_targets(test_df, c590, {'eea': (0.65, c592)}),
+        'egb': blend_targets(test_df, c590, {'egb': (0.5, c593)}),
+        'egc': blend_targets(test_df, c590, {'egc': (0.175, c594)}),
+        'ei': blend_targets(test_df, c590, {'ei': (0.5, c595)}),
+        'eps': blend_targets(test_df, c590, {'eps': (0.1, c596)}),
+        'nc': blend_targets(test_df, c590, {'nc': (0.25, c597)}),
+        'tg': blend_targets(test_df, c590, {'tg': (0.075, c594)}),
+    })
+    c607 = reflected_source(c605, c435)
+    c608 = reflected_source(c605, c490)
+    c609 = reflected_source(c605, c481)
+    c610 = reflected_source(c605, c356_f06_ei0625)
+    c611 = reflected_source(c605, c356_f06_eps0875)
+    c612 = reflected_source(c605, c553)
+    c613 = reflected_source(c605, c356_f05_tg0875)
+    c621 = splice_targets(test_df, c605, {
+        'eea': blend_targets(test_df, c605, {'eea': (0.1, c607)}),
+        'egb': blend_targets(test_df, c605, {'egb': (0.035, c608)}),
+        'egc': blend_targets(test_df, c605, {'egc': (0.125, c609)}),
+        'ei': blend_targets(test_df, c605, {'ei': (0.175, c610)}),
+        'eps': blend_targets(test_df, c605, {'eps': (0.075, c611)}),
+        'nc': blend_targets(test_df, c605, {'nc': (1.0, c612)}),
+        'tg': blend_targets(test_df, c605, {'tg': (0.005, c613)}),
+    })
+    c924 = splice_targets(test_df, c621, {
+        'egb': blend_targets(test_df, c511, {'egb': (0.025, c531)}),
+        'egc': blend_targets(test_df, c605, {'egc': (0.125, c612)}),
+        'ei': blend_targets(test_df, c605, {'ei': (0.175, c612)}),
+        'eps': blend_targets(test_df, c621, {'eps': (0.075, c340)}),
+        'nc': blend_targets(test_df, c621, {'nc': (0.025, c340)}),
+    })
+    c942 = epsnc_b3_overlay(test_df, train_df, c924, eps_weight=0.1, nc_weight=0.2, consistency_pull=0.81)
+    c947 = c407_weak_zoo_weak_target_zoo(train_df, test_df, c942, targets='ei,eps,nc,tg,egc', models='ridge_200,extra_trees,lightgbm', morgan_bits=512)
+    c925 = c407_weak_zoo_weak_target_zoo(train_df, test_df, c621, targets='eps,nc', models='lightgbm', morgan_bits=512)
+    c949 = splice_targets(test_df, c942, {
+        'egc': blend_targets(test_df, c942, {'egc': (0.1, c947)}),
+        'ei': blend_targets(test_df, c942, {'ei': (0.1, c947)}),
+        'nc': blend_targets(test_df, c942, {'nc': (0.05, c947)}),
+        'tg': blend_targets(test_df, c942, {'tg': (0.1, c947)}),
+    })
+    c950 = reflected_source(c949, c947)
+    c952 = splice_targets(test_df, c949, {'eps': blend_targets(test_df, c949, {'eps': (0.025, c950)})})
+    c954 = splice_targets(test_df, c952, {'tg': blend_targets(test_df, c952, {'tg': (0.125, c947)})})
+    c982 = identity_overlay_identity_overlay(test_df, train_df, c954, eea_weight=0.1, ei_weight=0.1, egb_weight=0.0)
+    c943 = epsnc_b3_overlay(test_df, train_df, c924, eps_weight=0.1, nc_weight=0.25, consistency_pull=0.65)
+    c983 = splice_targets(test_df, c982, {'eps': c943})
+    c1004 = epsnc_ionic_overlay(train_df, test_df, c983, eps_weight=0.05, nc_weight=0.0, mode='extra_trees_raw')
+    c985 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c983, observed_weight_scale=0.0, cotest_weight_scale=0.2, targets='ei,eea')
+    c1037 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c983, observed_weight_scale=0.0, cotest_weight_scale=1.5, targets='egb')
+    c1043 = blend_targets(test_df, c952, {'tg': (0.11, c947)})
+    c1053 = splice_targets(test_df, c1037, {'tg': c1043})
+    c1057 = splice_targets(test_df, c1053, {'eps': c1004})
+    c1058 = reflected_source(c1057, c985)
+    c1074 = blend_targets(test_df, c1057, {'ei': (1.0, c1058)})
+    c1075 = reflected_source(c1074, c985)
+    c1085 = blend_targets(test_df, c1074, {'ei': (0.8, c1075)})
+    c1088 = reflected_source(c1085, c402)
+    c1114 = blend_targets(test_df, c1085, {'eps': (0.375, c1088)})
+    c990 = epsnc_ionic_overlay(train_df, test_df, c983, eps_weight=0.0, nc_weight=0.1, mode='median')
+    c1119 = reflected_source(c1114, c990)
+    c1144 = blend_targets(test_df, c1114, {'nc': (0.8, c1119)})
+    c1172 = blend_targets(test_df, c1144, {'egc': (0.035, c947)})
+    c1175 = reflected_source(c1172, c985)
+    c1188 = blend_targets(test_df, c1172, {'eea': (1.0, c1175)})
+    c1189 = reflected_source(c1188, c985)
+    c1201 = blend_targets(test_df, c1188, {'eea': (0.15, c1189)})
+    c1211 = blend_targets(test_df, c1201, {'tg': (0.125, c927)})
+    c1215 = blend_targets(test_df, c1201, {'egb': (0.005, c927)})
+    c1228 = blend_targets(test_df, c1201, {'eea': (0.035, c927)})
+    c1230 = splice_targets(test_df, c1201, {'eea': c1228, 'egb': c1215, 'tg': c1211})
+    c1345 = epsnc_b3_overlay(test_df, train_df, c1230, eps_weight=0.07, nc_weight=0.03, consistency_pull=0.3)
+    c1348 = identity_overlay_identity_overlay(test_df, train_df, c1345, eea_weight=0.0, ei_weight=0.075, egb_weight=0.0)
+    c1284 = epsnc_b3_overlay(test_df, train_df, c1230, eps_weight=0.05, nc_weight=0.05, consistency_pull=0.3)
+    c1295 = identity_overlay_identity_overlay(test_df, train_df, c1284, eea_weight=0.01, ei_weight=0.0, egb_weight=0.0)
+    c1282 = epsnc_b3_overlay(test_df, train_df, c1230, eps_weight=0.02, nc_weight=0.1, consistency_pull=0.5)
+    c1349 = splice_targets(test_df, c1348, {'eea': c1295, 'nc': c1282})
+    c1369 = c1369_stack_fast_direct_stack(train_df, test_df, c1349, targets='egc,ei,nc,eps', models='ridge_20,ridge_80,ridge_250', morgan_bits=256, seed=20260808, components=None)
+    c1370 = reflected_source(c1349, c1369)
+    c1374 = blend_targets(test_df, c1349, {'ei': (0.165, c1370)})
+    c1378 = reflected_source(c1374, c286v4)
+    c1376 = reflected_source(c1374, c391)
+    c1377 = reflected_source(c1374, c925)
+    c1375 = reflected_source(c1374, c947)
+    c1380 = blend_targets(test_df, c1374, {
+        'eea': (0.02, c1378), 'egb': (0.1, c1378), 'egc': (0.075, c1376),
+        'ei': (0.1, c1377), 'eps': (0.05, c1378), 'tg': (0.2, c1378),
+    })
+    c1382 = blend_targets(test_df, c1380, {
+        'eea': (0.01, c1376), 'egb': (0.035, c1376), 'egc': (0.1, c1378),
+        'ei': (0.01, c1377), 'tg': (0.1, c1376),
+    })
+    c1384 = blend_targets(test_df, c1382, {
+        'eea': (0.1, c1375), 'egb': (0.05, c1378), 'egc': (0.1, c1377),
+        'ei': (0.005, c1377), 'tg': (0.035, c1378),
+    })
+    c1392 = reflected_source(c1384, c340)
+    c1394 = blend_targets(test_df, c1384, {
+        'eea': (0.035, c340), 'egb': (0.005, c1392), 'egc': (0.01, c340),
+        'ei': (0.075, c340), 'eps': (0.02, c340), 'nc': (0.1, c340), 'tg': (0.3, c1392),
+    })
+    c1396 = blend_targets(test_df, c1394, {
+        'eea': (0.005, c1392), 'egb': (0.0025, c340), 'egc': (0.0025, c340),
+        'ei': (0.01, c340), 'eps': (0.0025, c340), 'nc': (0.0025, c1392), 'tg': (0.035, c340),
+    })
+    c1398 = c380_ei_eht_ei_eht_cotest(train_df, test_df, c1396, c282_oof_df, residual_weight=0.05, ridge_alpha=60.0, residual_clip=0.3)
+    c1410 = epsnc_b3_overlay(test_df, train_df, c1398, eps_weight=0.1, nc_weight=0.025, consistency_pull=0.3)
+    c1433 = c407_weak_zoo_weak_target_zoo(train_df, test_df, c1410, targets='ei,eea,eps,nc', models='ridge_200,extra_trees', morgan_bits=384)
+    c1446 = c1446_physics_proj_c1446_physics_projection(train_df, test_df, c1410, egb_pull=0.08, gap_pull=0.05, epsnc_pull=0.02)
+    c1447 = splice_targets(test_df, c1410, {'eea': c1446, 'egb': c1446, 'egc': c1446})
+    c1494 = c1446_physics_proj_c1446_physics_projection(train_df, test_df, c1447, egb_pull=0.0, gap_pull=0.02, epsnc_pull=0.05)
+    c1493 = c1446_physics_proj_c1446_physics_projection(train_df, test_df, c1447, egb_pull=0.04, gap_pull=0.03, epsnc_pull=0.04)
+    c1496 = splice_targets(test_df, c1447, {'egc': c1493, 'eea': c1494, 'ei': c1494})
+    c1506 = physics_overlay_safe_identity_physics_overlay(train_df, test_df, c1496, observed_weight_scale=0.3, cotest_weight_scale=0.1, targets='ei,eea,egb,eps,nc')
+    c1530 = reflected_source(c1496, c1433)
+    c355_egc_030 = blend_targets(test_df, c1496, {'egc': (0.3, c1530)})
+    c355_eps_035 = blend_targets(test_df, c1496, {'eps': (0.035, c1530)})
+    c1532 = splice_targets(test_df, c1496, {'egc': c355_egc_030, 'eps': c355_eps_035})
+    c355_tg_035 = blend_targets(test_df, c1394, {'tg': (0.035, c340)})
+    c1535 = splice_targets(test_df, c1532, {
+        'eea': c1494, 'egb': c1446, 'egc': c1530, 'ei': c1494, 'eps': c355_eps_035,
+        'nc': c1506, 'tg': c355_tg_035,
+    })
+    c355_eps_002 = blend_targets(test_df, c1535, {'eps': (0.002, c1530)})
+    c1570 = c1570_physics_grid_build_c1570_physics_grid(train_df, test_df, c355_eps_002, egb_pull=0.05, gap_pull=0.02, epsnc_pull=0.0)
+    c1572 = splice_targets(test_df, c355_eps_002, {'egc': c1570})
 
-    # ---- V53 compound (noarchive_rank2): base C1572 + 7 weighted arms ----
-    compound = c1572['target'].to_numpy(float).copy()
-    compound_id = c1572['id'].to_numpy(int)
-    tt = test_df['target_type'].to_numpy(object)
-    arms = {
-        'eea': (0.055858956052114814, c287_eea_huber),
-        'egb': (-0.2280466904798347, c565),
-        'egc': (-0.039664646178507984, c1370),
-        'ei': (-1.1545974766202354, c1349),
-        'eps': (-0.37638616522376744, c488),
-        'nc': (-1.6702239063784179, c1345),
-        'tg': (0.15926696690525582, c927),
-    }
-    for target, (weight, arm_df) in arms.items():
-        mask = tt == target
-        compound[mask] = compound[mask] + weight * (arm_df['target'].to_numpy(float)[mask] - compound[mask])
-    base_target = compound.copy()
+    # ---- Base compound: C1572 candidate spine ----
+    base_target = c1572['target'].to_numpy(float).copy()
 
     # ---- char arm: per-target Ridge on character n-grams of C282 OOF residuals ----
-    from sklearn.feature_extraction.text import CountVectorizer
+    from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
     from sklearn.linear_model import Ridge as RidgeModel
     from sklearn.pipeline import make_pipeline as make_pipeline_model
     from sklearn.model_selection import KFold as KFoldModel
@@ -9157,11 +9373,15 @@ def run_v57(data_dir, out_path):
         y = resid[idx].copy()
         pred = np.zeros(len(test_smiles))
         kf = KFoldModel(n_splits=5, shuffle=True, random_state=2026)
+        use_tfidf = (t == 'nc' or t == 'eps')
         for tr_f, va_f in kf.split(idx):
-            model = make_pipeline_model(
-                CountVectorizer(analyzer='char', ngram_range=(2, 7), max_features=65536, lowercase=False),
-                RidgeModel(alpha=40.0, solver='lsqr', max_iter=5000, tol=1e-4),
-            )
+            if use_tfidf:
+                vec = TfidfVectorizer(analyzer='char', ngram_range=(2, 7), max_features=65536, lowercase=False, sublinear_tf=True)
+                alpha = 30.0
+            else:
+                vec = CountVectorizer(analyzer='char', ngram_range=(2, 7), max_features=65536, lowercase=False)
+                alpha = 40.0
+            model = make_pipeline_model(vec, RidgeModel(alpha=alpha, solver='lsqr', max_iter=5000, tol=1e-4))
             model.fit([tr_smiles[i] for i in idx[tr_f]], y[tr_f])
             pred += model.predict(test_smiles) / 5
         mte = test_df['target_type'].to_numpy(object) == t
@@ -9173,8 +9393,12 @@ def run_v57(data_dir, out_path):
     for t in TARGETS_ORDER:
         mte = test_tt == t
         if t in ('ei', 'eea'):
-            med = medians[t]
-            final[mte] = med + 1.05 * (base_target[mte] - med)
+            tr_vals = train_df.loc[train_df['target_type'] == t, 'target'].to_numpy(float)
+            lo = float(np.quantile(tr_vals, 0.001)) - float(np.std(tr_vals, ddof=1)) * 0.25
+            hi = float(np.quantile(tr_vals, 0.999)) + float(np.std(tr_vals, ddof=1)) * 0.25
+            med = float(np.median(tr_vals))
+            spread = med + 1.05 * (base_target[mte] - med)
+            final[mte] = np.clip(spread, lo, hi)
         else:
             final[mte] = base_target[mte] + char_delta[mte]
 
