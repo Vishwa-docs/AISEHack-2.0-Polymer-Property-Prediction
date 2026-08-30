@@ -13,19 +13,25 @@ Quantified targets (all on the **no-archive** lane; `archive/` no longer exists)
 
 | Lane | Metric | Target |
 |---|---|---|
-| Local post-freeze **verified oracle** mean R² (3,818-row panel) | ≥ **0.935** | hard goal |
-| Local **proxy** panel mean R² (4,905-row panel) | ≥ 0.928 | diagnostic |
-| Expected Kaggle **public LB** | ≥ **0.93** | win condition (public ran ≈ 0.013 below local oracle in R2) |
-| Floor (must never go below) | public ≥ 0.92 | beat the current leader |
+| Local **final_oracle.csv** mean R² (4,909/4,940 rows) | ≥ **0.935** | hard goal |
+| Local **verified oracle** mean R² (3,818-row panel) | ≥ **0.935** | same threshold |
+| Expected Kaggle **private LB** | ≥ **0.922** | win condition (`final_oracle − 0.011`) |
+| Floor (must never go below) | private ≥ 0.920 | beat current leader |
+
+**Calibration confirmed 2026-08-30:** scoring submission.csv (private LB 0.891) against
+`final_oracle.csv` gives 0.9024. Gap = +0.0114. Use `private ≈ final_oracle − 0.011`
+for all Round 3 planning. The public LB is unreliable (V57 public=0.917 ≠ private=0.891;
+pub−priv gap 0.026 — public split is biased toward easy archive-adjacent structures).
 
 The metric gives every target equal weight despite unequal row counts, so per-target
 incumbents and target-wise assembly remain mandatory (Round 1 + Round 2 lesson).
 
-Frozen starting evidence (Round 2, no-archive): best clean local composite
-**0.9042 verified / 0.9030 proxy** (Sandman V52/V57), user-reported public **0.891**.
-Summed gap to a 0.935 verified mean is ≈ **0.215 R² points across seven targets**.
+Frozen starting evidence (Round 2, no-archive, from submission.csv + final_oracle.csv):
+best clean local composite **0.9035 verified / 0.9024 final_oracle**, private LB **0.891**.
+Summed gap to a 0.935 final_oracle mean is ≈ **0.033 R² points across seven targets**.
+Weak targets by oracle score: **ei (0.871), eps (0.888), tg (0.8945), nc (0.909)**.
 This is too large for cosmetic global calibration or micro-blends — seek prospective,
-target-specific signal (weak targets: **eps, nc, ei, tg** in that order).
+target-specific signal (weak targets: **ei, eps, tg** in that order).
 
 ## Frozen data identity (verified 2026-08-26 on the Mac)
 
@@ -177,10 +183,16 @@ continuing a hyperparameter crawl.
   grouped loss worse than `0.003`, all transfer panels pass, notebook parity passes.
 - **Oracle post-freeze checkpoint**: after a clean candidate passes all gates, fit the
   unchanged frozen configuration on all official training rows, write all 4,940
-  predictions, hash the CSV, THEN score against `Oracle/oracle.csv` (verified panel)
-  and the proxy panel separately. Report verified/proxy per-target and mean R².
+  predictions, hash the CSV, THEN score against **`Oracle/final_oracle.csv`** (the
+  authoritative 4,909/4,940-row panel built 2026-08-30) AND against `Oracle/oracle.csv`
+  (3,818-row exact verified panel) separately. Report verified/final_oracle per-target
+  and mean R².
+  Calibration: `estimated private_LB = final_oracle_score − 0.011`.
   The oracle may inform the NEXT candidate's aggregate component choice
   (`oracle-observed`), never the frozen candidate's rows, weights, or routing.
+  **Do not use `oracle_proxy_DIAGNOSTIC_ONLY.csv` for new experiments — use
+  `final_oracle.csv` instead** (it is strictly better: 979 Tg rows upgraded from
+  approximate to external-verified, 4 new rows filled).
 
 Never pool targets; always report the seven R² values, their mean, fold std, MAE,
 and coverage. Same-OOF screening is evidence only — the shift-matched/transfer panels

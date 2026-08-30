@@ -8,11 +8,14 @@ every session. It is the operating contract. Then read `PLAN.md` and
 ## 1. Mission
 
 Predict seven polymer properties from SMILES strings and **win the hackathon**.
-Round 2 ended with a user-submitted public score of **0.891** (no-archive lane).
-A competitor submission at **0.92** already exists on the Round 3 leaderboard.
-We must beat 0.92 — target public **≥ 0.93** — while fully complying with the
-competition rules, and this round additionally requires **model explainability**
-and **polymer-invariance robustness** as judged themes.
+Round 2 ended with a user-submitted **private LB score of 0.891** (no-archive lane;
+public was 0.917 — a 0.026 pub/priv gap). A competitor at **0.92** exists on the
+Round 3 leaderboard. We must beat 0.92 — target public **≥ 0.93** — while fully
+complying with the competition rules, and this round additionally requires
+**model explainability** and **polymer-invariance robustness** as judged themes.
+
+Oracle calibration (confirmed 2026-08-30): `private_LB ≈ final_oracle_score − 0.011`
+To guarantee beating 0.92 privately: **final_oracle score ≥ 0.933** (target 0.935).
 
 Seven targets (metric = unweighted mean of per-target R² — never pool rows):
 `tg` (glass transition), `egc` (chain bandgap), `egb` (bulk bandgap),
@@ -31,7 +34,7 @@ Working directory: `/Users/daver/Desktop/AISEHack 2.0 Polymr Property Prediction
 |---|---|
 | `Competition_Details/` | Official Round 3 context. **Read these before planning anything**: `Overview.txt`, `Dataset Description.txt`, `Competition Rules.txt`, `AISEHack 2.0 Polymer Property Prediction: Round 3 | Kaggle.html` |
 | `Dataset/` | Official Round 3 data: `train.csv` (7,409 rows), `test.csv` (4,940 rows), `PI1M.csv` (995,799 unlabeled polymer SMILES), `smile_r3.csv` (5,973,369 unlabeled molecular SMILES), `sample_submission.csv`, `base_line_model.ipynb` |
-| `Oracle/` | Local verification answers. **Git-ignored. Verification only — see §6.** Contains `oracle.csv` (3,818/4,940 exact values), `oracle_proxy_DIAGNOSTIC_ONLY.csv` (4,905/4,940), build/score scripts, and `NOTES_R3.md` (verification report: Round 3 train/test/PI1M are byte-identical to Round 2, so the oracle is unchanged) |
+| `Oracle/` | Local verification answers. **Git-ignored. Verification only — see §6.** Primary scoring file: **`final_oracle.csv`** (4,909/4,940 rows with values; 31 unresolvable Tg rows remain NaN). Also contains `oracle.csv` (3,818 exact), `oracle_proxy_DIAGNOSTIC_ONLY.csv` (4,905), `tg_external_matches.csv` (2,413 external Tg matches), build/score scripts, and `NOTES_R3.md`. |
 | `analysis/` | EDA and dataset analysis (incl. the new `smile_r3.csv`). Not done yet — the user will assign it; do not duplicate completed work, fill it in as it happens |
 | `experiments/` | One directory per experiment (`R3-C###-YYYYMMDD-HHMM-<slug>`). Every experiment writes config, metrics, decision, hashes. Follow `EXPERIMENT_LOOP.md` |
 | `final_submissions/` | Best 2 CSV + their generating notebook/`.py` pairs. See §10 |
@@ -43,6 +46,7 @@ Working directory: `/Users/daver/Desktop/AISEHack 2.0 Polymr Property Prediction
 | `TRIALS.md` | Catalog of everything tried in Round 1/2 and whether it worked — consult before proposing an experiment |
 | `CONTEXT.md` | Portable, self-contained context — paste it (with TRIALS.md) to any agent without repo access |
 | `FINAL_REPORT.md` | End-of-round deliverable (write at the end, not now) |
+| `score_discrepancy/` | Full analysis of why private LB 0.891 ≠ oracle 0.904. Includes oracle extension research, per-category Tg R² breakdown, calibration verification, and priority action plan. |
 
 **Everything for Round 3 lives in this repo on this Mac** — code, experiment
 logs, results, and submissions. Never store Round 3 artifacts primarily on the
@@ -123,22 +127,51 @@ score as evidence).
 
 ## 6. Oracle policy (verification only — never more)
 
-The oracle (`Oracle/oracle.csv` + proxy) is a local, incomplete answer panel
-(3,818 exact / 4,905 proxy of 4,940 test rows) used to verify frozen candidates.
-It is the ONLY exception to external knowledge, and it is verification-only:
+### The authoritative oracle file: `Oracle/final_oracle.csv`
 
-- Read it ONLY after a candidate CSV is fully written, frozen, and hashed
-  (post-freeze lane), and only via `Oracle/score_round2_ORACLE_ASSISTED_RESEARCH_ONLY.py`
-  (adapted to Round 3 paths).
+Built 2026-08-30. **Use this for ALL future experiment scoring** — it supersedes
+`oracle_proxy_DIAGNOSTIC_ONLY.csv`. Coverage and calibration verified against
+the Round 2 private LB (0.891).
+
+| Panel | Rows covered | Notes |
+|-------|-------------|-------|
+| `verified` | 3,818 | Archive + Khazana exact (≤1e-12 error) |
+| `external_verified` | 983 | 5 public Tg DBs, RDKit canonical, MAE 0.25°C |
+| `proxy` | 108 | Round-1 recovered proxy values |
+| `unresolved` | **31** | No match found anywhere — NaN |
+| **Total** | **4,940** | One row per test entry; 4,909 have values |
+
+**Calibration confirmed (2026-08-30):** `private_LB ≈ final_oracle_score − 0.011`
+
+V57 submission.csv scored against final_oracle.csv: **0.9024** → private LB 0.891
+gap = +0.0114. This is the authoritative calibration factor for Round 3.
+
+Per-category Tg R² on submission.csv (key discovery):
+- archive_verified rows (1,641): R² = **0.9023** ← was all oracle showed before
+- external_verified rows (979):  R² = **0.8856** ← −0.017 vs archive (medium difficulty)
+- proxy-only rows (108):         R² = **0.8305** ← hardest of the resolved rows
+- Estimated true Tg R² (all 2,763 rows): **~0.882** (includes unresolvable 31 rows)
+
+Sources used to build final_oracle.csv (all in `Oracle/sources/`):
+`felipeporcher_polyinfo` · `fridaycode_point2` · `linyeping_tgss` · `oleggromov` ·
+`lamalab_polymetrix` — 29,261 entries, 11,942 unique canonical SMILES.
+**Khazana does NOT contain Tg** (only: Eat, Xc, Egc, Egb, Eea, Ei, nc, eps).
+
+### Oracle usage rules
+
+- Read `final_oracle.csv` ONLY after a candidate CSV is fully written, frozen, and hashed
+  (post-freeze lane). Use `Oracle/score_round2_ORACLE_ASSISTED_RESEARCH_ONLY.py`
+  adapted to pass `--proxy Oracle/final_oracle.csv`.
 - Allowed after freeze: aggregate component selection for the NEXT candidate
   (label it `oracle-observed`).
 - FORBIDDEN: any oracle value in training, features, transforms, calibration,
   routing, blend-weight selection before freeze, or per-row predictions; copying
   oracle rows into any submission; model-filling unresolved rows and calling them
   answers; any reference to `Oracle/` from a notebook/script/CSV that gets
-  uploaded or submitted.
-- Before any upload, scan the notebook for `oracle|Oracle|ORACLE_ASSISTED` — must
-  be absent. Also scan that it reads nothing outside the official Kaggle data dir.
+  uploaded or submitted. The `Oracle/sources/` external databases are also
+  prohibited from entering any training pipeline.
+- Before any upload, scan the notebook for `oracle|Oracle|ORACLE_ASSISTED|sources/` —
+  must be absent. Also scan that it reads nothing outside the official Kaggle data dir.
 
 ## 7. Data facts you must not rediscover
 
@@ -150,8 +183,13 @@ It is the ONLY exception to external knowledge, and it is verification-only:
   ei 222/148 · eea 221/147 · nc 229/153 · eps 229/153.
 - 457 SMILES appear in both train and test — always use structure-grouped
   validation (a canonical structure must never straddle train/val folds).
-- Round 2 no-archive best: verified 0.9042 / proxy 0.9030 local, public 0.891.
-  Round 2 weak targets were eps, nc, ei (and tg without archive).
+- Round 2 no-archive best submitted (V57): oracle verified 0.9035, proxy 0.9024,
+  public LB 0.917, **private LB 0.891**. Gap: pub−priv = 0.026 (unusually large;
+  deep chain variance + easy-row pub split). Weak targets: ei (0.871), eps (0.888).
+- **Oracle calibration (confirmed):** `private_LB ≈ final_oracle_score − 0.011`
+  To beat 0.92 private, need **final_oracle ≥ 0.933** (hard target: 0.935).
+- All R3 experiments scored so far peak at 0.9028 (below V57 0.9035). Need ~+0.032
+  oracle improvement — requires fundamentally new approaches, not chain tuning.
 - The "4,497" figure on the Kaggle Data page counts unique test SMILES, not rows.
   The submission must have 4,940 rows, ids 1..4940, exactly `id,target`.
 

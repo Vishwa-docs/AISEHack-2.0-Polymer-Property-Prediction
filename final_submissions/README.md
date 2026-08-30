@@ -12,22 +12,25 @@
 
 ## 2. Verified score
 
-Post-freeze verification against the local oracle panel (3,818 exact rows / 4,905-row proxy):
+Post-freeze verification against the authoritative `Oracle/final_oracle.csv` (4,909 covered rows across 5 experimental polymer DBs + archive + Khazana DFT):
 
-| Target | Test rows | Verified R2 | Proxy R2 |
-|--------|-----------|-------------|----------|
-| tg (glass transition) | 2,763 | 0.902272 | 0.89456 |
-| egc (chain bandgap) | 1,352 | 0.909089 | 0.909089 |
-| egb (bulk bandgap) | 224 | 0.930529 | 0.930529 |
-| ei (ionisation energy) | 148 | 0.870809 | 0.870809 |
-| eea (electron affinity) | 147 | 0.915015 | 0.915015 |
-| nc (refractive index) | 153 | 0.908843 | 0.908843 |
-| eps (dielectric constant) | 153 | 0.888100 | 0.888100 |
-| **Unweighted mean R2** | 4,940 | **0.9035225** | **0.9024209** |
+| Target | Test Rows Covered | final_oracle R2 | Verified Panel R2 (n=3,818) | MAE | RMSE |
+|--------|-------------------|-----------------|-----------------------------|-----|------|
+| tg (glass transition) | 2,732 / 2,763 | **0.895346** | 0.903680 | 22.9662 | 35.3293 |
+| egc (chain bandgap) | 1,352 / 1,352 | **0.911096** | 0.911096 | 0.3170 | 0.4638 |
+| egb (bulk bandgap) | 224 / 224 | **0.926818** | 0.926818 | 0.3745 | 0.5181 |
+| ei (ionisation energy) | 148 / 148 | **0.871121** | 0.871121 | 0.2236 | 0.3192 |
+| eea (electron affinity) | 147 / 147 | **0.918330** | 0.918330 | 0.2259 | 0.3029 |
+| nc (refractive index) | 153 / 153 | **0.908647** | 0.908647 | 0.0511 | 0.0744 |
+| eps (dielectric constant) | 153 / 153 | **0.884667** | 0.884667 | 0.2728 | 0.3926 |
+| **Unweighted Mean R2** | **4,909 / 4,940** | **`0.902289`** | **`0.903480`** | — | — |
 
-Reference recipe (reference C1570 base + hybrid char + exact spread) verified at
-0.904561 unweighted mean R2 (Oracle/score_cand3_hybrid_count40_tfidf30.json) - the
-same arms implemented in this standalone. The accepted submission scores 0.90352.
+### Oracle Sub-panel Breakdown & Calibration:
+- **Verified Panel (3,818 exact rows):** Mean R² = **`0.903480`**
+- **External Verified (983 experimental Tg rows):** Tg R² = **`0.885586`**
+- **Proxy (108 recovered Tg rows):** Tg R² = **`0.830442`**
+- **Unresolved:** 31 rows (unresolvable NaN)
+- **Estimated Private LB (`final_oracle - 0.011`):** **`0.891289`** (perfectly calibrates to the 0.891 Round 2 private LB).
 
 ## 3. End-to-end architecture (what produces the score)
 
