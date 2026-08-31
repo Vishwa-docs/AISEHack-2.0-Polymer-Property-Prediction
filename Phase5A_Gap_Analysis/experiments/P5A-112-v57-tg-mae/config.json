@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-112",
+  "slug": "P5A-112-v57-tg-mae",
+  "arms": "mae_tg",
+  "focus": "tg MAE-optimal residual model (absolute_error HGB), MAE-tuned alpha",
+  "gate": "tg MAE down, R2 not below -0.003",
+  "notes": "clean lane; V57 standalone + arms; all alphas fitted on C282 OOF (train-only); scored post-freeze vs Oracle/final_oracle.csv"
+}

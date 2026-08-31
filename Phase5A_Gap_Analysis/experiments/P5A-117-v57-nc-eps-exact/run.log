@@ -1,0 +1,352 @@
+[1/6] building C282/C284/C285 reference leaves ...
+[2/6] building F03 clean candidate + fable engines F01..F06 ...
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:416: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  all_labels = pd.concat([train[['can', 'target_type', 'target']], archive[['can', 'target_type', 'target']]], ignore_index=True).drop_duplicates().reset_index(drop=True)
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:416: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  all_labels = pd.concat([train[['can', 'target_type', 'target']], archive[['can', 'target_type', 'target']]], ignore_index=True).drop_duplicates().reset_index(drop=True)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:416: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  all_labels = pd.concat([train[['can', 'target_type', 'target']], archive[['can', 'target_type', 'target']]], ignore_index=True).drop_duplicates().reset_index(drop=True)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:416: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  all_labels = pd.concat([train[['can', 'target_type', 'target']], archive[['can', 'target_type', 'target']]], ignore_index=True).drop_duplicates().reset_index(drop=True)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:416: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  all_labels = pd.concat([train[['can', 'target_type', 'target']], archive[['can', 'target_type', 'target']]], ignore_index=True).drop_duplicates().reset_index(drop=True)
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:416: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  all_labels = pd.concat([train[['can', 'target_type', 'target']], archive[['can', 'target_type', 'target']]], ignore_index=True).drop_duplicates().reset_index(drop=True)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:416: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  all_labels = pd.concat([train[['can', 'target_type', 'target']], archive[['can', 'target_type', 'target']]], ignore_index=True).drop_duplicates().reset_index(drop=True)
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:416: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  all_labels = pd.concat([train[['can', 'target_type', 'target']], archive[['can', 'target_type', 'target']]], ignore_index=True).drop_duplicates().reset_index(drop=True)
+[3/6] building F11/F14/F15/F18/F10 portfolios + C287 zoo ...
+[4/6] building C287 zoo arms + C286v4 + C340 + C927 + C391 ...
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/sklearn/linear_model/_huber.py:348: ConvergenceWarning: lbfgs failed to converge after 500 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=500).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+  self.n_iter_ = _check_optimize_result("lbfgs", opt_res, self.max_iter)
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/sklearn/linear_model/_huber.py:348: ConvergenceWarning: lbfgs failed to converge after 500 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=500).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+  self.n_iter_ = _check_optimize_result("lbfgs", opt_res, self.max_iter)
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/sklearn/linear_model/_huber.py:348: ConvergenceWarning: lbfgs failed to converge after 500 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=500).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+  self.n_iter_ = _check_optimize_result("lbfgs", opt_res, self.max_iter)
+/home/vishwa/Desktop/AISEHack-2.0/.venv-polymer/lib/python3.12/site-packages/sklearn/linear_model/_huber.py:348: ConvergenceWarning: lbfgs failed to converge after 500 iteration(s) (status=1):
+STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+Increase the number of iterations to improve the convergence (max_iter=500).
+You might also want to scale the data as shown in:
+    https://scikit-learn.org/stable/modules/preprocessing.html
+  self.n_iter_ = _check_optimize_result("lbfgs", opt_res, self.max_iter)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:3687: RuntimeWarning: All-NaN slice encountered
+  med = np.nanmedian(out, axis=0)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:3687: RuntimeWarning: All-NaN slice encountered
+  med = np.nanmedian(out, axis=0)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:3687: RuntimeWarning: All-NaN slice encountered
+  med = np.nanmedian(out, axis=0)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:3687: RuntimeWarning: All-NaN slice encountered
+  med = np.nanmedian(out, axis=0)
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:4275: RuntimeWarning: overflow encountered in cast
+  base_dense = c391_pi1m_zoo_c289_sanitize_dense(np.hstack([descriptor, physical, pi1m_features, morgan2, morgan3, maccs]).astype(np.float32))
+[5/6] building F21/F24/F26 stack ...
+[6/6] chaining the candidate spine ...
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:7797: RuntimeWarning: overflow encountered in cast
+  out = np.asarray(x, dtype=np.float32)
+!!! Warning !!! Distance between atoms 10 and 5 (0.868222 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 6 (0.882402 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 5 (0.992447 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 6 (0.824808 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 7 (0.915626 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 5 (0.992497 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 5 (0.991281 A) is suspicious.
+!!! Warning !!! Distance between atoms 4 and 2 (0.997327 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.860861 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 3 (0.993039 A) is suspicious.
+!!! Warning !!! Distance between atoms 18 and 4 (0.993458 A) is suspicious.
+!!! Warning !!! Distance between atoms 22 and 8 (0.992121 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 4 (0.992843 A) is suspicious.
+!!! Warning !!! Distance between atoms 4 and 3 (0.898046 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 3 (0.953674 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 3 (0.992913 A) is suspicious.
+!!! Warning !!! Distance between atoms 19 and 9 (0.992256 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 10 (0.991287 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 8 (0.992622 A) is suspicious.
+!!! Warning !!! Distance between atoms 18 and 7 (0.958420 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 4 (0.992379 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 4 (0.877402 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 5 (0.825891 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.968482 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 2 (0.951967 A) is suspicious.
+!!! Warning !!! Distance between atoms 14 and 7 (0.984731 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 3 (0.843112 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 2 (0.992402 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 2 (0.992401 A) is suspicious.
+!!! Warning !!! Distance between atoms 20 and 8 (0.992916 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.990826 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 4 (0.868616 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 5 (0.847554 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 7 (0.993022 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 7 (0.993072 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 7 (0.991286 A) is suspicious.
+!!! Warning !!! Distance between atoms 15 and 7 (0.991271 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 5 (0.991295 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 5 (0.991300 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 7 (0.913368 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 9 (0.984092 A) is suspicious.
+!!! Warning !!! Distance between atoms 23 and 13 (0.965940 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 3 (0.917842 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.824675 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.912718 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 6 (0.728544 A) is suspicious.
+!!! Warning !!! Distance between atoms 15 and 1 (0.903251 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 3 (0.979849 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 6 (0.878717 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 7 (0.878716 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992658 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992955 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992337 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992662 A) is suspicious.
+!!! Warning !!! Distance between atoms 14 and 1 (0.993109 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 1 (0.992857 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 1 (0.989508 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 5 (0.992767 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 9 (0.993061 A) is suspicious.
+!!! Warning !!! Distance between atoms 23 and 11 (0.992927 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 5 (0.992355 A) is suspicious.
+!!! Warning !!! Distance between atoms 19 and 9 (0.992345 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 11 (0.992435 A) is suspicious.
+!!! Warning !!! Distance between atoms 25 and 1 (0.997147 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992724 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 1 (0.991775 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992396 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 3 (0.878753 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.878752 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 8 (0.947499 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 9 (0.969491 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 3 (0.983953 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 5 (0.868223 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 6 (0.882401 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 4 (0.882230 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 5 (0.868157 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 3 (0.836158 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 5 (0.992479 A) is suspicious.
+!!! Warning !!! Distance between atoms 4 and 2 (0.917905 A) is suspicious.
+!!! Warning !!! Distance between atoms 7 and 6 (0.972291 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 5 (0.992933 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 5 (0.991307 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.875163 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 3 (0.992913 A) is suspicious.
+!!! Warning !!! Distance between atoms 18 and 4 (0.993459 A) is suspicious.
+!!! Warning !!! Distance between atoms 22 and 8 (0.992415 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 4 (0.992843 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 3 (0.992442 A) is suspicious.
+!!! Warning !!! Distance between atoms 19 and 9 (0.992608 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 10 (0.991267 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 8 (0.992729 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 4 (0.992555 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 4 (0.819945 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 5 (0.801963 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.995300 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 2 (0.814563 A) is suspicious.
+!!! Warning !!! Distance between atoms 14 and 7 (0.828383 A) is suspicious.
+!!! Warning !!! Distance between atoms 3 and 2 (0.891010 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 2 (0.958126 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 2 (0.992402 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 2 (0.992402 A) is suspicious.
+!!! Warning !!! Distance between atoms 20 and 8 (0.992912 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.990743 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 7 (0.993020 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 7 (0.993072 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 7 (0.991286 A) is suspicious.
+!!! Warning !!! Distance between atoms 15 and 7 (0.991261 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 5 (0.909516 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 6 (0.992031 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 5 (0.991295 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 7 (0.819959 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.956439 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 5 (0.991299 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 5 (0.898759 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 6 (0.884332 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 7 (0.748538 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 6 (0.878711 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 7 (0.878710 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 5 (0.888724 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 6 (0.888567 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992843 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992713 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992328 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992349 A) is suspicious.
+!!! Warning !!! Distance between atoms 14 and 1 (0.992490 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 1 (0.993091 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 1 (0.992743 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 5 (0.992380 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 9 (0.991393 A) is suspicious.
+!!! Warning !!! Distance between atoms 23 and 11 (0.991575 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 5 (0.992365 A) is suspicious.
+!!! Warning !!! Distance between atoms 19 and 9 (0.993187 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 11 (0.992748 A) is suspicious.
+!!! Warning !!! Distance between atoms 25 and 1 (0.993092 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992428 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 1 (0.993653 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992785 A) is suspicious.
+!!! Warning !!! Distance between atoms 2 and 1 (0.347622 A) is suspicious.
+!!! Warning !!! Distance between atoms 4 and 3 (0.917525 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 5 (0.098594 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 3 (0.971094 A) is suspicious.
+!!! Warning !!! Distance between atoms 18 and 9 (0.992715 A) is suspicious.
+!!! Warning !!! Distance between atoms 19 and 10 (0.923270 A) is suspicious.
+!!! Warning !!! Distance between atoms 20 and 12 (0.929759 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 13 (0.960411 A) is suspicious.
+!!! Warning !!! Distance between atoms 22 and 14 (0.975284 A) is suspicious.
+!!! Warning !!! Distance between atoms 23 and 15 (0.972745 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 3 (0.878752 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.878753 A) is suspicious.
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:4275: RuntimeWarning: overflow encountered in cast
+  base_dense = c391_pi1m_zoo_c289_sanitize_dense(np.hstack([descriptor, physical, pi1m_features, morgan2, morgan3, maccs]).astype(np.float32))
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:5963: RuntimeWarning: overflow encountered in cast
+  base_dense = c407_weak_zoo_c385_sanitize_dense(np.hstack([descriptor, physical, morgan2, morgan3, maccs]).astype(np.float32))
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:5963: RuntimeWarning: overflow encountered in cast
+  base_dense = c407_weak_zoo_c385_sanitize_dense(np.hstack([descriptor, physical, morgan2, morgan3, maccs]).astype(np.float32))
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:6678: RuntimeWarning: overflow encountered in cast
+  matrix = c1369_stack__sanitize_dense(np.hstack([descriptor, physical, morgan2, morgan3, maccs, grammar]).astype(np.float32))
+!!! Warning !!! Distance between atoms 10 and 5 (0.868223 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 6 (0.882401 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 4 (0.882230 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 5 (0.868157 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 3 (0.836158 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 5 (0.992479 A) is suspicious.
+!!! Warning !!! Distance between atoms 4 and 2 (0.917905 A) is suspicious.
+!!! Warning !!! Distance between atoms 7 and 6 (0.972291 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 5 (0.992933 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 5 (0.991307 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.875163 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 3 (0.992913 A) is suspicious.
+!!! Warning !!! Distance between atoms 18 and 4 (0.993459 A) is suspicious.
+!!! Warning !!! Distance between atoms 22 and 8 (0.992415 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 4 (0.992843 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 3 (0.992442 A) is suspicious.
+!!! Warning !!! Distance between atoms 19 and 9 (0.992608 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 10 (0.991267 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 8 (0.992729 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 4 (0.992555 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 4 (0.819945 A) is suspicious.
+!!! Warning !!! Distance between atoms 8 and 5 (0.801963 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.995300 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 2 (0.814563 A) is suspicious.
+!!! Warning !!! Distance between atoms 14 and 7 (0.828383 A) is suspicious.
+!!! Warning !!! Distance between atoms 3 and 2 (0.891010 A) is suspicious.
+!!! Warning !!! Distance between atoms 11 and 2 (0.958126 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 2 (0.992402 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 2 (0.992402 A) is suspicious.
+!!! Warning !!! Distance between atoms 20 and 8 (0.992912 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.990743 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 7 (0.993020 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 7 (0.993072 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 7 (0.991286 A) is suspicious.
+!!! Warning !!! Distance between atoms 15 and 7 (0.991261 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 5 (0.909516 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 6 (0.992031 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 5 (0.991295 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 7 (0.819959 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.956439 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 5 (0.991299 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 5 (0.898759 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 6 (0.884332 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 7 (0.748538 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 6 (0.878711 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 7 (0.878710 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 5 (0.888724 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 6 (0.888567 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992843 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992713 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992328 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992349 A) is suspicious.
+!!! Warning !!! Distance between atoms 14 and 1 (0.992490 A) is suspicious.
+!!! Warning !!! Distance between atoms 13 and 1 (0.993091 A) is suspicious.
+!!! Warning !!! Distance between atoms 12 and 1 (0.992743 A) is suspicious.
+!!! Warning !!! Distance between atoms 17 and 5 (0.992380 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 9 (0.991393 A) is suspicious.
+!!! Warning !!! Distance between atoms 23 and 11 (0.991575 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 5 (0.992365 A) is suspicious.
+!!! Warning !!! Distance between atoms 19 and 9 (0.993187 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 11 (0.992748 A) is suspicious.
+!!! Warning !!! Distance between atoms 25 and 1 (0.993092 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 1 (0.992428 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 1 (0.993653 A) is suspicious.
+!!! Warning !!! Distance between atoms 10 and 1 (0.992785 A) is suspicious.
+!!! Warning !!! Distance between atoms 2 and 1 (0.347622 A) is suspicious.
+!!! Warning !!! Distance between atoms 4 and 3 (0.917525 A) is suspicious.
+!!! Warning !!! Distance between atoms 6 and 5 (0.098594 A) is suspicious.
+!!! Warning !!! Distance between atoms 16 and 3 (0.971094 A) is suspicious.
+!!! Warning !!! Distance between atoms 18 and 9 (0.992715 A) is suspicious.
+!!! Warning !!! Distance between atoms 19 and 10 (0.923270 A) is suspicious.
+!!! Warning !!! Distance between atoms 20 and 12 (0.929759 A) is suspicious.
+!!! Warning !!! Distance between atoms 21 and 13 (0.960411 A) is suspicious.
+!!! Warning !!! Distance between atoms 22 and 14 (0.975284 A) is suspicious.
+!!! Warning !!! Distance between atoms 23 and 15 (0.972745 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 3 (0.878752 A) is suspicious.
+!!! Warning !!! Distance between atoms 9 and 4 (0.878753 A) is suspicious.
+/tmp/r3_final_runtime/P5A-117/v57_standalone.py:5963: RuntimeWarning: overflow encountered in cast
+  base_dense = c407_weak_zoo_c385_sanitize_dense(np.hstack([descriptor, physical, morgan2, morgan3, maccs]).astype(np.float32))
+P5A-117 nc-eps exact: nc alpha=0.3557 (n=134)
+submission written: predictions.csv
+mean per-target final:
+  tg: n=2763 mean=137.837244 std=102.778734
+  egc: n=1352 mean=4.510892 std=1.494268
+  egb: n=224 mean=4.257310 std=1.802294
+  ei: n=148 mean=6.147665 std=0.965017
+  eea: n=147 mean=2.359244 std=0.967128
+  nc: n=153 mean=1.970504 std=0.241585
+  eps: n=153 mean=4.591401 std=1.046345
+done.
+DONE P5A-117

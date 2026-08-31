@@ -1,0 +1,42 @@
+==========================================================================================
+03 EMPIRICAL METRIC VERIFICATION - frozen V57 submission vs Oracle panels
+==========================================================================================
+
+Per-target on final_oracle covered rows (4,909):
+target    n     r2          sse          tss    rmse     mae  sse_share  tss_share
+    tg 2732 0.8953 3409962.3610 3.258328e+07 35.3293 22.9662     0.9999     0.9999
+   egc 1352 0.9111     290.8487 3.271479e+03  0.4638  0.3170     0.0001     0.0001
+   egb  224 0.9268      60.1163 8.214616e+02  0.5181  0.3745     0.0000     0.0000
+    ei  148 0.8711      15.0778 1.169921e+02  0.3192  0.2236     0.0000     0.0000
+   eea  147 0.9183      13.4898 1.651743e+02  0.3029  0.2259     0.0000     0.0000
+    nc  153 0.9086       0.8472 9.274200e+00  0.0744  0.0511     0.0000     0.0000
+   eps  153 0.8847      23.5770 2.044265e+02  0.3926  0.2728     0.0000     0.0000
+
+A: unweighted mean of per-target R2 = 0.9023   (documented 0.9024)
+B: pooled r2_score (sklearn, all covered rows) = 0.9370
+C: TSS-weighted mean (within-pooled) = 0.8953
+A on verified panel only = 0.9035   (documented 0.9035)
+
+Ground truth anchors from Kaggle:
+  private LB = 0.891 (all 4,940 rows)   public LB = 0.917 (~30% subset)
+
+VERDICT:
+  - Variant B gives 0.9370. If Kaggle pooled the array, V57's private LB would be ~0.937,
+    not 0.891 - and it would beat the 0.92 competitor. POOLED IS RULED OUT.
+  - Variant A gives 0.9023 and matches private LB via the documented -0.011 calibration
+    (hard Tg rows + 31 unresolved rows + pub/priv split). THIS IS THE METRIC.
+  - Variant C (0.8953) is numerically close to the LB only because tg is 99.99% of the TSS;
+    it requires a different gap story and contradicts the official text ('mean across the seven targets').
+
+Tg difficulty by oracle row category (final_oracle panel):
+         category    n     r2     mae    rmse
+         verified 1641 0.9037 22.6273 34.0112
+external_verified  983 0.8856 23.1864 37.3217
+            proxy  108 0.8304 26.1128 36.3220
+       unresolved    0    NaN     NaN     NaN
+
+  Estimated true Tg R2 on all 2,763 rows (weighted by category R2): 0.8842   (31 unresolved excluded from oracle score)
+
+Why the private LB (0.891) looked like 'tg R2 (0.8945)': pure coincidence -
+mean(0.9024) - 0.011 calibration = 0.8914 ~= tg R2 0.8953. The team's -0.011 offset
+(documented, explained by hard-row difficulty) happens to be ~= mean - tg_R2 = 0.0071 + 0.004.

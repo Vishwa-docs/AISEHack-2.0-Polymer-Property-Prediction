@@ -1,0 +1,8 @@
+{
+ "exp_id": "P5A-002",
+ "focus": "Tg OOF residual kriging: Tanimoto kNN correction of tg predictions, alpha fitted on train OOF only",
+ "n_estimators": 300,
+ "char_max_features": 4096,
+ "morgan_nbits": 1024,
+ "clip": true
+}

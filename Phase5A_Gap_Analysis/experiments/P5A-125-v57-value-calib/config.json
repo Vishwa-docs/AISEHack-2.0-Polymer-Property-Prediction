@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-125",
+  "slug": "P5A-125-v57-value-calib",
+  "arms": "valcal",
+  "focus": "per-target value-aware calibration: Ridge on [base, base^2] per target (fixes mid-value compression + eps over-dispersion)",
+  "gate": "mean +0.002, eps/ei/nc +0.005",
+  "notes": "clean lane; V57 standalone + arms; alphas on C282 OOF (train-only)"
+}

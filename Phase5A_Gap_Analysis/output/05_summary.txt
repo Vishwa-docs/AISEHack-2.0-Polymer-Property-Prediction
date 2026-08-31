@@ -1,0 +1,2 @@
+TRAIN multi-target polymers: 6565 unique smiles, 415 with >=2 targets
+TEST multi-target polymers: 4497 unique smiles, 291 with >=2 targets

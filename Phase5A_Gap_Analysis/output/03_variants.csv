@@ -1,0 +1,5 @@
+variant,score,note
+A: unweighted mean of per-target R2 (official metric),0.9022893442322809,V57 documented oracle score 0.9024; private LB = 0.891 => -0.011 calibration
+B: sklearn pooled r2_score on all covered rows,0.9369734889912695,"If Kaggle pooled the array, V57 would score ~this on LB - contradicts LB 0.891 (and would beat the 0.92 competitor)"
+C: TSS-weighted mean of per-target R2 (within-pooled),0.8953486017472194,~= R2_tg = 0.8953; private LB 0.891 is 0.004 below - needs a different gap story
+A on verified-only panel (3818 rows),0.9034798503893734,documented verified score 0.9035

@@ -1,0 +1,9 @@
+{
+ "exp_id": "P5A-005",
+ "focus": "ei via egc+eea identity overlay with stronger guarded alpha (0.8 max)",
+ "ei_identity_max_alpha": 0.8,
+ "n_estimators": 300,
+ "char_max_features": 4096,
+ "morgan_nbits": 1024,
+ "clip": true
+}

@@ -1,0 +1,18 @@
+=== 09: ERROR CONCENTRATION, CLIPPING, AFFINE INVARIANCE ===
+
+target    n     r2  top1pct_share  top5pct_share  top10pct_share  clip_bounds_gain  clip_q995_gain  halve_top1pct_gain
+    tg 2732 0.8953         0.2641         0.5551          0.6992            0.0000          0.0001              0.0207
+   egc 1352 0.9111         0.2005         0.4777          0.6424            0.0000         -0.0005              0.0134
+   egb  224 0.9268         0.1465         0.4428          0.5961            0.0000          0.0000              0.0080
+    ei  148 0.8711         0.1234         0.3741          0.5884            0.0000         -0.0012              0.0119
+   eea  147 0.9183         0.0789         0.3915          0.5617            0.0019          0.0021              0.0048
+    nc  153 0.9086         0.2242         0.4915          0.6303            0.0001         -0.0014              0.0154
+   eps  153 0.8847         0.1911         0.4797          0.6266            0.0000         -0.0004              0.0165
+
+clip_bounds_gain  = R2 gain from clipping predictions to [train min, train max] (clean, principled)
+clip_q995_gain    = R2 gain from clipping to train 0.5%/99.5% quantiles
+halve_top1pct_gain= hypothetical R2 gain if the worst 1% rows errors were halved (upper bound of fixing)
+
+AFFINE INVARIANCE: R2(y,p)=0.895346 | R2(0.01*y,0.01*p)=0.895346 | R2(0.01*y+100,0.01*p+100)=0.895346
+=> normalizing/scaling Tg (or any single target) changes NOTHING for per-target R2.
+   Normalization only matters when targets share ONE loss (joint/multi-task training).

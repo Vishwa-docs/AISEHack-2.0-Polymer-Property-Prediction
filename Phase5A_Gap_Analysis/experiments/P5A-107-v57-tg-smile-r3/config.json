@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-107",
+  "slug": "P5A-107-v57-tg-smile-r3",
+  "arms": "smiler3",
+  "focus": "tg residual model on smile_r3-fitted char-SVD features (400k sample)",
+  "gate": "tg +0.010",
+  "notes": "clean lane; V57 standalone + arms; all alphas fitted on C282 OOF (train-only); scored post-freeze vs Oracle/final_oracle.csv"
+}

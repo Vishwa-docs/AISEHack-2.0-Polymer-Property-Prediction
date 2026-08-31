@@ -1,0 +1,57 @@
+[
+ {
+  "claim": "tg has 4,143 train rows",
+  "verified": "YES",
+  "detail": "actual 4143"
+ },
+ {
+  "claim": "ei has 222 train rows",
+  "verified": "YES",
+  "detail": "actual 222"
+ },
+ {
+  "claim": "nc has 229 train rows",
+  "verified": "YES",
+  "detail": "actual 229"
+ },
+ {
+  "claim": "tg std ~ 109.1",
+  "verified": "YES",
+  "detail": "actual 109.0836"
+ },
+ {
+  "claim": "ei std ~ 1.04",
+  "verified": "YES",
+  "detail": "actual 1.0471"
+ },
+ {
+  "claim": "nc std ~ 0.23",
+  "verified": "YES",
+  "detail": "actual 0.2354"
+ },
+ {
+  "claim": "tg internal variance ~ 49,298,827 (4143*109.1^2)",
+  "verified": "YES",
+  "detail": "claim 49,313,342 vs exact n*var 49,298,527"
+ },
+ {
+  "claim": "ei internal variance ~ 240 (222*1.04^2)",
+  "verified": "YES",
+  "detail": "claim 240.1 vs exact 243.4"
+ },
+ {
+  "claim": "nc internal variance ~ 12 (229*0.23^2)",
+  "verified": "YES",
+  "detail": "claim 12.1 vs exact 12.7"
+ },
+ {
+  "claim": "Tg is 55.9% of TEST rows (2763/4940)",
+  "verified": "YES",
+  "detail": "actual 2763/4940 = 0.5593"
+ },
+ {
+  "claim": "Tg is 55.9% of TRAIN rows",
+  "verified": "YES",
+  "detail": "actual 4143/7409 = 0.5592"
+ }
+]

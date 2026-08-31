@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-126",
+  "slug": "P5A-126-v57-eea-identity",
+  "arms": "eea_id",
+  "focus": "eea via ei - egc identity with exact partner overlay (reverse direction - missing so far; eea needs only 0.003 RMSE for 0.92)",
+  "gate": "eea +0.005",
+  "notes": "clean lane; V57 standalone + arms; alphas on C282 OOF (train-only)"
+}

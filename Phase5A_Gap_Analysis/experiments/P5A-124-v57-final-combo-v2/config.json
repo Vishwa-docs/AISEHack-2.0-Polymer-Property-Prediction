@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-124",
+  "slug": "P5A-124-v57-final-combo-v2",
+  "arms": "kriging,calib,ei,eps,egb,char_tune,spread_tune,shrink,mae_tg,weak_aug,smiler3,nc_eps,mae_weak,tg_gbm,weak_stack,weak_kernel,tg_aug_char",
+  "focus": "ALL arms: best-possible candidate v2",
+  "gate": "mean > 0.907, no target < -0.003",
+  "notes": "clean lane; V57 standalone + arms; all alphas fitted on C282 OOF (train-only); scored post-freeze vs Oracle/final_oracle.csv"
+}

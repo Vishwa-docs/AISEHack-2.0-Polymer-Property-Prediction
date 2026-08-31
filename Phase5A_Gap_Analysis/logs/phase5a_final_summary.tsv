@@ -1,0 +1,2 @@
+exp_id	slug	mean_oracle_r2	mean_oof_r2	tg_r2	egc_r2	egb_r2	ei_r2	eea_r2	eps_r2	nc_r2
+P5A-117	P5A-117-v57-nc-eps-exact	0.84403	0.0	0.895346	0.911097	0.92683	0.512003	0.879781	0.884693	0.898462

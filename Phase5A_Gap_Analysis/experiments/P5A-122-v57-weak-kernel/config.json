@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-122",
+  "slug": "P5A-122-v57-weak-kernel",
+  "arms": "weak_kernel",
+  "focus": "weak-target Tanimoto KRR residual models (kernel/similarity method for small data)",
+  "gate": "weak targets +0.005 each",
+  "notes": "clean lane; V57 standalone + arms; all alphas fitted on C282 OOF (train-only); scored post-freeze vs Oracle/final_oracle.csv"
+}

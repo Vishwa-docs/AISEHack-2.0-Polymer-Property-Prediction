@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-104",
+  "slug": "P5A-104-v57-eps-ionic",
+  "arms": "eps",
+  "focus": "eps via nc^2+ionic identity (61.8% variance removed)",
+  "gate": "eps +0.010",
+  "notes": "clean lane; V57 standalone + arms; all alphas fitted on C282 OOF (train-only); scored post-freeze vs Oracle/final_oracle.csv"
+}

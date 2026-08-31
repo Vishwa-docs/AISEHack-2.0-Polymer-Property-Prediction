@@ -1,0 +1,5 @@
+Similarity Bin,Row Count,Percentage
+< 0.3 (Very Low / OOD),25,0.51
+0.3 - 0.5 (Low / Novel),270,5.47
+0.5 - 0.7 (Medium),797,16.13
+0.7 - 1.0 (High / Scaffold Match),3848,77.89

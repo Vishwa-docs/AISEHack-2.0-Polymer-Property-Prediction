@@ -1,0 +1,8 @@
+target,total_test_rows,resolved_in_oracle,unresolved_count,coverage_pct
+tg,2763,2732,31,98.87803112558812
+egc,1352,1352,0,100.0
+egb,224,224,0,100.0
+ei,148,148,0,100.0
+eea,147,147,0,100.0
+eps,153,153,0,100.0
+nc,153,153,0,100.0

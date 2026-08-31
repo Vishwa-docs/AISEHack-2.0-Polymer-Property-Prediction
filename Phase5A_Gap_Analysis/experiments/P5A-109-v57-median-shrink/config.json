@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-109",
+  "slug": "P5A-109-v57-median-shrink",
+  "arms": "shrink",
+  "focus": "per-target shrink toward train median (alpha on OOF)",
+  "gate": "mean +0.002",
+  "notes": "clean lane; V57 standalone + arms; all alphas fitted on C282 OOF (train-only); scored post-freeze vs Oracle/final_oracle.csv"
+}

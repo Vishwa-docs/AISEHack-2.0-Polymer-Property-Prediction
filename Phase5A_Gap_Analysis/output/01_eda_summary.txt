@@ -1,0 +1,42 @@
+==============================================================================
+01 DATASET EDA - per-target statistics (train.csv, 7,409 rows; test.csv, 4,940 rows)
+==============================================================================
+target                       name  train_n  train_mean  train_std  train_min  train_q25  train_median  train_q75  train_max  train_skew  train_var    train_TSS  test_n  train_row_share  test_row_share  train_TSS_share
+    tg Glass Transition Tg (degC)     4143    143.4589   109.0836  -109.8200    58.0000      136.4000   232.0000   495.0000      0.0912 11899.2342 4.928663e+07    2763           0.5592          0.5593           0.9999
+   egc         Chain Bandgap (eV)     2028      4.5290     1.5682     0.0205     3.2655        4.6136     5.8321     9.8627     -0.1025     2.4592 4.984698e+03    1352           0.2737          0.2737           0.0001
+   egb          Bulk Bandgap (eV)      337      4.2763     1.9786     0.5068     2.5870        4.0520     5.8529    10.1137      0.4451     3.9149 1.315418e+03     224           0.0455          0.0453           0.0000
+    ei     Ionisation Energy (eV)      222      6.3463     1.0471     4.0261     5.6643        6.1679     6.8894     9.8385      0.7895     1.0964 2.423089e+02     148           0.0300          0.0300           0.0000
+   eea     Electron Affinity (eV)      221      2.2781     1.1072     0.3936     1.3443        2.2723     3.0595     5.1438      0.2248     1.2258 2.696762e+02     147           0.0298          0.0298           0.0000
+    nc           Refractive Index      229      1.9340     0.2354     1.5596     1.7609        1.9001     2.0504     2.7581      0.8887     0.0554 1.263810e+01     153           0.0309          0.0310           0.0000
+   eps        Dielectric Constant      229      4.5766     1.0940     2.6100     3.8000        4.3200     5.1700     9.0900      1.2220     1.1968 2.728740e+02     153           0.0309          0.0310           0.0000
+
+Total train TSS (sum over targets, within-target only): 49,293,726
+Total test  rows by target sum: 4940  (must be 4940)
+
+------------------------------------------------------------------------------
+POOLED (all-rows) TSS decomposition  [what a 'pool the array' metric would see]
+------------------------------------------------------------------------------
+TRAIN: within-target TSS  = 49,293,726  (58.2% of pooled)
+TRAIN: between-target TSS = 35,372,132  (41.8% of pooled)
+TRAIN: pooled TSS         = 84,665,858   (global mean = 82.11)
+TEST(proxy): within  = 32,870,411   between = 23,583,166   pooled = 56,453,577
+TEST(proxy): between-target variance is 0.7x the within-target variance
+
+Claim check: 'saving 7,000 SSE on a denominator of ~84,000,000 improves score by 0.00008'
+  - Actual TEST-proxy pooled TSS = 56,453,577  (claim said ~84M; actual ~56M)
+  - Actual TRAIN TSS of the 6 non-tg targets = 7,098 (claim implied ~7,000)
+  - So even under a fully pooled metric, perfecting all 6 small targets saves at most 7,098 SSE,
+    i.e. 0.000126 in pooled R^2 terms (claim said 0.00008; actual 0.00012572)
+
+------------------------------------------------------------------------------
+LABEL QUALITY
+------------------------------------------------------------------------------
+exact (smiles,target_type) duplicated rows: 3  |  with CONFLICTING values (nunique>1): 3
+                                                                                                                                         count  nunique     min     max
+smiles                                                                                                                      target_type                                
+*C(C*)c1ncccc1                                                                                                              tg               2        2   98.28  105.00
+*O[Si](*)(CCCOc1ccc(cc1)C(=O)OC1CC2=CCC3C(CCC4(C(CCC34)C(CCCC(C)C)C)C)C2(CC1)C)C                                            tg               2        2   61.10   72.08
+*c1cc2c(C(=O)N(C2=O)c2ccc(cc2)Oc2ccc(cc2)N2C(=O)c3c(C2=O)cc(cc3)C(=O)Nc2ccc(cc2)Oc2c(cccc2)c2c(cccc2)Oc2ccc(cc2)NC(=O)*)cc1 tg               2        2  239.00  244.00
+train SMILES appearing under >=2 target types: 415 (of 6565 unique) -> cross-property learning possible for these
+test  SMILES appearing under >=2 target types: 291 (of 4497 unique)
+SMILES in BOTH train and test: 457 (AGENTS says 457)

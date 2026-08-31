@@ -1,0 +1,53 @@
+========================================================================================
+02 METRIC MATH - official metric = UNWEIGHTED MEAN of the seven per-target R2 values
+   Score = (R2_tg + R2_egc + R2_egb + R2_ei + R2_eea + R2_nc + R2_eps) / 7
+========================================================================================
+
+KEY RESULT 1 - every target is worth EXACTLY 1/7 of the score, regardless of rows.
+  +0.01 R2 on ANY single target = +0.00143 on the mean.  (+0.05 -> +0.00714)
+
+KEY RESULT 2 - the marginal value of an absolute SSE reduction is (1/7)/TSS_j:
+  cutting SSE by 1 unit on nc is worth ~4 MILLION times more than on tg,
+  but the SSE you can realistically cut scales with TSS_j. R2 already normalises this.
+
+KEY RESULT 3 - 'make one target perfect' ceilings (current mean 0.9024):
+  perfect  tg -> mean 0.9172   (gain +0.0150)
+  perfect egc -> mean 0.9150   (gain +0.0127)
+  perfect egb -> mean 0.9127   (gain +0.0105)
+  perfect  ei -> mean 0.9207   (gain +0.0184)
+  perfect eea -> mean 0.9140   (gain +0.0117)
+  perfect  nc -> mean 0.9153   (gain +0.0131)
+  perfect eps -> mean 0.9188   (gain +0.0165)
+
+  => Even a PERFECT Tg model gives mean 0.9175 only; perfect ei gives 0.9210.
+     'Throw everything at Tg' alone CANNOT reach 0.935. (Refutes analysis #1's strategy.)
+
+KEY RESULT 4 - TSS-weighted (pooled-within-target) metric would give tg ~98-99% weight:
+   tg: test-proxy TSS   32,865,685  = 99.99% of total
+  egc: test-proxy TSS        3,322  =  0.01% of total
+  egb: test-proxy TSS          873  =  0.00% of total
+   ei: test-proxy TSS          161  =  0.00% of total
+  eea: test-proxy TSS          179  =  0.00% of total
+   nc: test-proxy TSS            8  =  0.00% of total
+  eps: test-proxy TSS          182  =  0.00% of total
+  Under such a metric, LB ~ R2_tg = 0.8953 and the 0.891 private LB coincidence would be explained.
+  The official page says 'mean ... across the seven targets' = unweighted. Empirical check in script 03.
+
+KEY RESULT 5 - what it takes to reach 0.935 (need +0.0326 mean = +0.228 R2 spread over 7 targets):
+  Per-target R2 needed if every target improves by the same amount: +0.0326 each.
+  That means ~0.928 avg (tg 0.928, ei 0.904, eps 0.917, ...) - i.e. state-of-the-art on EVERY target.
+
+Scenario table (mean of 7 per-target R2, oracle panel):
+                                                                                      scenario   mean   gain     tg    egc    egb     ei    eea     nc    eps
+                                                                          V57 current baseline 0.9023 0.0000 0.8953 0.9111 0.9268 0.8711 0.9183 0.9086 0.8847
+                                                               S1 all targets +0.033 (uniform) 0.9353 0.0330 0.9283 0.9441 0.9598 0.9041 0.9513 0.9416 0.9177
+S2 realistic 7-target push (tg .920, egc .922, egb .940, ei .905, eea .928, nc .920, eps .910) 0.9207 0.0184 0.9200 0.9220 0.9400 0.9050 0.9280 0.9200 0.9100
+                                                  S3 'Tg-only hack' - tg to 0.95, nothing else 0.9101 0.0078 0.9500 0.9111 0.9268 0.8711 0.9183 0.9086 0.8847
+                                                                   S4 perfect Tg only (R2=1.0) 0.9172 0.0150 1.0000 0.9111 0.9268 0.8711 0.9183 0.9086 0.8847
+                                S5 weak-target push only (ei .905, eps .915, others unchanged) 0.9115 0.0092 0.8953 0.9111 0.9268 0.9050 0.9183 0.9086 0.9150
+               S6 big+weak (tg .915, ei .905, eps .910, nc .918, eea .925, egc .918, egb .935) 0.9180 0.0157 0.9150 0.9180 0.9350 0.9050 0.9250 0.9180 0.9100
+             S7 aggressive (tg .925, egc .925, egb .945, ei .915, eea .935, nc .925, eps .920) 0.9271 0.0249 0.9250 0.9250 0.9450 0.9150 0.9350 0.9250 0.9200
+                S8 ceiling-flirt (tg .93, egc .93, egb .95, ei .92, eea .94, nc .93, eps .925) 0.9321 0.0299 0.9300 0.9300 0.9500 0.9200 0.9400 0.9300 0.9250
+
+Takeaways: S3/S4 (Tg-only) cap ~0.910-0.917. 0.935 needs near-uniform ~0.03 gains,
+with the biggest absolute lifts coming from tg (+~0.025), ei (+~0.035), eps (+~0.02).

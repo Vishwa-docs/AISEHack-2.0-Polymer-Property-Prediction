@@ -1,0 +1,11 @@
+=== 10: PHYSICS IDENTITIES ON TRAIN (same-polymer paired labels) ===
+
+egb vs egc: 82 same-polymer pairs (of egb 337 rows)
+  linear fit egb = a*egc + b:  a=1.1026  b=-0.694  R2=0.8577  resid_std=0.6813 eV
+ei vs (egc+eea): 10 same-polymer triples (ei 222 rows)
+eps vs nc: 134 same-polymer pairs
+  ionic = eps - nc^2: mean 0.7667  std 0.4088
+  eps std 1.0697 vs ionic std 0.4088 -> 61.8% of eps variance removed by the nc^2 baseline
+  R2 of predicting eps = nc^2 alone: 0.3364  (the residual = ionic is what must be modeled)
+
+Tg duplicated-polymer labels: 3 polymers with 2+ measurements; avg within-polymer scatter sd 5.35 C

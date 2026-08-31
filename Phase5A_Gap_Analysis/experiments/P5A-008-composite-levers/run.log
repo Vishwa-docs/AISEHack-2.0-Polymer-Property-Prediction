@@ -1,0 +1,19 @@
+[core] features built in 10.5s  Xtr=(7409, 5135) Xte=(4940, 5135)
+[core] stage1 tg: OOF R2=0.8968 (et)
+[core] stage1 egc: OOF R2=0.8988 (nnls)
+[core] stage1 egb: OOF R2=0.8754 (lgb)
+[core] stage1 ei: OOF R2=0.7710 (lgb)
+[core] stage1 eea: OOF R2=0.8621 (lgb)
+[core] stage1 nc: OOF R2=0.8035 (lgb)
+[core] stage1 eps: OOF R2=0.7073 (lgb)
+[core] stage2 tg: OOF R2=0.8992
+[core] stage2 egc: OOF R2=0.9633
+[core] stage2 egb: OOF R2=0.9073
+[core] stage2 ei: OOF R2=0.8001
+[core] stage2 eea: OOF R2=0.8858
+[core] stage2 nc: OOF R2=0.8780
+[core] stage2 eps: OOF R2=0.8337
+[core] overlay eps: alpha=0.104 -> OOF R2=0.8352
+[core] overlay egb: alpha=0.333 -> OOF R2=0.9179
+[core] overlay ei: alpha=0.233 -> OOF R2=0.8142
+DONE P5A-008 mean_oof_r2=0.8848

@@ -1,0 +1,20 @@
+[core] features built in 9.5s  Xtr=(7409, 5135) Xte=(4940, 5135)
+smile_r3 SVD block: (7409, 48) / (4940, 48)
+[core] stage1 tg: OOF R2=0.8985 (et)
+[core] stage1 egc: OOF R2=0.8759 (lgb)
+[core] stage1 egb: OOF R2=0.8687 (lgb)
+[core] stage1 ei: OOF R2=0.7745 (et)
+[core] stage1 eea: OOF R2=0.8682 (lgb)
+[core] stage1 nc: OOF R2=0.7595 (lgb)
+[core] stage1 eps: OOF R2=0.6694 (lgb)
+[core] stage2 tg: OOF R2=0.8912
+[core] stage2 egc: OOF R2=0.9589
+[core] stage2 egb: OOF R2=0.9146
+[core] stage2 ei: OOF R2=0.8117
+[core] stage2 eea: OOF R2=0.8797
+[core] stage2 nc: OOF R2=0.8722
+[core] stage2 eps: OOF R2=0.7691
+[core] overlay eps: alpha=0.292 -> OOF R2=0.7845
+[core] overlay egb: alpha=0.200 -> OOF R2=0.9193
+[core] overlay ei: alpha=0.083 -> OOF R2=0.8152
+DONE P5A-003 mean_oof_r2=0.8755

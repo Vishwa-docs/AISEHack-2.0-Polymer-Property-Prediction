@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-127",
+  "slug": "P5A-127-v57-imp-stack",
+  "arms": "imp_stack",
+  "focus": "FULL imputation stacker: Ridge on [all 4 partner values (exact where available) + base + base^2] per weak target",
+  "gate": "weak targets +0.005 each",
+  "notes": "clean lane; V57 standalone + arms; alphas on C282 OOF (train-only)"
+}

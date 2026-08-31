@@ -1,0 +1,8 @@
+{
+  "exp_id": "P5A-115",
+  "slug": "P5A-115-v57-final-combo",
+  "arms": "kriging,calib,ei,eps,egb,char_tune,spread_tune,shrink,mae_tg,weak_aug,smiler3",
+  "focus": "best-possible: all arms combined",
+  "gate": "mean > 0.907, no target < -0.003",
+  "notes": "clean lane; V57 standalone + arms; all alphas fitted on C282 OOF (train-only); scored post-freeze vs Oracle/final_oracle.csv"
+}

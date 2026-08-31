@@ -1,0 +1,9 @@
+{
+ "exp_id": "P5A-006",
+ "focus": "egb via egc covariate overlay (linear map fitted on OOF, alpha up to 0.8)",
+ "egb_egc_max_alpha": 0.8,
+ "n_estimators": 300,
+ "char_max_features": 4096,
+ "morgan_nbits": 1024,
+ "clip": true
+}

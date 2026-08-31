@@ -1,0 +1,15 @@
+{
+ "exp_id": "P5A-008",
+ "focus": "all levers combined (tg robust, eps residual, ei/egb overlays, egc zoo) - kitchen-sink candidate",
+ "tg_huber": true,
+ "tg_reweight": true,
+ "tg_median": true,
+ "eps_residual": true,
+ "ei_identity_max_alpha": 0.8,
+ "egb_egc_max_alpha": 0.8,
+ "egc_zoo": true,
+ "n_estimators": 300,
+ "char_max_features": 4096,
+ "morgan_nbits": 1024,
+ "clip": true
+}

@@ -1,0 +1,9 @@
+{
+ "exp_id": "P5A-007",
+ "focus": "egc model zoo: lgb/xgb/extra-trees OOF NNLS blend for egc",
+ "egc_zoo": true,
+ "n_estimators": 300,
+ "char_max_features": 4096,
+ "morgan_nbits": 1024,
+ "clip": true
+}
