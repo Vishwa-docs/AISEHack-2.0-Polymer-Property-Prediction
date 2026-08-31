@@ -1,0 +1,71 @@
+target,model,config,oof_r2,n_train
+tg,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 200, ""lr"": 0.05, ""leaves"": 31}",0.8966375862430046,4143
+tg,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.05, ""leaves"": 63}",0.899972028490982,4143
+tg,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.03, ""leaves"": 63}",0.8989710300205922,4143
+tg,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 600, ""lr"": 0.02, ""leaves"": 127}",0.895512959406262,4143
+tg,ridge,"{""model"": ""ridge"", ""alpha"": 10}",0.6732550899447793,4143
+tg,ridge,"{""model"": ""ridge"", ""alpha"": 100}",0.8072999944715292,4143
+tg,ridge,"{""model"": ""ridge"", ""alpha"": 1000}",0.8560183036997969,4143
+tg,et,"{""model"": ""et"", ""n_estimators"": 100}",0.8991945724427146,4143
+tg,et,"{""model"": ""et"", ""n_estimators"": 300}",0.89980778639939,4143
+tg,et,"{""model"": ""et"", ""n_estimators"": 500}",0.9000116312375452,4143
+egc,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 200, ""lr"": 0.05, ""leaves"": 31}",0.8836023177741363,2028
+egc,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.05, ""leaves"": 63}",0.8757397652677944,2028
+egc,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.03, ""leaves"": 63}",0.8763403236048423,2028
+egc,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 600, ""lr"": 0.02, ""leaves"": 127}",0.8760921841138853,2028
+egc,ridge,"{""model"": ""ridge"", ""alpha"": 10}",0.6520280630988486,2028
+egc,ridge,"{""model"": ""ridge"", ""alpha"": 100}",0.7410901010962554,2028
+egc,ridge,"{""model"": ""ridge"", ""alpha"": 1000}",0.8214080288181332,2028
+egc,et,"{""model"": ""et"", ""n_estimators"": 100}",0.8797210569505653,2028
+egc,et,"{""model"": ""et"", ""n_estimators"": 300}",0.8808407119122691,2028
+egc,et,"{""model"": ""et"", ""n_estimators"": 500}",0.8810557227154656,2028
+egb,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 200, ""lr"": 0.05, ""leaves"": 31}",0.8561006110950553,337
+egb,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.05, ""leaves"": 63}",0.8529322966791772,337
+egb,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.03, ""leaves"": 63}",0.8539783873399588,337
+egb,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 600, ""lr"": 0.02, ""leaves"": 127}",0.8550334924738507,337
+egb,ridge,"{""model"": ""ridge"", ""alpha"": 10}",0.7420145747575986,337
+egb,ridge,"{""model"": ""ridge"", ""alpha"": 100}",0.7746835199563797,337
+egb,ridge,"{""model"": ""ridge"", ""alpha"": 1000}",0.7747657292021604,337
+egb,et,"{""model"": ""et"", ""n_estimators"": 100}",0.8583934118363552,337
+egb,et,"{""model"": ""et"", ""n_estimators"": 300}",0.8611046848920575,337
+egb,et,"{""model"": ""et"", ""n_estimators"": 500}",0.8627746379483547,337
+ei,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 200, ""lr"": 0.05, ""leaves"": 31}",0.7936533213795764,222
+ei,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.05, ""leaves"": 63}",0.7914306833420015,222
+ei,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.03, ""leaves"": 63}",0.7919636269171816,222
+ei,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 600, ""lr"": 0.02, ""leaves"": 127}",0.7926054875547224,222
+ei,ridge,"{""model"": ""ridge"", ""alpha"": 10}",0.6483140970491605,222
+ei,ridge,"{""model"": ""ridge"", ""alpha"": 100}",0.6865414936943577,222
+ei,ridge,"{""model"": ""ridge"", ""alpha"": 1000}",0.7197651206283299,222
+ei,et,"{""model"": ""et"", ""n_estimators"": 100}",0.7764008759670777,222
+ei,et,"{""model"": ""et"", ""n_estimators"": 300}",0.7849605264350644,222
+ei,et,"{""model"": ""et"", ""n_estimators"": 500}",0.7850085954855277,222
+eea,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 200, ""lr"": 0.05, ""leaves"": 31}",0.8386508195373439,221
+eea,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.05, ""leaves"": 63}",0.8393314464549376,221
+eea,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.03, ""leaves"": 63}",0.8422088001212258,221
+eea,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 600, ""lr"": 0.02, ""leaves"": 127}",0.8397705715652455,221
+eea,ridge,"{""model"": ""ridge"", ""alpha"": 10}",0.712062949680025,221
+eea,ridge,"{""model"": ""ridge"", ""alpha"": 100}",0.7633194637323086,221
+eea,ridge,"{""model"": ""ridge"", ""alpha"": 1000}",0.7614236945735727,221
+eea,et,"{""model"": ""et"", ""n_estimators"": 100}",0.8094152518333129,221
+eea,et,"{""model"": ""et"", ""n_estimators"": 300}",0.807896444208871,221
+eea,et,"{""model"": ""et"", ""n_estimators"": 500}",0.8081339489699902,221
+nc,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 200, ""lr"": 0.05, ""leaves"": 31}",0.7865248669517415,229
+nc,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.05, ""leaves"": 63}",0.7870019935497645,229
+nc,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.03, ""leaves"": 63}",0.78219797300184,229
+nc,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 600, ""lr"": 0.02, ""leaves"": 127}",0.7854124001171185,229
+nc,ridge,"{""model"": ""ridge"", ""alpha"": 10}",0.6338528687137432,229
+nc,ridge,"{""model"": ""ridge"", ""alpha"": 100}",0.7292958156506318,229
+nc,ridge,"{""model"": ""ridge"", ""alpha"": 1000}",0.7333986483530026,229
+nc,et,"{""model"": ""et"", ""n_estimators"": 100}",0.776508430055713,229
+nc,et,"{""model"": ""et"", ""n_estimators"": 300}",0.7725534015392821,229
+nc,et,"{""model"": ""et"", ""n_estimators"": 500}",0.7755463968499902,229
+eps,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 200, ""lr"": 0.05, ""leaves"": 31}",0.725657456816303,229
+eps,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.05, ""leaves"": 63}",0.7273961621683034,229
+eps,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 400, ""lr"": 0.03, ""leaves"": 63}",0.7249073447192226,229
+eps,lgbm,"{""model"": ""lgbm"", ""n_estimators"": 600, ""lr"": 0.02, ""leaves"": 127}",0.7244747921443271,229
+eps,ridge,"{""model"": ""ridge"", ""alpha"": 10}",0.5605712074860307,229
+eps,ridge,"{""model"": ""ridge"", ""alpha"": 100}",0.6258843302756694,229
+eps,ridge,"{""model"": ""ridge"", ""alpha"": 1000}",0.6605513523140993,229
+eps,et,"{""model"": ""et"", ""n_estimators"": 100}",0.7160528336755447,229
+eps,et,"{""model"": ""et"", ""n_estimators"": 300}",0.7116969819032006,229
+eps,et,"{""model"": ""et"", ""n_estimators"": 500}",0.7081611856087192,229

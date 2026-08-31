@@ -1,0 +1,40 @@
+{
+  "tg": {
+    "model": "et",
+    "n_estimators": 500
+  },
+  "egc": {
+    "model": "lgbm",
+    "n_estimators": 200,
+    "lr": 0.05,
+    "leaves": 31
+  },
+  "egb": {
+    "model": "et",
+    "n_estimators": 500
+  },
+  "ei": {
+    "model": "lgbm",
+    "n_estimators": 200,
+    "lr": 0.05,
+    "leaves": 31
+  },
+  "eea": {
+    "model": "lgbm",
+    "n_estimators": 400,
+    "lr": 0.03,
+    "leaves": 63
+  },
+  "nc": {
+    "model": "lgbm",
+    "n_estimators": 400,
+    "lr": 0.05,
+    "leaves": 63
+  },
+  "eps": {
+    "model": "lgbm",
+    "n_estimators": 400,
+    "lr": 0.05,
+    "leaves": 63
+  }
+}

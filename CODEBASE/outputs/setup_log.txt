@@ -1,0 +1,16 @@
+=== Phase 4 setup ===
+  all required libraries importable
+  train.csv: 7409 rows, cols=['smiles', 'target', 'target_type']
+  test.csv:  4940 rows, cols=['id', 'smiles', 'target_type']
+    tg: train n=4143, test n=2763
+    egc: train n=2028, test n=1352
+    egb: train n=337, test n=224
+    ei: train n=222, test n=148
+    eea: train n=221, test n=147
+    nc: train n=229, test n=153
+    eps: train n=229, test n=153
+  data train.csv: OK /home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/Dataset/train.csv
+  data test.csv: OK /home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/Dataset/test.csv
+  data PI1M.csv: OK /home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/Dataset/PI1M.csv
+  data smile_r3.csv: OK /home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/Dataset/smile_r3.csv
+  compliance scan: no forbidden strings outside marked scripts
