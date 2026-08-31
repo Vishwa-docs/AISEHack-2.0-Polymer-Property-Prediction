@@ -24,10 +24,15 @@
    - `Consolidation_Handoff/research/SOURCE_INVENTORY.md` — every path on both machines,
      what is in it, and where it should end up.
 3. Work through the work packages in the order given in §17. They have dependencies.
-4. Maintain `Consolidation_Handoff/PROGRESS.md` (create it) as an append-only log:
+4. **The source repo is live.** Another session committed to it while this plan was being
+   written (commit `10b2858`, which added `CODEBASE/NEXT_STEPS.md` and updated
+   `requirements.txt` + `CONTEXT.md` with the python-3.11 finding). **Run `git log` and
+   `git status` in the source repo before you start**, read anything new, and re-check §2.6
+   and §15.2 against what you find.
+5. Maintain `Consolidation_Handoff/PROGRESS.md` (create it) as an append-only log:
    one line per completed step with a timestamp. If your session dies, the next agent
    resumes from that file.
-5. When you finish a work package, run its acceptance checklist (§16) before moving on.
+6. When you finish a work package, run its acceptance checklist (§16) before moving on.
 
 ---
 
@@ -152,7 +157,7 @@ title slide.
 | **Kaggle private LB (the real result)** | **0.891** |
 | public − private gap | **0.026** |
 | MAE / RMSE per target | see `RESULTS_ANALYSIS.md` §1 |
-| Round-3 evidence scorecard | **14 / 18 requirement groups PASS** |
+| Round-3 evidence scorecard | **14 / 18 requirement groups PASS** (the regenerated bundle may report **14–15 / 19** once AUG + REL are counted — check `outputs/scorecard.md` at the time you write, and use whatever that file says, consistently, everywhere) |
 
 **Vocabulary rule for anything public (submission repo, report, slides, website):** say
 **"local held-out verification panel"**, never "oracle". The word `oracle` may appear only
@@ -217,11 +222,26 @@ scikit-learn 1.9.0 · lightgbm 4.7.0 · xgboost 3.2.0 · joblib
 
 The V57 `ei`/`eea` leaves (MLPRegressor, GaussianProcessRegressor, rdEHT,
 Descriptors3D) **collapse** under numpy ≥ 2.5 (ei 0.871→0.516; mean 0.9023→0.8469) and under
-sklearn < 1.9.0 (ei 0.871→0.512). A run that scores far below 0.90 with identical code and
-data is an **environment mismatch, not a model regression**. The validated interpreter is
-`<source repo>/.venv/bin/python` — verified by this planning agent to hold exactly the
-pinned versions. **Never delete that venv; never copy it either — recreate from
+sklearn < 1.9.0 (ei 0.871→0.512).
+
+**Update (added to the source repo as `CODEBASE/NEXT_STEPS.md` on 2026-08-31, mid-session):
+the load-bearing factor is the PYTHON BUILD ITSELF, not only the packages.** Regenerating on
+**python 3.12.x collapses ei (0.871 → 0.512) regardless of numpy/rdkit/pandas versions** —
+two different 3.12 environments collapsed identically. **Python 3.11.7 is required for the
+V57 submission path (Part A).** The Round-3 **evidence suite (Part B) is version-robust** and
+reproduces on any of these environments.
+
+A run that scores far below 0.90 with identical code and data is an **environment mismatch,
+not a model regression**. The validated interpreter is `<source repo>/.venv/bin/python` —
+verified by this planning agent to hold exactly the pinned versions. A matching python-3.11.7
+venv also exists on the GPU laptop at `/tmp/r3_py311_venv` (may be wiped on reboot; it is a
+`/tmp` path). **Never delete the Mac venv; never copy it either — recreate from
 `requirements.txt`.**
+
+Read `CODEBASE/NEXT_STEPS.md` in the source repo before doing anything that regenerates a
+submission: it documents the one remaining manual regeneration step, the exact command, and
+what "already done, do not redo" covers. **The frozen `submission.csv` is valid and is the
+artifact to ship — regeneration is optional parity verification, not a prerequisite.**
 
 ---
 
@@ -701,10 +721,13 @@ Rules:
 The first code cell must:
 1. Print the python executable, and the versions of numpy / pandas / sklearn / rdkit /
    lightgbm / shap / matplotlib.
-2. **Assert** `numpy == 2.4.6` and `scikit-learn == 1.9.0`, and if they differ print a
-   large, unmissable warning that reads: *"ENVIRONMENT MISMATCH — the ei/eea leaf models
-   collapse under numpy ≥ 2.5 (ei 0.871 → 0.516). Results below are NOT comparable to the
-   reported scores. Run `bash setup.sh` and restart the kernel."*
+2. **Assert** `python == 3.11.x`, `numpy == 2.4.6` and `scikit-learn == 1.9.0`, and if any
+   differs print a large, unmissable warning: *"ENVIRONMENT MISMATCH — the ei/eea leaf models
+   collapse under python 3.12 (ei 0.871 → 0.512, regardless of package versions) and under
+   numpy ≥ 2.5 (ei 0.871 → 0.516). Results below are NOT comparable to the reported scores.
+   Run `bash setup.sh` and restart the kernel."* Note that this affects the **submission
+   path only**; the evidence/analysis suite is version-robust, so the notebook can still run
+   usefully — but say so on screen rather than silently.
 3. Resolve `DATA_DIR` from, in order: an env var `PPP_DATA_DIR`, `./Dataset`,
    `../Dataset`, `/kaggle/input/...` — and print which one it picked.
 4. Create `outputs/{eda,training,explainability,robustness,generalization}`.
@@ -1728,7 +1751,7 @@ document quote it rather than restate it. When a number changes, it changes ther
 | 1 | Mean R² appears as 0.90352 / 0.903480 / 0.902289 / 0.90229 | use **0.9023** everywhere; footnote the panels once |
 | 2 | `TRIALS.md` says Tg has **2,497** duplicate groups; Round-3 data has **4** | the 2,497 figure is Round-2 archive-inclusive. Label it or drop it |
 | 3 | `AGENTS.md` says **457** SMILES appear in both train and test; canonicalised the number is **1,063** | state both: 457 raw string matches, 1,063 canonical |
-| 4 | Scorecard says "14/17" in some docs and "14/18" in `scorecard.md` | the generated scorecard has **18** rows (AUG was added). Use **14/18** |
+| 4 | Scorecard says "14/17" in some docs, "14/18" in the generated `scorecard.md`, and `NEXT_STEPS.md` anticipates "14–15/19" | **read `CODEBASE/outputs/scorecard.md` at write time and use its actual numerator/denominator everywhere.** Never quote a scorecard ratio from memory |
 | 5 | Tg unit is °C in the data (min −109.8) but Phase-4 `AGENTS.md` says "K" | it is **°C**. Fix wherever it says K |
 | 6 | `score_discrepancy` uses calibration −0.013; the verified figure is **−0.011** | use −0.011 (it is measured); mention −0.013 only as the earlier estimate |
 | 7 | "median NN similarity 0.55–0.57 for weak targets" (TRIALS) vs "98% of test polymers are in train" | both true — the first is *same-target*, the second is *any-target*. **Always state the basis.** This is the two-regimes finding; do not let it read as a contradiction |
