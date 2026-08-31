@@ -1,0 +1,14 @@
+# The held-out verification data and every external label source. Never committed, never
+# copied outward, never named in a public artifact.
+06_oracle_QUARANTINE/
+
+# The dataset is large and belongs to the organisers; it is not redistributed.
+00_competition/dataset/*.csv
+
+# Cruft
+.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/

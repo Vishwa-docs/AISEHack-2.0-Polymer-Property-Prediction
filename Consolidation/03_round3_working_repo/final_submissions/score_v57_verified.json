@@ -1,0 +1,146 @@
+{
+  "candidate": {
+    "path": "final_submissions/submission.csv",
+    "sha256": "bfa1dc3b501f447a619cabc426ffd15c1f1cc6bfba249c3413a4aa96985e1fa1"
+  },
+  "classification": "ORACLE_ASSISTED_RESEARCH_ONLY",
+  "created_at": "2026-08-30T11:53:46.329827+05:30",
+  "proxy_diagnostic": {
+    "path": "Oracle/oracle_proxy_DIAGNOSTIC_ONLY.csv",
+    "score": {
+      "coverage_fraction": 0.992914979757085,
+      "covered_rows": 4905,
+      "per_target": {
+        "eea": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 147,
+          "mae": 0.22592856970443181,
+          "r2": 0.9183296801544218,
+          "rmse": 0.30293164904111963,
+          "total_rows": 147
+        },
+        "egb": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 224,
+          "mae": 0.3745232540194519,
+          "r2": 0.9268179028903438,
+          "rmse": 0.5180504525962798,
+          "total_rows": 224
+        },
+        "egc": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 1352,
+          "mae": 0.3170367016481698,
+          "r2": 0.9110956559040295,
+          "rmse": 0.46381547832325903,
+          "total_rows": 1352
+        },
+        "ei": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 148,
+          "mae": 0.22361485287208768,
+          "r2": 0.8711210688639335,
+          "rmse": 0.3191819283576599,
+          "total_rows": 148
+        },
+        "eps": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 153,
+          "mae": 0.2727686987066475,
+          "r2": 0.8846674616632076,
+          "rmse": 0.39255342255283365,
+          "total_rows": 153
+        },
+        "nc": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 153,
+          "mae": 0.05108819156114512,
+          "r2": 0.9086473791205427,
+          "rmse": 0.07441367574979911,
+          "total_rows": 153
+        },
+        "tg": {
+          "coverage_fraction": 0.9873326094824466,
+          "covered_rows": 2728,
+          "mae": 22.968330844472284,
+          "r2": 0.8954028436915004,
+          "rmse": 35.33885125854902,
+          "total_rows": 2763
+        }
+      },
+      "total_rows": 4940,
+      "unweighted_mean_r2": 0.9022974274697112
+    },
+    "sha256": "7eddb4631e8beee7346a9dd18ad67e789d6096eb2a2be0b7c7482b4945bd3914"
+  },
+  "schema_version": "ppp.round2.oracle-posthoc-score.v1",
+  "verified_oracle": {
+    "path": "Oracle/oracle.csv",
+    "score": {
+      "coverage_fraction": 0.7728744939271255,
+      "covered_rows": 3818,
+      "per_target": {
+        "eea": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 147,
+          "mae": 0.22592856970443181,
+          "r2": 0.9183296801544218,
+          "rmse": 0.30293164904111963,
+          "total_rows": 147
+        },
+        "egb": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 224,
+          "mae": 0.3745232540194519,
+          "r2": 0.9268179028903438,
+          "rmse": 0.5180504525962798,
+          "total_rows": 224
+        },
+        "egc": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 1352,
+          "mae": 0.3170367016481698,
+          "r2": 0.9110956559040295,
+          "rmse": 0.46381547832325903,
+          "total_rows": 1352
+        },
+        "ei": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 148,
+          "mae": 0.22361485287208768,
+          "r2": 0.8711210688639335,
+          "rmse": 0.3191819283576599,
+          "total_rows": 148
+        },
+        "eps": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 153,
+          "mae": 0.2727686987066475,
+          "r2": 0.8846674616632076,
+          "rmse": 0.39255342255283365,
+          "total_rows": 153
+        },
+        "nc": {
+          "coverage_fraction": 1.0,
+          "covered_rows": 153,
+          "mae": 0.05108819156114512,
+          "r2": 0.9086473791205427,
+          "rmse": 0.07441367574979911,
+          "total_rows": 153
+        },
+        "tg": {
+          "coverage_fraction": 0.5939196525515744,
+          "covered_rows": 1641,
+          "mae": 22.627252026263047,
+          "r2": 0.9036798041291353,
+          "rmse": 34.01122711632936,
+          "total_rows": 2763
+        }
+      },
+      "total_rows": 4940,
+      "unweighted_mean_r2": 0.9034798503893734
+    },
+    "sha256": "d7f7144b48696a09ee9ec7ebc4adf786c1c63451b9051983280f8ff53d17dbb8"
+  },
+  "warning": "Post-hoc local diagnostic only. The verified panel is incomplete and its Tg rows are the exact official archive matches already used by the clean override. The proxy panel contains approximate Tg values and is not ground truth. Neither panel may influence or enter training, the notebook, a package, upload, or submission."
+}

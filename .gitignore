@@ -25,3 +25,12 @@ experiments/**/*.zip
 kaggle.json
 
 Oracle/
+
+# --- consolidation delivery ---
+# The two publishable repositories are their own git repos (see RUN.md step 10).
+/Personal/
+/AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/
+# Held-out verification data: never committed.
+Consolidation/06_oracle_QUARANTINE/
+# Build staging
+.build/

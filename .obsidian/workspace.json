@@ -1,0 +1,257 @@
+{
+  "main": {
+    "id": "3f03edc804276118",
+    "type": "split",
+    "children": [
+      {
+        "id": "f584f53c45a3780a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "3f2b3c3b8342072e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Personal/Obsidian/0. Strategy.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "0. Strategy"
+            }
+          },
+          {
+            "id": "8440ccc493c52db2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Personal/Obsidian/Travel Plans.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Travel Plans"
+            }
+          },
+          {
+            "id": "6b64174967c1f6fb",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Personal/Obsidian/Prompts and Skills.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Prompts and Skills"
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e1f079b8463a0e59",
+    "type": "split",
+    "children": [
+      {
+        "id": "4f652032aac2add7",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "fd2a9843c6b60e61",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "82a836d551a81344",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "2e1b0289e600e200",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200.0078125
+  },
+  "right": {
+    "id": "2a4572c16f3bded5",
+    "type": "split",
+    "children": [
+      {
+        "id": "c86730929c06ff0d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "857855859920c820",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Personal/Obsidian/Prompts and Skills.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "0f01e39f0692f10e",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Personal/Obsidian/Prompts and Skills.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "a9518aa9fd1f7bbf",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "74e7497ebc5ff116",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "a887189d74a13f66",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Personal/Obsidian/Prompts and Skills.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "6b64174967c1f6fb",
+  "lastOpenFiles": [
+    "Personal/Obsidian/0. Strategy.md",
+    "Personal/Obsidian/Travel Plans.md",
+    "Personal/Obsidian/Prompts and Skills.md",
+    "Personal/Sample Presentations/Untitled presentation.pdf",
+    "Personal/Sample Presentations/LuVW_presentation.pdf",
+    "Personal/Sample Presentations/Triverse_ANRFAISEHack_Template_FinalePresentation.pdf",
+    "Personal/Sample Presentations/The-Alchemists.pdf",
+    "Personal/Sample Presentations/ANRFAISEHack_Template_FinalePresentation.pdf",
+    "Personal/Sample Presentations/ANRFAISEHack_Presentation.pdf",
+    "Personal/Sample Presentations/~$ANRFAISEHack_Presentation.pptx",
+    "Personal/Sample Presentations/contents.md",
+    "Personal/Sample Presentations/VibeCoders_ppt.pdf",
+    "Personal/Sample Presentations/Untitled presentation.pptx",
+    "Personal/Sample Presentations/Triverse_ANRFAISEHack_Template_FinalePresentation.pptx",
+    "Sample Presentations/contents.md",
+    "Personal/Obsidian/Presentation.md",
+    "Personal/Sample Reports/RuVision_FinalSubmission_Report.docx.md",
+    "Personal/Sample Reports/Final submission Report.md",
+    "Personal/Sample Reports/Final Submission Report Template_ AI for Science & Engineering_team_triverse.md",
+    "Personal/Sample Reports/Final Submission - Achievers.md",
+    "Sample Reports/RuVision_FinalSubmission_Report.docx.md",
+    "RuVision_FinalSubmission_Report.docx.md",
+    "Sample Reports/Final submission Report.md",
+    "Sample Reports/Final Submission - Achievers.md",
+    "Final submission Report.md",
+    "Sample Reports/Final Submission Report Template_ AI for Science & Engineering_team_triverse.md",
+    "Personal/Obsidian/Codebase.md",
+    "Personal/Obsidian/Logs and Sessions.md",
+    "Personal/Obsidian/Judging Criteria and Expectations.md",
+    "Personal/Obsidian/Post Readiness Score Analysis.md",
+    "Personal/Obsidian/Analysis and Understanding.md",
+    "Personal/Obsidian/Deliverables.md",
+    "Personal/Obsidian/Celestial.md",
+    "Personal/Obsidian/Additional.md"
+  ]
+}

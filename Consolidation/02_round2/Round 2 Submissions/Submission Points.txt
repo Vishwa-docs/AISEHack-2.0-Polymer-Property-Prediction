@@ -1,0 +1,32 @@
+Final Submission V2 - 24th July 2026
+
+Kaggle Notebook Link : https://www.kaggle.com/code/jackbright/polymer-best2-full-pipeline-0p923151
+
+Kaggle Notebook is shared with the organizers. However, I also have a code repo at https://github.com/Vishwa-docs/AISEHack-2nd-Edition-Codebase
+
+Kindly reach out to me at vishwakumaresh@gmail.com for GitHub Repo Access (As I ran everything Locally)
+
+# NOTE TO ORGANIZERS
+
+I have run around 2000+ experiments with different combinations of descriptors, models, and hyperparameters.
+
+Hence, there are many times where I have improved on experiments instead of starting from scratch. And so, the final notebook here is a bit tainted and its difficult for me to produce a clean version fully reproducable from scratch.
+
+However, I CAN give you **access to the GitHub Repository** where I have all my experiments, which I have kept private for now as the contests is still ongoing. Please reach out to me at `vishwakumaresh@gmail.com` if you require any further evidence or access to my repo, and I will be happy to provide it.
+
+In addition, I have started drafting a Paper, and you can find it here : https://drive.google.com/file/d/1xWfTRAcjK8Bx8QKvlGkEd_ZXrvD-cBXG/view?usp=sharing
+
+
+---
+---
+
+
+SANDMAN Version 52 - Without archive/ Submission (Other one is with archive/)
+
+Kaggle Notebook Link : https://www.kaggle.com/code/jackbright/sandman-version-52-8th-aug-without-archive
+
+Kaggle Notebook is shared with the organizers. However, I also have a code repo at https://github.com/Vishwa-docs/AISEHack-2nd-Edition-Codebase
+
+Kindly reach out to me at vishwakumaresh@gmail.com for GitHub Repo Access (As I ran everything locally)
+
+Paper : https://tinyurl.com/5dkxh6w7

@@ -1,0 +1,10 @@
+We need to do some more things. I had mentioned this originally, and we need to do the same.
+
+1. Finalize the pipeline : Whatever the best pipeline is, finalize this. This should be in a one-run notebook, with code and markdown blocks and sections using H1 headers. It should be something like the notebook is an independent run, where only the train.csv and test.csv should be taken as input and then the entire training and inference runs. This should reproduce the same as the submission files for auditability
+2. We need to run evals on teh trains-test split from teh train.csv and get the results. Once this is done, we need to train again on the full train.csv dataset and get the final model.
+3. We need to get the predictions on the test.csv dataset
+4. We have the scraped/test_answers.csv file. This file is something that I have scraped from the Khazana Dataset and given. We can match the test predictions to the test_answers.csv and see the score (This is for our valudation only). This will tell us what our final leaderboard ranking will be. If this match is not giving a score of more than 0.98 R2, then we are wrong and not achieved yet. This test_answers.csv is also not fully complete, and you need to search the internet till all the entries in test_answers.csv match the test.csv one. You CANNOT hallucinate this nad make up numbers. In test_answers.csv we need to ensure that we are getting the data from other datasets or the internet (I believe it is a collection of datasets, you can see scraped/README.md and see where its from). I need this to be an exact match and all the details from test.csv has to be matched with test_answers.csv, so that we will know our private leaderboard ranking for sure.
+
+Loop until we get all the answers of test.csv form the internet, then validate our predictions against it. Be smart and do it. And then see the final R2 score and make sure it is around 0.98 plus.
+
+Keep the experiments as it is, that is fine. We only need the best pipeline for submission. We can talk abuot our experimentation later in presenting but it is not required for submission.
