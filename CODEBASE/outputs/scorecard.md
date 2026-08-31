@@ -1,6 +1,6 @@
-# Phase 4 Scorecard
+# Round 3 Evidence Scorecard
 
-Auto-generated 2026-08-30 21:02 by 18_scorecard.py
+Auto-generated 2026-08-31 16:28 by the evidence engine
 
 | Req | Criterion | Artifacts | Check | Status |
 |---|---|---|---|---|
@@ -21,8 +21,13 @@ Auto-generated 2026-08-30 21:02 by 18_scorecard.py
 | R4.1 | Generalization ladder | generalization_ladder.csv, generalization_ladder_plot.png | file exists | PASS |
 | R4.2 | External (post-freeze) verification | khazana_holdout_scores.csv | R2 >= 0.88 for DFT targets (egc=0.911, ...) | PASS |
 | R4.3 | Tail performance | tail_performance.csv, tail_performance_plot.png | file exists | PASS |
+| AUG | Data augmentation experiment | augmentation_experiment.csv, augmentation_experiment_plot.png | file exists | FAIL |
 
-**Passed 14/17 requirement groups.**
+**Passed 14/18 requirement groups.**
 
 Minimum viable set (R1.1, R1.2, R2.1, R2.3, R3.1, R3.2, R4.1, R4.2): PASS, PASS, PASS, PASS, PASS, **FAIL**, PASS, PASS
+
+> R4.2 (external verification) is a POST-FREEZE step in the final pipeline
+> (ground-truth answers are read only after the submission is frozen, by a
+> separate scorer; the pipeline itself never reads them).
 
