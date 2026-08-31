@@ -58,8 +58,9 @@ GPU laptop (§5).
 2. Read `Competition_Details/Overview.txt` + `Competition_Details/Competition Rules.txt` (rules change — verify the deadline, submission limits, and host-sharing list are still as stated here).
 3. **Load your available skills and use them.** Previous agents ignored skills and burned context. At minimum: load any skill for context economy / long-task management (in past sessions these were named **headroom** and **ponytail**) and follow their instructions faithfully; load any skill for experiment hygiene, file management, or subagent orchestration that applies to this work. If a skill's description matches a task you are about to do, load it BEFORE acting.
 4. Verify the frozen data hashes (see `EXPERIMENT_LOOP.md` Stage 0) before trusting any cached feature or prediction.
-5. Confirm the oracle is not importable/reachable from the code you are about to run (grep for `oracle`, `Oracle`, `ORACLE_ASSISTED` in the clean path — must be absent).
-6. State in your first message: current best verified-oracle score, the next planned experiment id, and what you will do this session.
+5. **VERIFY THE PYTHON ENV MATCHES THE PINNED `CODEBASE/requirements.txt` BEFORE ANY SCORE-CRITICAL RUN.** The V57 ei/eea leaf models (MLP/GPR/rdEHT/Descriptors3D) collapse under **numpy 2.5.x** (ei 0.871→0.516; mean 0.9023→0.8469). Only **numpy 2.4.6 + scikit-learn 1.9.0** reproduce the verified 0.9035. On the laptop use `~/Desktop/AISEHack-2.0/.venv-polymer/bin/python` (numpy 2.4.6) — NOT `~/Desktop/r3_runtime/Phase_4_Explainability/.venv/bin/python` (numpy 2.5.2). A run that scores far below 0.90 with identical code+data is an ENV MISMATCH, not a model regression.
+7. Confirm the oracle is not importable/reachable from the code you are about to run (grep for `oracle`, `Oracle`, `ORACLE_ASSISTED` in the clean path — must be absent).
+8. State in your first message: current best verified-oracle score, the next planned experiment id, and what you will do this session.
 
 Use subagents for bulk reading/research/EDA so the main context stays lean; the
 main runner must verify every claimed metric itself (never accept a subagent's
