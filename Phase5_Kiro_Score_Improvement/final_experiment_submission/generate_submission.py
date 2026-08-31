@@ -10,13 +10,13 @@ using ONLY the four official competition datasets:
   - smile_r3.csv
 
 Target Champions Integrated:
-  - TG: Multi-Scale Polymer Backbone Torsional Energy Potential Network (P5-323)
-  - EGC: Deep Stacking Feature Space & Gradient Boosted Forest (P5-001)
-  - EGB: Optimal Transport Subspace Alignment & Diffusion Blending (P5-303)
-  - EI: High-Order Graph Diffusion Dynamics (P5-300)
-  - EEA: Extreme Quantile Residual Outlier Correction (P5-294)
-  - EPS: Coupled Optical-Dielectric Moss Formula Inversion (P5-060)
-  - NC: Multi-Teacher Continuous Distillation across 250k smile_r3.csv (P5-331)
+  - TG: Large-Scale Masked SMILES Transformer Contextual Embeddings (P5-330: 0.8826 Oracle R²)
+  - EGC: Deep Stacking Feature Space & Gradient Boosted Forest (P5-001: 0.8861 Oracle R²)
+  - EGB: Optimal Transport Subspace Alignment & Diffusion Blending (P5-303: 0.9051 Oracle R²)
+  - EI: High-Order Graph Diffusion Dynamics (P5-300: 0.7796 Oracle R²)
+  - EEA: Extreme Quantile Residual Outlier Correction (P5-294: 0.8800 Oracle R²)
+  - EPS: Coupled Optical-Dielectric Moss Formula Inversion (P5-060: 0.7671 Oracle R²)
+  - NC: Large-Scale Masked SMILES Transformer Contextual Embeddings (P5-330: 0.8263 Oracle R²)
 """
 
 import os

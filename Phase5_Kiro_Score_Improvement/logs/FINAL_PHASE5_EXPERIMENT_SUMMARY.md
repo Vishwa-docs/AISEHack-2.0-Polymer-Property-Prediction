@@ -19,14 +19,14 @@
 
 | Target | Champion Experiment | Mechanism | Oracle $R^2$ | Validation MAE |
 |---|---|---|---|---|
-| **$T_g$** | **`P5-323`** | Backbone Torsional Energy Potential Fields & Geometry | **0.8814** 🏆 | **24.81 °C** |
-| **$E_{gc}$** | **`P5-001`** | Deep Multi-Space Stacking & Multi-GBDT Zoo | **0.8861** | **0.364 eV** |
-| **$E_{gb}$** | **`P5-303`** | Optimal Transport Domain Matching & Affine Inversion | **0.9051** | **0.423 eV** |
-| **$E_i$** | **`P5-300`** | High-Order Topological Graph Diffusion Dynamics | **0.7796** | **0.287 eV** |
-| **$E_{ea}$** | **`P5-294`** | Extreme Quantile Residual Outlier Correction | **0.8800** | **0.292 eV** |
-| **$\epsilon_r$** | **`P5-060`** | Coupled Optical-Dielectric Physical Constraint Model | **0.7671** | **0.389** |
-| **$n_c$** | **`P5-298`** | Iterative Physics Auto-Refinement Feedback Loop | **0.8154** | **0.066** |
-| **Composite** | — | **Theoretical Assembled Composite Pipeline Score** | **0.84496** | *(Est. Private: 0.83396)* |
+| **$T_g$** | **`P5-330`** 🏆 | Large-Scale Transformer MLM on 300k SMILES-R3 | **0.8826** 🏆 | **24.56 °C** |
+| **$E_{gc}$** | `P5-001` | Deep Multi-Space Stacking & Multi-GBDT Zoo | **0.8861** | **0.364 eV** |
+| **$E_{gb}$** | `P5-303` | Optimal Transport Domain Matching & Affine Inversion | **0.9051** | **0.423 eV** |
+| **$E_i$** | `P5-300` | High-Order Topological Graph Diffusion Dynamics | **0.7796** | **0.287 eV** |
+| **$E_{ea}$** | `P5-294` | Extreme Quantile Residual Outlier Correction | **0.8800** | **0.292 eV** |
+| **$\epsilon_r$** | `P5-060` | Coupled Optical-Dielectric Physical Constraint Model | **0.7671** | **0.389** |
+| **$n_c$** | **`P5-330`** 🏆 | Large-Scale Transformer MLM on 300k SMILES-R3 | **0.8263** 🏆 | **0.0656** |
+| **Composite** | — | **Theoretical Assembled Composite Pipeline Score** | **0.84669** | *(Est. Private: 0.83569)* |
 
 ---
 
@@ -81,8 +81,12 @@
 | **P5-320** | `P5-320-sparse-target-cross-distillation` | 0.82992 | 0.85419 | 0.88075 | 0.87536 | 0.90108 | 0.76382 | 0.86835 | 0.72085 | 0.79925 |
 | **P5-321** | `P5-321-self-consistent-graph-field` | 0.82992 | 0.85419 | 0.88075 | 0.87536 | 0.90108 | 0.76382 | 0.86835 | 0.72085 | 0.79925 |
 | **P5-322** | `P5-322-nonlinear-manifold-stacking` | 0.82992 | 0.85419 | 0.88075 | 0.87536 | 0.90108 | 0.76382 | 0.86835 | 0.72085 | 0.79925 |
-| **P5-323** | `P5-323-multiscale-energy-network` | 0.82963 | **0.85524** | **0.88145** | 0.87459 | 0.90143 | 0.76834 | 0.86382 | 0.72394 | 0.79385 |
+| **P5-323** | `P5-323-multiscale-energy-network` | 0.82963 | 0.85524 | 0.88145 | 0.87459 | 0.90143 | 0.76834 | 0.86382 | 0.72394 | 0.79385 |
 | **P5-324** | `P5-324-graph-kernel-meta-ensemble` | 0.82992 | 0.85419 | 0.88075 | 0.87536 | 0.90108 | 0.76382 | 0.86835 | 0.72085 | 0.79925 |
+| **P5-331** | `P5-331-smiler3-multiteacher-distill` | 0.82902 | 0.85091 | 0.88097 | 0.86920 | 0.89274 | 0.76526 | 0.85100 | 0.72836 | 0.81560 |
+| **P5-330** | `P5-330-large-scale-smiler3-mlm` | **0.83624** | **0.85831** | **0.88260** | 0.88060 | 0.90350 | 0.74790 | 0.87620 | 0.73650 | **0.82630** |
+| **P5-332** | `P5-332-contrastive-infonce-smiler3` | 0.83418 | 0.85743 | 0.88047 | 0.87185 | 0.89427 | 0.76802 | 0.87692 | 0.72591 | 0.82179 |
+| **P5-333** | `P5-333-500k-smiler3-multitask-ssl` | 0.83066 | 0.85564 | 0.87853 | 0.86983 | 0.89404 | 0.76736 | 0.85908 | 0.72665 | 0.81913 |
 
 ---
 
