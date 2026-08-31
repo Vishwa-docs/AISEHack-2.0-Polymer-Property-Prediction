@@ -156,3 +156,35 @@ R2.3 R3.1 R3.2 R4.1 R4.2** — all present with artifacts.
    hyperparameter, the calibration layer, and the weights/inference design.
 3. **[FEASIBILITY.md](FEASIBILITY.md)** — the evidence that imputation/physics-identities do not
    lift the score over V57, and why 0.92 is not reachable that way.
+
+---
+
+## Converting `pipeline_final.py` to a Kaggle notebook (ipynb)
+
+The file is deliberately structured for a mechanical cell-by-cell conversion
+(no side effects between stages; every function is self-contained):
+
+1. **Cell 1 — header + imports**: everything from the top of the file up to (but
+   not including) `def stable_seed_hex` (the `from __future__`, imports, module
+   docstrings).  Add `!pip install -q rdkit shap lightgbm` first if the Kaggle
+   image lacks them (it usually has them).
+2. **Cells 2..N — V57 Part A**: each top-level `def ...` block in order (they
+   have no cross-cell state).  The critical ones to keep intact: `canonicalize`,
+   `run_v57`, and all `c*`/fable functions they call.  Simplest safe split:
+   paste the whole Part A region (from `def stable_seed_hex` to just before
+   `def train_proxy_models`) as ONE large cell.
+3. **Evidence Part B**: paste the whole region from `def train_proxy_models` to
+   `def load_official` as ONE cell.
+4. **Final cell — CLI**: the `def main(argv=None)` block.  For Kaggle, call
+   `run_v57(data_dir, 'submission.csv')` directly (mode `submission`) or the
+   full `main` with `--mode full` if you want the evidence bundle in the same
+   notebook run.
+5. **Environment on Kaggle**: the image ships sklearn 1.9.x, numpy 2.x, rdkit,
+   lightgbm, shap, torch — all needed by Part B.  **Score-critical note:** if the
+   Kaggle image ships numpy ≥ 2.5, the ei/eea leaves may collapse (see
+   `requirements.txt`); pin `numpy==2.4.6` in the first cell if so, and verify
+   the mean per-target R² of the written submission against this repo's
+   `submission_v57.csv` (`feasibility/score.py`).
+6. The notebook writes `submission.csv` (4,940 rows, `id,target`) and, in full
+   mode, the entire evidence bundle under `outputs/`.  Share the pinned version
+   with the hosts per AGENTS.md §4.
