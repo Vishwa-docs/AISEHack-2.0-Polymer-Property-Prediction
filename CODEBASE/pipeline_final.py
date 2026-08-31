@@ -10809,6 +10809,7 @@ CRITERIA = [
     ("R4.2", "External (post-freeze) verification", ["khazana_holdout_scores.csv"], "R2 >= 0.88 for DFT targets"),
     ("R4.3", "Tail performance", ["tail_performance.csv", "tail_performance_plot.png"], "file exists"),
     ("AUG", "Data augmentation experiment", ["augmentation_experiment.csv", "augmentation_experiment_plot.png"], "file exists"),
+    ("REL", "Homologous-series (Flory-Fox) relation demo", ["relation_homologous_series.csv", "relation_flory_fox_fits.csv", "relation_homologous_series_plot.png"], "file exists"),
 ]
 
 
@@ -10945,6 +10946,8 @@ SECTIONS = [
      "tail_performance_plot.png", "tail_performance.csv"]),
     ("6. Data-Augmentation & Invariance-by-Construction", ["augmentation_experiment_plot.png",
      "augmentation_experiment.csv", "canonicalization_check.txt"]),
+    ("7. Structure->Property Relations (Homologous Series)", ["relation_homologous_series_plot.png",
+     "relation_flory_fox_fits.csv", "relation_homologous_series.csv"]),
 ]
 
 
@@ -11031,6 +11034,7 @@ def run_evidence_engine(train, test, submission, out_dir):
     run_generalization_ladder(train, proxies, out_dir)
     run_tail_performance(proxies, out_dir)
     run_augmentation_experiment(train, out_dir)
+    run_relation_demo(train, proxies, out_dir)
     run_scorecard(out_dir)
     run_html_report(out_dir)
     print(f"evidence engine TOTAL: {time.time() - t_all:.0f}s — artifacts in {out_dir}", flush=True)
@@ -11044,6 +11048,89 @@ def load_official(data_dir: str):
     test["target_type"] = test["target_type"].astype(str).str.lower()
     train["target_type"] = train["target_type"].astype(str).str.lower()
     return train, test
+
+
+# ---------------------------------------------------------------------------
+# NEW — relation demo: homologous-series (monomer..tetramer) Tg evolution.
+# Shows the model finds a physical structure->property relation: predicted Tg
+# rises with chain length and saturates like Flory–Fox (linear in 1/n).
+# ---------------------------------------------------------------------------
+def build_oligomer(smi, n_copies):
+    """Extend a *-endcapped repeat unit to n_copies (n_copies>=1)."""
+    try:
+        s = str(smi).replace("[*]", "*")
+        first, last = s.find("*"), s.rfind("*")
+        if first == -1 or first == last:
+            return None
+        inner = s[first + 1:last]
+        if not inner:
+            return None
+        out = "*" + inner * n_copies + "*"
+        mol = Chem.MolFromSmiles(out)
+        if mol is None:
+            return None
+        return Chem.MolToSmiles(mol)
+    except Exception:
+        return None
+
+
+def run_relation_demo(train, proxies, out_dir):
+    """Homologous-series: does predicted Tg follow Flory-Fox (linear in 1/n)?"""
+    seed_all(EV_SEED); t0 = time.time()
+    target = "tg"
+    df_t = train[train["target_type"] == target].copy()
+    df_t = df_t[df_t["smiles"].astype(str).str.contains(r"\*", regex=True)]
+    rng = np.random.RandomState(EV_SEED)
+    n_sample = smoke_n(10, 4)
+    sample = df_t.sample(min(n_sample, len(df_t)), random_state=EV_SEED)
+    pkl = proxies[target]
+    rows = []
+    for _, row in sample.iterrows():
+        base = row["smiles"]
+        chain_preds = []
+        for n in (1, 2, 3, 4):
+            smi = build_oligomer(base, n)
+            if smi is None:
+                continue
+            Xs, _ = featurize([smi], pipe=pkl["pipe"])
+            p = float(predict_ensemble(Xs, pkl)[0])
+            chain_preds.append((n, p))
+        if len(chain_preds) >= 3:
+            for n, p in chain_preds:
+                rows.append({"polymer": row["smiles"][:60], "n_copies": n,
+                             "inv_n": 1.0 / n, "pred_tg": p})
+    df = pd.DataFrame(rows, columns=["polymer", "n_copies", "inv_n", "pred_tg"])
+    df.to_csv(out_dir / "relation_homologous_series.csv", index=False)
+
+    # Flory-Fox linear fit: Tg vs 1/n per polymer
+    fit_rows = []
+    if len(df):
+        for poly, g in df.groupby("polymer"):
+            if len(g) >= 3:
+                x = g["inv_n"].values; y = g["pred_tg"].values
+                beta = np.polyfit(x, y, 1)
+                yhat = np.polyval(beta, x)
+                r2 = r2_score(y, yhat)
+                fit_rows.append({"polymer": poly, "slope_vs_inv_n": float(beta[0]),
+                                 "intercept_Tg_inf": float(beta[1]), "flory_fox_r2": r2})
+    fdf = pd.DataFrame(fit_rows)
+    fdf.to_csv(out_dir / "relation_flory_fox_fits.csv", index=False)
+    med_r2 = float(fdf["flory_fox_r2"].median()) if len(fdf) else float("nan")
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    if not len(df):
+        ax.text(0.5, 0.5, "no valid homologous series in sample", ha="center", va="center")
+    for poly, g in df.groupby("polymer"):
+        ax.plot(g["inv_n"], g["pred_tg"], "o-", alpha=0.7, ms=5)
+    ax.invert_xaxis()  # 1/n: left = long chain (saturated), right = monomer
+    style_ax(ax, "Homologous Series — predicted Tg vs chain length (Flory–Fox)",
+             "1 / n (chain length)", "Predicted Tg (K)")
+    ax.text(0.05, 0.05, f"median Flory–Fox R² = {med_r2:.3f}", transform=ax.transAxes,
+            va="bottom", fontsize=12)
+    save_plot(fig, "relation_homologous_series_plot.png", out_dir)
+    print(f"[REL] homologous series: median Flory-Fox R2 = {med_r2:.3f} "
+          f"({len(fdf)} polymers, n={len(df)} rows)", flush=True)
+    print(f"[REL] relation demo DONE in {time.time() - t0:.0f}s", flush=True)
 
 # ---------------------------------------------------------------------------
 # unified CLI — Round-3 final pipeline

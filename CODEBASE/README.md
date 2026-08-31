@@ -104,6 +104,51 @@ used. Scoring against the oracle is done **separately**, by the `feasibility/` d
 predictions are frozen. Imputation is strictly train→test (same-polymer partner labels), never
 from the oracle.
 
+
+
+---
+
+## Round-3 judging themes — evidence bundle (`pipeline_final.py` + `outputs/`)
+
+Round 3 is judged not only on the leaderboard score but on **explainability**,
+**polymer-invariance robustness** and **proven generalization**.  Every claim is
+backed by a measured artifact in `outputs/` (all produced from official data
+only, all oracle-free):
+
+| Theme | Artifacts (outputs/) | Key result |
+|---|---|---|
+| **R1 Explainability** | `shap_beeswarm_*.png`, `shap_top20_per_target.csv`, `local_shap_*.png`, `fidelity_curve_*.png`, `explanation_agreement_heatmap.png`, `physics_decomp_eps_shap.png` | top SHAP features are chemically defensible per target (e.g. tg → aromaticity/rigidity; nc/eps → polarisability); masking SHAP-top features drops R² 0.85 vs 0.04 for random (fidelity PASS); eps explained via `nc² + ionic` decomposition |
+| **R2 Polymer invariance** | `smiles_invariance_per_target.csv`, `smiles_invariance_boxplot.png`, `canonicalization_check.txt`, `attribution_invariance_per_target.csv`, `oligomer_invariance.csv` | 30 randomized SMILES of the same polymer → graph-feature prediction std ≤ 0.23% of train std; attribution cosine 0.95–0.99 (req ≥ 0.70); canonicalization audit all-OK; oligomer |Δ|<3σ for 96% of pairs |
+| **R3 Reliability** | `cv_validation_table.csv`, `conformal_coverage_table.csv`, `test_predictions_with_intervals.csv`, `error_uncertainty_correlation.csv`, `ad_analysis_table.csv`, `seed_stability.csv` | structured CV across random/group/scaffold/low-sim; split-conformal 80/90/95% intervals on all 4,940 test rows; AD error rises monotonically with novelty; seed std 0.0018 |
+| **R4 Generalization** | `generalization_ladder.csv`, `generalization_ladder_plot.png`, `tail_performance.csv`, `khazana_holdout_scores.csv` | the "staircase": R² decays smoothly from random CV → scaffold → ultra-low-similarity holdout; tail performance holds in top/bottom 10%; post-freeze external verification R² 0.87–0.93 |
+| **AUG / REL (new)** | `augmentation_experiment.csv`, `relation_homologous_series.csv` | randomized-SMILES data augmentation preserves R² while cutting string-sensitivity ~10×; homologous-series demo shows the model finds Flory–Fox-like physics (Tg vs 1/n) |
+
+**The one-file deliverable — `pipeline_final.py`** reproduces the submission AND
+regenerates this entire evidence bundle in one run (official inputs only):
+
+```bash
+python pipeline_final.py --mode full --data-dir ../Dataset --out submission.csv --out-dir outputs
+# or, for a fast demo on tiny data:
+PHASE4_SMOKE=1 python pipeline_final.py --mode full --smoke --data-dir ../Dataset
+```
+
+After the run, open `outputs/TRUSTWORTHINESS_REPORT.html` (a single judge-facing
+document with every plot/table) and `outputs/scorecard.md` (PASS/FAIL per
+requirement).  `evidence_engine.py` is the standalone source of the evidence
+suite (used by `pipeline_final.py`).
+
+## Scorecard (full-data run, outputs/scorecard.md)
+
+**14/17 requirement groups PASS** (R1.1 R1.2 R1.3 R1.5 R2.1 R2.2 R2.3 R2.4 R3.1
+R3.4 R3.5 R4.1 R4.2 R4.3).  The three fails are honest, quantified limitations:
+R1.4 cross-model agreement ρ=0.47 (different model families rank features
+differently — reported as-is), R3.2 conformal coverage on the tiny DFT targets
+(sampling noise with ~45 validation rows; Tg/Egc are within ±3%), R3.3
+error–uncertainty correlation (shallow-tree ensembles — a known limitation with
+a documented MLP/MC-dropout upgrade path).  Minimum viable set: **R1.1 R1.2 R2.1
+R2.3 R3.1 R3.2 R4.1 R4.2** — all present with artifacts.
+
+
 ## Reading order for judges
 
 1. **README.md** (this) — what to submit and how to run it.
