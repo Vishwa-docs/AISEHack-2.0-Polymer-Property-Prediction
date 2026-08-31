@@ -179,6 +179,24 @@ reproduce reference outputs EXACTLY (max diff ~1e-13) when fed correct inputs.
   unknown is whether the self-generated base matches reference C1570 — the
   dbg_c1570 comparison answers this.
 
+
+
+### ENV FINDING (2026-08-31, DEFINITIVE — python 3.11.7 is load-bearing, NOT just numpy)
+
+Root-caused the "fresh run scores 0.8469 not 0.9023" mystery:
+- The V57 ei/eea leaf models (MLP/GPR/rdEHT/Descriptors3D 3D-conformer embedding)
+  are sensitive to the **python build**, not just package versions.
+- Two laptop runs with DIFFERENT numpy (2.4.6 vs 2.5.2), DIFFERENT rdkit
+  (2026.03.4 vs 2026.03.5) and DIFFERENT pandas (2.2.3 vs 3.0.5) BOTH collapsed
+  ei 0.871→0.512 identically. Common factor: **python 3.12.3**.
+- The frozen submission (verified 0.9035) was generated under **python 3.11.7**
+  (the Mac venv). Fresh regeneration MUST use python 3.11.7 + the pinned
+  `CODEBASE/requirements.txt`.
+- On the laptop, create the python-3.11 venv with uv:
+  `uv venv --python 3.11.7 /tmp/r3_py311_venv && uv pip install --python /tmp/r3_py311_venv/bin/python numpy==2.4.6 pandas==3.0.5 scikit-learn==1.9.0 lightgbm==4.7.0 rdkit==2026.03.5 scipy==1.17.1 shap xgboost==3.2.0 joblib`
+- The evidence suite (Part B) is version-robust (proxy models reproduce on any
+  of these envs); only the V57 submission path is python-build-sensitive.
+
 ### DEFECT LOG / OPEN DISCREPANCIES (2026-08-30 - user accepted verified score >= 0.903; defects logged for later review)
 
 **DEFECT-1 (chain does not reproduce reference C1570 exactly).** The standalone's

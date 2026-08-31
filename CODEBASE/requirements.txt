@@ -1,8 +1,10 @@
 # Environment validated for this pipeline.
 # The V57 spine's ei/eea leaf models (MLPRegressor, GaussianProcessRegressor, rdEHT,
-# RDKit Descriptors3D) are version-sensitive: below scikit-learn 1.9.0 the ei target
-# collapses (0.871 -> 0.512), and numpy 2.5.x ALSO collapses ei (0.871 -> 0.52).
-# Pin these EXACT versions to reproduce the verified 0.90352 (numpy 2.4.6 is load-bearing).
+# RDKit Descriptors3D) are python-build + version-sensitive: under python 3.12.x (any
+# numpy/rdkit combo) the ei target collapses 0.871 -> 0.512. ONLY python 3.11.7 with
+# these EXACT pins reproduces the verified 0.90352. python 3.11.7 is load-bearing.
+# (2026-08-31: root-caused — two python-3.12 laptop envs with different numpy/rdkit
+#  both collapsed ei identically; python 3.11.7 reproduces.)
 python==3.11.7
 rdkit==2026.03.5
 numpy==2.4.6
