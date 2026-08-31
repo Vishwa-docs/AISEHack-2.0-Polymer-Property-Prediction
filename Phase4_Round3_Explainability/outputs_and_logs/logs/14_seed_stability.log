@@ -1,0 +1,6 @@
+  seed 42: tg OOF R2 = 0.90606
+  seed 137: tg OOF R2 = 0.90775
+  seed 2024: tg OOF R2 = 0.90890
+  seed 2025: tg OOF R2 = 0.90667
+  seed 2026: tg OOF R2 = 0.90350
+14_seed_stability.py DONE in 756s — std of mean R2 = 0.00182

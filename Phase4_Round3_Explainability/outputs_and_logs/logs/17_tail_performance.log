@@ -1,0 +1,8 @@
+  tg: bottom_10=-0.832 middle_80=0.850 top_10=-0.410
+  egc: bottom_10=-1.496 middle_80=0.864 top_10=0.248
+  egb: bottom_10=-13.210 middle_80=0.845 top_10=0.089
+  ei: bottom_10=-5.904 middle_80=0.649 top_10=-0.360
+  eea: bottom_10=-19.615 middle_80=0.772 top_10=-1.114
+  nc: bottom_10=-8.329 middle_80=0.651 top_10=-0.826
+  eps: bottom_10=-0.396 middle_80=0.640 top_10=-1.580
+17_tail_performance.py DONE in 0s

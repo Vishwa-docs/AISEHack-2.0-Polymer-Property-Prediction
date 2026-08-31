@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/B1_counterfactuals.py", line 82, in <module>
+    main()
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/B1_counterfactuals.py", line 51, in main
+    opt = torch.optim.SGD([x], lr=0.05)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/.venv/lib/python3.12/site-packages/torch/optim/sgd.py", line 65, in __init__
+    super().__init__(params, defaults)
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/.venv/lib/python3.12/site-packages/torch/optim/optimizer.py", line 405, in __init__
+    self.add_param_group(cast(dict, param_group))
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/.venv/lib/python3.12/site-packages/torch/_compile.py", line 54, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1446, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/.venv/lib/python3.12/site-packages/torch/optim/optimizer.py", line 1155, in add_param_group
+    raise ValueError("can't optimize a non-leaf Tensor")
+ValueError: can't optimize a non-leaf Tensor

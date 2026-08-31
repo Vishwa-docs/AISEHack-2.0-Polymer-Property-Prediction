@@ -1,0 +1,8 @@
+  tg: R2=0.8969  MAE=22.8367  n=2624
+  egc: R2=0.9111  MAE=0.3170  n=1352
+  egb: R2=0.9268  MAE=0.3745  n=224
+  ei: R2=0.8711  MAE=0.2236  n=148
+  eea: R2=0.9183  MAE=0.2259  n=147
+  nc: R2=0.9086  MAE=0.0511  n=153
+  eps: R2=0.8847  MAE=0.2728  n=153
+16_khazana_verification.py DONE in 0s — ground truth used for post-freeze evaluation only

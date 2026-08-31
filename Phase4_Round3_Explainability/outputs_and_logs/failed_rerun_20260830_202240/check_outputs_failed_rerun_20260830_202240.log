@@ -1,0 +1,21 @@
+=== Phase 4 outputs check ===
+  [PASS] R1.1_shap_global
+  [PASS] R1.2_shap_local
+  [PASS] R1.3_fidelity
+  [PASS] R1.4_agreement
+  [PASS] R1.5_physics_decomp
+  [PASS] R2.1_smiles_invariance
+  [PASS] R2.2_canonicalization
+  [PASS] R2.3_attribution_invariance
+  [PASS] R2.4_oligomer
+  [PASS] R3.1_cv
+  [PASS] R3.2_conformal
+  [PASS] R3.3_uq_corr
+  [PASS] R3.4_ad
+  [PASS] R3.5_seed
+  [PASS] R4.1_ladder
+  [PASS] R4.2_khazana
+  [PASS] R4.3_tail
+  [PASS] R5_scorecard
+---
+ALL REQUIRED ARTIFACTS PRESENT

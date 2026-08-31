@@ -1,0 +1,6 @@
+       coverage_standard  coverage_shift_aware
+level                                         
+0.80            0.828659              0.822207
+0.90            0.931741              0.923059
+0.95            0.966423              0.963248
+D2_shift_aware_conformal.py DONE in 8s

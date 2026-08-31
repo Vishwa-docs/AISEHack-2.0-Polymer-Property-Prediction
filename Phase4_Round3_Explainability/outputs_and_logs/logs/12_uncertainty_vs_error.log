@@ -1,0 +1,8 @@
+  tg: rho = 0.237
+  egc: rho = 0.304
+  egb: rho = 0.260
+  ei: rho = 0.133
+  eea: rho = 0.273
+  nc: rho = 0.152
+  eps: rho = 0.186
+12_uncertainty_vs_error.py DONE in 0s

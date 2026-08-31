@@ -1,0 +1,8 @@
+tg: ridge=0.8073  et=0.8996  lgbm=0.9027  ens=0.9093  (n=4143)
+egc: ridge=0.7411  et=0.8805  lgbm=0.8930  ens=0.8955  (n=2028)
+egb: ridge=0.7747  et=0.8610  lgbm=0.8489  ens=0.8707  (n=337)
+ei: ridge=0.6865  et=0.7830  lgbm=0.7605  ens=0.8003  (n=222)
+eea: ridge=0.7633  et=0.8083  lgbm=0.8076  ens=0.8533  (n=221)
+nc: ridge=0.7293  et=0.7729  lgbm=0.7545  ens=0.8031  (n=229)
+eps: ridge=0.6259  et=0.7114  lgbm=0.7072  ens=0.7437  (n=229)
+01_proxy_models.py DONE in 309s — outputs in outputs/

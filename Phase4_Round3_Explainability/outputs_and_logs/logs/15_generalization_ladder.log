@@ -1,0 +1,8 @@
+  tg: G0_random=0.894 G1_canonical_group=0.896 G2_scaffold=0.825 G3_family=-0.409 G4_low_sim_0.6=0.620 G5_ultra_low_0.4=0.562
+  egc: G0_random=0.876 G1_canonical_group=0.884 G2_scaffold=0.698 G3_family=-0.110 G4_low_sim_0.6=0.672 G5_ultra_low_0.4=0.622
+  egb: G0_random=0.868 G1_canonical_group=0.864 G2_scaffold=0.691 G3_family=-0.792 G4_low_sim_0.6=0.592 G5_ultra_low_0.4=0.742
+  ei: G0_random=0.790 G1_canonical_group=0.788 G2_scaffold=0.388 G3_family=-0.416 G4_low_sim_0.6=-0.207 G5_ultra_low_0.4=0.714
+  eea: G0_random=0.849 G1_canonical_group=0.844 G2_scaffold=0.760 G3_family=0.616 G4_low_sim_0.6=0.639 G5_ultra_low_0.4=0.338
+  nc: G0_random=0.761 G1_canonical_group=0.757 G2_scaffold=0.605 G3_family=0.037 G4_low_sim_0.6=0.459 G5_ultra_low_0.4=0.718
+  eps: G0_random=0.708 G1_canonical_group=0.733 G2_scaffold=0.653 G3_family=0.408 G4_low_sim_0.6=0.486 G5_ultra_low_0.4=0.658
+15_generalization_ladder.py DONE in 161s

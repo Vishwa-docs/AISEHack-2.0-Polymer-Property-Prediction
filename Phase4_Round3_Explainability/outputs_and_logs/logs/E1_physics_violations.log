@@ -1,0 +1,4 @@
+             identity    n  mean_abs_violation  frac_gt_0_1
+0  eps ~ nc^2 + ionic  153            0.392619     0.830065
+1      ei ~ egc + eea  148            0.326488     0.743243
+E1_physics_violations.py DONE in 76s

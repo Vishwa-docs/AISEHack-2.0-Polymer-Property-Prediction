@@ -1,0 +1,4 @@
+  lambda=0.0: OOF R2=-1.3002, invariance std=0.0000
+  lambda=0.1: OOF R2=-1.2934, invariance std=0.0000
+  lambda=0.5: OOF R2=-1.3392, invariance std=0.0000
+C3_consistency_reg.py DONE in 353s

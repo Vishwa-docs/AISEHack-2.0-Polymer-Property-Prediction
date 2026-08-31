@@ -1,0 +1,47 @@
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  tg polymer 0: smiles=*c1cc2c(C(=O)N(C2=O)c2ccc(cc2)c2sc(c(c2c2ccccc2)c2ccccc2)c2c... pred=311.25 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  tg polymer 1: smiles=*OC(=O)Nc1ccc(cc1)Cc1ccc(cc1)NC(=O)OCCN(CC*)c1ccc(cc1)N=Nc1c... pred=125.92 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  tg polymer 2: smiles=*[Si](CCC*)(C[Si](c1ccccc1)(C)C)C[Si](c1ccccc1)(C)C... pred=-1.70 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  egc polymer 0: smiles=*CC(*)C(=O)OCC(F)(F)C(F)(F)C(F)(F)F... pred=6.63 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  egc polymer 1: smiles=*OC1(C)CC(C)(C)C(C)(N2CCCC(*)C2)C1C... pred=4.67 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  egc polymer 2: smiles=*CC(*)c1ccc(F)cc1... pred=2.29 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  egb polymer 0: smiles=*C(F)C(*)(F)OC(F)(F)F... pred=7.74 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  egb polymer 1: smiles=*CCc1ccc(O*)cc1... pred=4.06 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  egb polymer 2: smiles=*NC(=O)C(=S)c1ccc(*)cc1... pred=1.56 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  ei polymer 0: smiles=*CCC(O*)(C(F)(F)F)C(F)(F)F... pred=8.36 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  ei polymer 1: smiles=*Sc1ccc(*)cc1... pred=6.17 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  ei polymer 2: smiles=*Cc1ccc(-c2ccc(N*)s2)s1... pred=5.17 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  eea polymer 0: smiles=*CNC(=O)C(*)=S... pred=4.05 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  eea polymer 1: smiles=*CCOC(=O)c1ccc(C(=O)O*)cc1... pred=2.25 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  eea polymer 2: smiles=*NCCCNC(=O)NC(*)=O... pred=0.66 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  nc polymer 0: smiles=*Nc1ccc(-c2ccc(C(*)=O)s2)s1... pred=2.42 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  nc polymer 1: smiles=*Nc1ccc(Oc2ccc(*)s2)s1... pred=2.22 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  nc polymer 2: smiles=*C(=O)CC(F)(F)C(*)(F)F... pred=1.60 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  eps polymer 0: smiles=*NC(=S)c1ccc(C(*)=S)s1... pred=6.60 map=OK
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  eps polymer 1: smiles=*NC(=O)c1ccc(O*)cc1... pred=4.41 map=OK
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/.venv/lib/python3.12/site-packages/shap/plots/_force_matplotlib.py:350: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
+  fig, ax = plt.subplots(figsize=figsize)
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/03_shap_local.py:55: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_open_warning`). Consider using `matplotlib.pyplot.close()`.
+  fig, ax = plt.subplots(figsize=(8, 6))
+    similarity map failed (GetSimilarityMapFromWeights() missing 1 required positional argument: 'draw2d'); fallback: highlighted structure
+  eps polymer 2: smiles=*OC(=O)C(F)(F)C(*)(F)F... pred=3.66 map=OK
+03_shap_local.py DONE in 67s

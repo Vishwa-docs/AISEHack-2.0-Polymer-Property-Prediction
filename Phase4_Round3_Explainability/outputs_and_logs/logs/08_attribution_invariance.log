@@ -1,0 +1,8 @@
+  tg: mean attribution cosine = 0.9468 (n=1000)
+  egc: mean attribution cosine = 0.9868 (n=1000)
+  egb: mean attribution cosine = 0.9961 (n=1000)
+  ei: mean attribution cosine = 0.9884 (n=1000)
+  eea: mean attribution cosine = 0.9667 (n=998)
+  nc: mean attribution cosine = 0.9965 (n=1000)
+  eps: mean attribution cosine = 0.9767 (n=996)
+08_attribution_invariance.py DONE in 28s

@@ -1,0 +1,2 @@
+Background dataset has 229 samples but max_samples=100. Subsampling to 100 samples for SHAP value computation. To use all samples, set max_samples=229 when initializing the masker.
+06_physics_decomp.py DONE in 2s — ionic std=0.658, nc-hat mean=1.953

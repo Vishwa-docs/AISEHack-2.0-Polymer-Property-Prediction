@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/A2_linear_probes.py", line 139, in <module>
+    main()
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/A2_linear_probes.py", line 93, in main
+    act = activations(model, Xt, lname).reshape(len(Xt), -1)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/A2_linear_probes.py", line 62, in activations
+    h = getattr(model, layer_key).register_forward_hook(hook_fn(layer_key))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1967, in __getattr__
+    raise AttributeError(
+AttributeError: 'MLP' object has no attribute 'layer1'

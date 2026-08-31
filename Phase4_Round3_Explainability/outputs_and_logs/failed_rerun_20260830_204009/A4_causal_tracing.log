@@ -1,0 +1,5 @@
+  tg: block1=1.00 block2=1.00 block3=1.00
+  egc: block1=1.00 block2=1.00 block3=1.00
+  nc: block1=1.00 block2=1.00 block3=1.00
+  eps: block1=1.00 block2=1.00 block3=1.00
+A4_causal_tracing.py DONE in 2s

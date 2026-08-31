@@ -1,0 +1,9 @@
+  tg: 9 valid dimers
+  egc: 11 valid dimers
+  egb: 4 valid dimers
+  ei: 5 valid dimers
+  eea: 7 valid dimers
+  nc: 9 valid dimers
+  eps: 9 valid dimers
+pass rate (|delta| < 3σ): 1.000
+09_oligomer_invariance.py DONE in 3s

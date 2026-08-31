@@ -1,0 +1,8 @@
+  tg: G3_low_sim_0.4=0.562 G0_random=0.894 G1_canonical_group=0.896 G2_scaffold=0.825
+  egc: G3_low_sim_0.4=0.622 G0_random=0.876 G1_canonical_group=0.884 G2_scaffold=0.698
+  egb: G3_low_sim_0.4=0.742 G0_random=0.868 G1_canonical_group=0.864 G2_scaffold=0.691
+  ei: G3_low_sim_0.4=0.714 G0_random=0.790 G1_canonical_group=0.788 G2_scaffold=0.388
+  eea: G3_low_sim_0.4=0.338 G0_random=0.849 G1_canonical_group=0.844 G2_scaffold=0.760
+  nc: G3_low_sim_0.4=0.718 G0_random=0.761 G1_canonical_group=0.757 G2_scaffold=0.605
+  eps: G3_low_sim_0.4=0.658 G0_random=0.708 G1_canonical_group=0.733 G2_scaffold=0.653
+10_cv_validation.py DONE in 183s

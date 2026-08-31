@@ -1,0 +1,22 @@
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/02_shap_global.py:44: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(sv, X[idx], feature_names=feat_names,
+  tg: top feature = NumHeterocycles (30.5853)
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/02_shap_global.py:44: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(sv, X[idx], feature_names=feat_names,
+  egc: top feature = morgan_356 (0.4257)
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/02_shap_global.py:44: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(sv, X[idx], feature_names=feat_names,
+  egb: top feature = VSA_EState1 (1.0011)
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/02_shap_global.py:44: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(sv, X[idx], feature_names=feat_names,
+  ei: top feature = FpDensityMorgan1 (0.3347)
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/02_shap_global.py:44: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(sv, X[idx], feature_names=feat_names,
+  eea: top feature = morgan_97 (0.3429)
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/02_shap_global.py:44: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(sv, X[idx], feature_names=feat_names,
+  nc: top feature = PEOE_VSA12 (0.1165)
+/home/vishwa/Desktop/r3_runtime/Phase_4_Explainability/scripts/02_shap_global.py:44: FutureWarning: The NumPy global RNG was seeded by calling `np.random.seed`. In a future version this function will no longer use the global RNG. Pass `rng` explicitly to opt-in to the new behaviour and silence this warning.
+  shap.summary_plot(sv, X[idx], feature_names=feat_names,
+  eps: top feature = PEOE_VSA12 (0.4783)
+02_shap_global.py DONE in 53s

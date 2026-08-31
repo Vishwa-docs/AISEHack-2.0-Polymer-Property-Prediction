@@ -1,0 +1,8 @@
+  tg: best = et (0.9000)
+  egc: best = lgbm (0.8836)
+  egb: best = et (0.8628)
+  ei: best = lgbm (0.7937)
+  eea: best = lgbm (0.8422)
+  nc: best = lgbm (0.7870)
+  eps: best = lgbm (0.7274)
+F1_proxy_sweep.py DONE in 1089s - 70 runs logged

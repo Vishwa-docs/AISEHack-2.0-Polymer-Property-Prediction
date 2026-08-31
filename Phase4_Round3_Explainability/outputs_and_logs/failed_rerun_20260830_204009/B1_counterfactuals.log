@@ -1,0 +1,22 @@
+  tg: 20 counterfactuals; top deltas:
+    *Nc1ccc(cc1)C(c1ccc(cc1)NC(=O)c1cc(cc(c1)NC(=O)CCC -> Chi1v -353.34
+    *N1C(=O)c2c(C1=O)cc(cc2)Oc1c(cccc1)Oc1cc2c(C(=O)N( -> Chi1v +1062.03
+    *NC(=O)CCP(=O)(CCC(=O)NCCCCCCCCCC*)C -> Chi1v +1463.69
+    *N1C(=O)c2c(C1=O)cc(cc2)Oc1c(cccc1)Oc1cc2c(C(=O)N( -> Chi1v +228.77
+    *C(C*)C(=O)OCCCCSC -> Chi1v +2584.77
+    *c1cc2c(C(=O)N(C2=O)c2c(ccc(c2)C(=O)Oc2ccc(cc2)C(c -> Chi1v -134.53
+    *OC(=O)CCCCCCCCC(=O)OCC* -> Chi1v +1887.53
+    *C(CCCCC*)C -> Chi1v +1918.05
+    *Oc1ccc(cc1)C(=O)OCCOCCOCCOCCOC(=O)c1ccc(cc1)OC(=O -> Chi1v +2100.32
+    *C(C*)(C(=O)OCCOc1ccc(cc1)C(=O)Oc1ccc(cc1)OCCCC)C -> Chi1v +111.51
+    *N=Nc1ccc(cc1)NC(=O)CCC(=O)Nc1ccc(cc1)* -> Chi1v +1172.37
+    *C(C*)(C(=O)OCC(Oc1ccc(cc1)c1ccc(cc1)c1ccc(cc1)C#N -> Chi1v -1368.24
+    *c1nc2c(cc1)cc(cc2)C(=O)c1ccc(cc1)Oc1ccc(cc1)c1ccc -> Chi1v +2060.84
+    *N=P(*)(OCCCCC)OCCC -> Chi1v +1473.17
+    *Oc1ccc(cc1)OCC(CN(S(=O)(=O)c1ccc(cc1)c1ccc(cc1)S( -> Chi1v +423.23
+    *Oc1c(cc(cc1)C(c1cc(c(cc1)OC(=O)c1ccc(cc1)C(=O)*)C -> Chi1v +668.87
+    *Oc1ccc(cc1)C(c1ccc(cc1)OC(=O)c1ccc(cc1)Cc1ccc(cc1 -> Chi1v +56.93
+    *c1oc(nn1)c1ccc(cc1)C(=O)OCCCCCCOc1ccc(cc1)C=C1C(= -> Chi1v +1204.56
+    *Oc1c(cc(cc1)Oc1ccc(cc1)C(=O)Nc1ccc(cc1)Oc1ccc(cc1 -> Chi1v +1497.55
+    *c1cc2c(C(=O)N(C2=O)c2ccc(cc2)C(=O)OCCOCCOCCOCCOC( -> Chi1v +3894.64
+B1_counterfactuals.py DONE in 7s

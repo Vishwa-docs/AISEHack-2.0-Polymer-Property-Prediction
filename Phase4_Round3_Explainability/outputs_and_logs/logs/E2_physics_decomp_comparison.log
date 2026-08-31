@@ -1,0 +1,5 @@
+             route    r2_all   mae_all  r2_low_sim  mae_low_sim  n_low_sim
+0         A_direct  0.625425  0.483434    0.412050     0.488716         21
+1  B_reconstructed  0.671495  0.435172    0.502692     0.457147         21
+2       C_ensemble  0.666733  0.448558    0.479180     0.471961         21
+E2_physics_decomp_comparison.py DONE in 2s

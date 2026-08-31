@@ -1,0 +1,8 @@
+  tg: MLP OOF R2 = -1.1720 (n=4143, dim=9411)
+  egc: MLP OOF R2 = 0.6644 (n=2028, dim=9407)
+  egb: MLP OOF R2 = 0.6764 (n=337, dim=4430)
+  ei: MLP OOF R2 = 0.1677 (n=222, dim=2714)
+  eea: MLP OOF R2 = 0.7872 (n=221, dim=2657)
+  nc: MLP OOF R2 = 0.5172 (n=229, dim=2792)
+  eps: MLP OOF R2 = 0.4249 (n=229, dim=2782)
+A1_train_mlp.py DONE in 238s

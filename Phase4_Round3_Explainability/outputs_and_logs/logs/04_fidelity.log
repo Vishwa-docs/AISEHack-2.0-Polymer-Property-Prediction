@@ -1,0 +1,8 @@
+  tg: base=0.9785 drop@20% top=0.8637 random=0.4291
+  egc: base=0.9696 drop@20% top=2.3433 random=1.4747
+  egb: base=0.9705 drop@20% top=0.8378 random=0.3310
+  ei: base=0.9162 drop@20% top=0.7136 random=0.3105
+  eea: base=0.9590 drop@20% top=0.6281 random=0.4445
+  nc: base=0.9466 drop@20% top=0.6926 random=0.3760
+  eps: base=0.9093 drop@20% top=0.7142 random=0.3073
+04_fidelity.py DONE in 68s

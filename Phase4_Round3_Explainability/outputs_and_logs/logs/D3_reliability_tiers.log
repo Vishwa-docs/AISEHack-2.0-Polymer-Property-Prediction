@@ -1,0 +1,8 @@
+  tg: tiers {1: 3980, 2: 151, 3: 12}
+  egc: tiers {1: 1903, 2: 113, 3: 12}
+  egb: tiers {1: 317, 2: 19, 3: 1}
+  ei: tiers {1: 207, 2: 15}
+  eea: tiers {1: 202, 2: 19}
+  nc: tiers {1: 216, 2: 12, 3: 1}
+  eps: tiers {1: 206, 2: 23}
+D3_reliability_tiers.py DONE in 161s

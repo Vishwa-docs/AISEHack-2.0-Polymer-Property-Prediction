@@ -1,0 +1,8 @@
+  tg: mean std = 13.5859 (12.455% of train std) | graph-only = 0.2510 (0.230%)
+  egc: mean std = 0.1002 (6.388% of train std) | graph-only = 0.0011 (0.070%)
+  egb: mean std = 0.1257 (6.353% of train std) | graph-only = 0.0000 (0.000%)
+  ei: mean std = 0.0891 (8.509% of train std) | graph-only = 0.0000 (0.000%)
+  eea: mean std = 0.1559 (14.080% of train std) | graph-only = 0.0000 (0.000%)
+  nc: mean std = 0.0172 (7.304% of train std) | graph-only = 0.0000 (0.000%)
+  eps: mean std = 0.0719 (6.568% of train std) | graph-only = 0.0000 (0.003%)
+07_smiles_invariance.py DONE in 392s

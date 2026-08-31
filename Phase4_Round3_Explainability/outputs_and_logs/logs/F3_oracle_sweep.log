@@ -1,0 +1,4 @@
+--- generating candidates (no answer data touched yet) ---
+--- freezing + scoring candidates against answer file ---
+  proxy_ensemble: mean R2 = 0.7981
+F3_oracle_sweep.py DONE in 177s - candidates scored post-freeze

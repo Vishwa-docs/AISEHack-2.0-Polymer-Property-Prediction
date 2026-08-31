@@ -1,0 +1,8 @@
+  tg: all_features=0.893 no_morgan=0.892 no_rdkit_desc=0.892 no_char_ngram=0.889
+  egc: all_features=0.870 no_morgan=0.869 no_rdkit_desc=0.873 no_char_ngram=0.864
+  egb: all_features=0.856 no_morgan=0.855 no_rdkit_desc=0.830 no_char_ngram=0.851
+  ei: all_features=0.794 no_morgan=0.794 no_rdkit_desc=0.756 no_char_ngram=0.793
+  eea: all_features=0.839 no_morgan=0.820 no_rdkit_desc=0.875 no_char_ngram=0.824
+  nc: all_features=0.787 no_morgan=0.767 no_rdkit_desc=0.766 no_char_ngram=0.783
+  eps: all_features=0.726 no_morgan=0.722 no_rdkit_desc=0.692 no_char_ngram=0.733
+F2_feature_ablation.py DONE in 197s - 70 runs logged
