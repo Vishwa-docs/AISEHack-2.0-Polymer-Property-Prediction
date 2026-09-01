@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "vibearound": {
+      "type": "http",
+      "url": "http://127.0.0.1:12358/va/mcp?token=cd9be2fc7dab7b741a22ed7baa700406ddc705eb37f61da73326f836a68ab2a0"
+    }
+  }
+}
