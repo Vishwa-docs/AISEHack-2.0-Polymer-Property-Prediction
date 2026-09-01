@@ -124,6 +124,8 @@ first**, then every quoter, then re-run the consistency scan.
 | 5 | `REFINEMENT.md` (this file's predecessor) "MAXIMIZED at 0.90680 / no score work" | stale | superseded by §0/§1 of this file. |
 | 6 | `RESULTS.md` §3 / `docs/06_results/public_private_analysis.md` | the public→private gap decomposition sums to ~0.012 but the observed gap is **0.0114**, and the "predicted within 0.0004" claim is asserted, not shown | make the four components sum to the observed gap, and show the arithmetic behind the 0.0004 — it is our best methodology line and must close. |
 | 7 | `REPORT_10PAGE.md:238` | labels **0.9066 ± 0.0018** (a Tg out-of-fold *seed-stability* number) as "mean R² on the local panel" | relabel: it is 5-seed Tg OOF stability, **not** a panel score. Keep 0.9066 and 0.90680/0.907551 visually distinct or a judge will read them as contradictory. |
+| 8 | rounding drift across docs: `0.972/0.9716`, `0.928/0.9282`, `0.072/0.0716 eV`, `14.77/14.8` & `43.56/43.6 °C`, eps `0.885` vs `0.8847/0.8860` | same quantity printed at different precision in different files | standardise to the 4-sig-fig form in `00_INDEX.md` (0.9716, 0.9282, 0.0716, 14.77, 43.56, 0.8847). |
+| 9 | `STORY.md:1` | titled "in four acts" but the file has **five** (Act 0–4) | retitle "in five short acts" (or merge Act 0 into Act 1). |
 
 ### 2.3 Release-gate scan (run unchanged, but run it)
 
@@ -306,9 +308,15 @@ the field" answer** — that framing is exactly what the judges will ask.
    - **emergent physics** (Flory–Fox recovered unsupervised, median R² ≈ 0.99; aromaticity in the hidden layer, probe R² 0.895);
    - **decorrelated neural blending** (the GINE blend: +0.0045 from *different errors*, not better errors).
 3. **Add a "local held-out verification panel" explainer** (how it is constructed, why 4,909 of
-   4,940 rows, and why it is post-freeze only) — an expert will ask exactly this, and no file
+   4,940 rows = 99.4%, and why it is post-freeze only) — an expert will ask exactly this, and no file
    currently answers it in one place.
-4. Preserve the strong QnA additions from the previous REFINEMENT (why-not-pretrained, why-7-models,
+4. **Add three more answers the audit found missing:** (a) *"what is your score against a trivial
+   baseline?"* (the mean/median/constant predictor per target — state it as the floor every model
+   must beat); (b) *"how does 0.891/0.907 compare to published polymer-informatics numbers?"*
+   (position us against polyBERT / Polymer Genome / TransPolymer, with the caveat that datasets and
+   splits differ); (c) *"give me the full ablation table"* (the feature-family ablation + physics
+   deltas + the D1–D9 failure table, all in one place).
+5. Preserve the strong QnA additions from the previous REFINEMENT (why-not-pretrained, why-7-models,
    why-NNLS, why-0.20-character-multiplier, and hostile H11/H12 on the public/private gap and the
    invariance-vs-char-ngram contradiction) — they are correct and worth keeping verbatim.
 
@@ -321,6 +329,21 @@ the field" answer** — that framing is exactly what the judges will ask.
   **G1 (Grinsztajn, NeurIPS 2022) is present and verified** — it is the "cap and limits of ML on
   tabular data" paper you wanted. M2 (Fox & Flory 1950) backs the Flory–Fox demo. P1/P4/C6 back the
   "pretrained models didn't reproduce here" contrast. **Cite nothing not in this table.**
+- **Two citations are referenced in `00_My Docs.md` but are NOT in the `Research/INDEX.md` whitelist
+  — this violates the project's own rule (`INDEX.md:3`). Add them (both are directly load-bearing):**
+  1. **Krogh & Vedelsby (NIPS 1994)** — "Neural Network Ensembles, Cross Validation, and Active
+     Learning": the ambiguity decomposition (ensemble error = mean member error − diversity). This is
+     **the** theoretical backing for the Phase-7 GNN blend — "the GNN is not better alone, it makes
+     different errors, and decorrelation is why blending it helps." Add as a **primary** citation for
+     the blend.
+  2. **Hu et al. (ICLR 2020)** — "Strategies for Pre-training Graph Neural Networks": the standard
+     GNN-pretraining reference that justifies *why* we expected SSL/GNN pretraining to help and
+     measured that it didn't at our scale. Add as a **contrast** citation alongside C4/C6.
+- **Gap to close for the user's "cap/limits of polymers" ask:** the noise-floor ceiling currently
+  leans on M1 (Bicerano) + M2 (Fox–Flory) but has **no dedicated citation on the ceiling/limits of
+  polymer property prediction** (e.g. a reproducibility-of-Tg or DFT-scatter study). Either add one
+  to `INDEX.md` before the report cites the "σ ≈ 15 °C, literature-typical" figure (currently
+  uncited — see §4.1), or drop that specific number and keep only the derived formula.
 
 ---
 
