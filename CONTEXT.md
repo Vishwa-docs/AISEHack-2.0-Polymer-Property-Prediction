@@ -1,5 +1,37 @@
 # CONTEXT.md — the whole project on one page
 
+> ## ⭐ CURRENT BEST ARCHITECTURE — Phase 7 (0.90680)
+>
+> The best verified pipeline is **the V57 engine blended with a graph neural network**:
+> **mean R² 0.90680** on the local held-out verification panel (0.90813 on the verified
+> sub-panel), against the previous champion's 0.90230 — **+0.0045, every target at or above it**.
+>
+> | target | previous | **Phase 7** |
+> |---|---:|---:|
+> | tg | 0.8954 | **0.9043** |
+> | egc | 0.9111 | **0.9221** |
+> | egb | 0.9268 | **0.9310** |
+> | ei | 0.8711 | 0.8711 |
+> | eea | 0.9183 | **0.9270** |
+> | nc | 0.9086 | **0.9097** |
+> | eps | 0.8847 | **0.8860** |
+> | **mean** | 0.90230 | **0.90680** |
+>
+> **Mechanism:** a GINE message-passing network (3 seeds/target, structure-grouped CV) blended
+> per target at `w = clip((cv − 0.80)/0.25, 0.10, 0.60)` — weights derived from **cross-validation
+> on train.csv only**, never from evaluation labels. The gain comes from *decorrelation*: the GNN
+> is not better than the ensemble (tg 0.8987 vs 0.8954), it makes different errors.
+>
+> **Also established:** the long-standing claim that *python 3.11.7* is the load-bearing factor is
+> **wrong**. `rdEHTTools.RunMol` **segfaults on linux-x86_64** and works on macOS with identical
+> pins — it is a **platform** defect. Only ei and eea depend on it; the other five targets
+> reproduce at correlation 1.00000 on both. Kaggle runs Linux, so this matters for reproduction.
+>
+> Notebook, checkpoints, 44 charts and the resume note: **`904_submission/`** (see
+> `904_submission/RESUME_HERE.md`).
+
+
+
 *Portable. Paste this into any agent with no repo access.*
 *(Mirror of `Personal/CONTEXT.md` — keep them identical.)*
 
