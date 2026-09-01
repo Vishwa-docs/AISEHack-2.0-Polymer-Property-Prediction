@@ -1,1335 +1,378 @@
-# REFINEMENT.md — Final Hackathon Preparation Checklist
+# REFINEMENT.md — Final Hackathon Preparation (improved)
 
-**Created:** 2026 (Pre-hackathon final refinement)  
-**Audience:** Implementation agent for final polish  
-**Context:** AISEHack 2.0 Polymer Property Prediction Round 3 - Final submission ready, needs refinement for presentation
-
----
-
-## 0. CRITICAL CONTEXT
-
-**Score Status**: MAXIMIZED at 0.90680 (Phase 7). NO score experiments needed.  
-**Codebase Status**: Complete, documented, validated.  
-**This is REFINEMENT**: Fix gaps, enhance story, consolidate documentation. NOT wholesale changes.
-
-**READ FIRST:**
-- `/Users/daver/Desktop/AISEHack 2.0 Polymr Property Prediction Round 3/PLAN.md` 
-- `/Users/daver/Desktop/AISEHack 2.0 Polymr Property Prediction Round 3/RUN.md`
-- `/Users/daver/Desktop/AISEHack 2.0 Polymr Property Prediction Round 3/Personal/AGENTS.md`
+**Audience:** a coding + documentation agent (you) doing the final polish, and the human (for the
+decision points flagged `🔴 USER DECIDES`).
+**Scope:** finalise codebase, report, presentation, story, QnA and docs. **No new score
+experiments** — the model is frozen. This is consistency + narrative + readiness work.
+**Deadline:** 3 September 2026 · **2 final submissions** · team **Sandman**.
 
 ---
 
-## 1. CODEBASE VERIFICATION & CORRECTIONS
+## 0. READ THIS FIRST — the score story is broken, and it is the whole game
 
-### 1.1 Score & Metrics Validation
-**Task**: Verify all numbers are consistent and correct across all documents.
+The previous version of this file treated the score as "done at 0.90680" and told you to "enforce
+0.9023 everywhere". **That is wrong on both counts.** Here is the actual state, verified from the
+files on disk:
 
-**Files to check**:
-```
-- Personal/docs/00_INDEX.md (canonical source)
-- AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/README.md
-- Personal/STORY.md
-- Personal/Presentation/SLIDE_PLAN.md
-```
+| label | value | where it lives | what it is |
+|---|---|---|---|
+| **old champion** | **0.90230** | top of the historical table | the V57 ensemble + physics, **no GNN**. This is what was actually submitted → **private LB 0.891, public 0.917** |
+| **Phase 7 (first annotation)** | **0.90680** | every doc header (`CONTEXT.md`, `README.md`, `00_INDEX.md`, `RESULTS.md`, …) | V57 **blended with a GINE GNN**. The top-level `codebase/submission.csv` currently contains **this** file (SHA `30141c6a…`) |
+| **Phase 7 (final, verified)** | **0.907551** | `codebase/904_submission/submission_final.csv` (SHA `cd91f278…`), `logs/score_final_verified.json` (`mean_r2 0.90755055`), `notebook/STATUS.md` | the same GNN blend with the repaired ei/eea leaves. **Not yet propagated anywhere** — not into the docs, not into the top-level `submission.csv` |
+| verified sub-panel | **0.90813** | `00_INDEX.md`, `CONTEXT.md` | the same predictions scored on the 3,818 exactly-matched rows |
+| estimated private (Phase 7) | **0.8965** | `score_final_verified.json` → `estimated_private_lb 0.89655055` | what the 0.907551 file would ≈ score privately, versus 0.891 now |
+| competitor | **≈0.92** | `docs/01_task/competition.md:45` ("A competitor at 0.92 exists on the Round-3 board"), `Score_and_Invariance_Improvement/CEILING_REALITY_CHECK.md:63` | a competitor is at ~0.92 on the board. `beats_092_competitor: false` in `score_final_verified.json` |
 
-**Verification checklist**:
-- [ ] Private LB: 0.891 everywhere
-- [ ] Local panel: 0.9023 (NOT 0.90352, 0.903480, or 0.90229)
-- [ ] Per-target R²: tg 0.8953, egc 0.9111, egb 0.9268, ei 0.8711, eea 0.9183, nc 0.9086, eps 0.8847
-- [ ] Scorecard: 14/18 (may become 14-15/19 after full run - check outputs/scorecard.md)
-- [ ] Physics numbers: egc=ei-eea R² 0.9716, ionic 0/134 violations, Flory-Fox median R²≈0.99
-- [ ] Fidelity: 0.851 vs 0.043
-- [ ] SHAP cosine: 0.95-0.99
-- [ ] No "oracle", "khazana", "polyinfo", "TgSS" in codebase folder
+**Three separate documents are currently telling three different stories:**
+- doc **headers** say the current best is **0.90680**,
+- the doc **bodies** (report draft, presentation deck, website footer, `00_INDEX.md` canonical block, `RESULTS.md` §1–2) still quote **0.9023** as current,
+- the **actual best verified artifact** is **0.907551**, which appears in **no** doc and is not the top-level `submission.csv`.
 
-**Action**: Fix any inconsistencies found.
+A quantified scan of the docs found **13 distinct spellings of three different quantities**
+(`0.9023` ×97, `0.90680` ×59, `0.90230` ×45, `0.9066` ×9, `0.90813` ×8, `0.9028` ×7, plus
+`0.90352 / 0.903480 / 0.902289 / 0.90229 / 0.9035`). If a judge asks "what did you score?" and the
+answer is not one clean number with one clean story, the trust narrative the round is judged on
+collapses on stage.
 
-### 1.2 Charts & Misinformation Check
-**Task**: Verify methodology correctness in robustness/invariance experiments.
+### 0.1 The GNN-blend nuance you must get right in every artifact
 
-**Files to review**:
-```
-- Personal/docs/08_robustness/*.md
-- AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/outputs/robustness/
-- Personal/docs/07_explainability/*.md
-```
+The Phase 7 gain is **+0.0045 to +0.0053 over 0.9023**, and the mechanism is **decorrelation, not
+neural superiority**:
 
-**Check for**:
-- [ ] SMILES invariance methodology correct (30 randomized spellings, graph-only vs full)
-- [ ] Fidelity test methodology (ROAR-style masking)
-- [ ] Attribution invariance (SHAP cosine across spellings)
-- [ ] Flory-Fox relation (Tg vs 1/n linearity)
-- [ ] Counterfactuals (27/40 = 67.5% agreement documented with failures shown)
+> A GINE message-passing network (3 seeds/target, structure-grouped CV) is blended per target at
+> `w = clip((cv − 0.80) / 0.25, 0.10, 0.60)`, with `cv` the target's **cross-validated** score on
+> `train.csv` only. The GNN is **not better alone** (tg GNN 0.8987 vs ensemble 0.8954) — it makes
+> **different errors**, and blending two decorrelated predictors is what lifts the mean.
 
-**Known good**: All methodologies are documented correctly in Personal/docs/. Just verify charts match text.
+**This changes two claims the previous REFINEMENT.md made that are now false:**
 
----
+1. ❌ *"Not a single winner is a neural architecture."* → The Phase-7 winner **is** a tree+GNN
+   blend. The correct claim: *"trees still dominate every target; the single neural component
+   contributes only through decorrelation, at a weight ≤ 0.60 and a blend weight of 0.10 on the
+   weakest targets."* This is actually a **stronger, more honest** story than "we rejected deep
+   learning", and it stays consistent with the G1 citation (trees over deep nets on tabular data).
+2. ❌ *"0.894 → 0.896 (random → grouped): minimal drop proves dedup works."* → That ladder entry is
+   a **+0.002 rise**, not a drop, and it is within noise. The honest sentence is: *"grouped CV is
+   within noise of random CV (0.896 vs 0.894), i.e. deduplication costs nothing in the
+   interpolation regime; the real cost appears at the scaffold split (0.825) and beyond."*
 
-## 2. ML/DL BASELINE STORY
+### 0.2 The platform-defect finding (also new, also must be propagated)
 
-### 2.1 Consolidate Existing ML Comparisons
-**Task**: Create clear narrative showing ML was tried, measured, and domain knowledge won.
-
-**YOU ALREADY HAVE** (do NOT run new experiments):
-1. **GNN failure**: ei −0.309 on 0/5 folds (D-MPNN, literature crossover ~859-1,000 rows vs our 222)
-2. **Self-supervised learning**: 9 variants ≤ supervised control
-   - **Decisive**: MLM probe 0.651 vs random-init 0.708
-   - InfoNCE, PPMI/SVD, subword, denoising all failed
-3. **ChemBERTa** (out-of-competition): frozen 0.751, fine-tuned 0.784 vs tree baseline 0.810
-4. **Pattern**: 6 of 9 winners are domain knowledge, not ML
-
-**Files already containing this**:
-```
-- Personal/docs/04_experiments/what_failed.md
-- Personal/TRIALS.md (Part 1, D3 and D4)
-- AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/Experiment_Logs/D3_ssl_corpora.md
-- AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/Experiment_Logs/D4_neural.md
-```
-
-**Action needed**:
-- [ ] Add ML comparison summary to `Personal/docs/00_My Docs.md` (section "Why domain knowledge beat ML")
-- [ ] Ensure presentation slide 5 "failure strip" includes: GNN ei −0.309 · MLM 0.651 vs 0.708 · ChemBERTa note
-- [ ] Add to report §6 (Ablations): explicit ML vs domain knowledge comparison table
-- [ ] QnA file: Add question "Why didn't you use deep learning?" with this answer
-
-**Content to add** (use this text):
-```markdown
-## Why Domain Knowledge Beat Machine Learning
-
-We tested ML extensively:
-- **Graph Neural Networks**: D-MPNN scored **−0.309** on ei (0/5 folds). Literature shows message passing needs ~859-1,000 rows; we have 222.
-- **Self-supervised pretraining**: 9 variants tested on PI1M and smile_r3 corpora. **All ≤ supervised control**. Decisive: MLM probe 0.651 vs random-init 0.708 - pretraining *destroyed* task-relevant structure at our scale.
-- **ChemBERTa** (research paper, out-of-competition): frozen 0.751, fine-tuned 0.784 vs tree baseline **0.810**.
-
-**The pattern**: 6 of 9 winners are domain knowledge (physics identities, ionic decomposition, per-target design), 2 are assembly discipline, 1 is representation. **Not a single winner is a neural architecture.**
-
-This aligns with Grinsztajn et al. (NeurIPS 2022): tree ensembles outperform deep learning on tabular data at our sample sizes.
-```
+Phase 7 established that the long-standing *"python 3.11.7 is load-bearing"* claim is **wrong**.
+`rdEHTTools.RunMol` **segfaults on linux-x86_64** and works on macOS with **identical** pins — a
+**platform** defect, not a version one. Only **ei and eea** depend on it; the other five targets
+reproduce at correlation **1.00000** on both. Kaggle runs Linux, so this matters for reproduction.
+Wherever a doc currently says "python 3.11.7 is load-bearing", correct it to this platform story
+(source: `904_submission/RESUME_HERE.md`, `CONTEXT.md` §"Also established", `00_INDEX.md` header).
 
 ---
 
-## 3. REPORT REFINEMENT
+## 1. 🔴 Decisions the human must make before you change any number
 
-### 3.1 Scientific Contributions Verification
-**Task**: Ensure report clearly states research contributions beyond dataset analysis.
+You cannot propagate a canonical score until the human answers these. **Ask, then do the
+propagation in §2 in one pass.**
 
-**Check** `Personal/Midnight_Report/Sample Reports/` for what judges expect:
-- Understanding of polymer science ✓ (we have this in Personal/docs/02_domain/)
-- Novel methodology contributions
-- Negative results with scientific value
+| # | decision | context / recommendation |
+|---|---|---|
+| **D0** | **What is the final submission?** | `904_submission/submission_final.csv` (0.907551, est. private 0.8965) is strictly better than the top-level `submission.csv` (0.90680). **Recommend: submit `submission_final.csv` as the final**, and regenerate/verify it first (see §7, step 1). Confirm whether it has already been uploaded — the docs still say "private 0.891", which is the *old* file. |
+| **D1** | **Which number becomes canonical?** | One of `0.907551` (if D0 = submit final) or `0.90680` (if keeping the current top-level file). Do **not** keep `0.9023` as "current" anywhere — it becomes the historical "previous champion" only. The canonical block in `00_INDEX.md` must be rewritten to match, once, then propagated. |
+| **D2** | **Is the ~0.92 competitor on public or private LB, and do we care to chase it?** | `docs/01_task/competition.md:45` says "0.92 exists" but not which board. If it is private, our 0.8965 estimate is still ~0.025 behind, and the honest line is the ceiling argument (§9), not a score claim. Clarify so the story is truthful. |
+| **D3–D8** | Team name / licence / GitHub repo / weights link / 1-or-2 submissions / keep `Consolidation/` private | already enumerated in `RUN.md` §0 (D1–D6). Confirm; these write into the report header + repo. |
 
-**Action**:
-- [ ] Review `Personal/docs/00_My Docs.md` for research contribution section
-- [ ] Ensure report §2 includes: "We measured trust rather than asserting it" as scientific contribution
-- [ ] Highlight in report: First to show **load-bearing attributions** (0.851 vs 0.043) AND **attribution invariance** (cosine 0.95-0.99) together
-- [ ] Mention measured Flory-Fox recovery (unsupervised physics learning)
-- [ ] Honest negative results (4 scorecard FAILs with causes) as research contribution
-
-### 3.2 Max Cap Appendix Verification
-**Task**: Verify or remove Appendix B (ceiling analysis).
-
-**File**: Check if `Personal/Midnight_Report/PROMPT_10PAGE.md` §E matches `Personal/docs/06_results/ceiling_analysis.md`
-
-**Verify**:
-- [ ] Metric identity (0.9023 mean vs 0.9370 pooled)
-- [ ] Tg-alone bound (perfect Tg → mean 0.9172)
-- [ ] Per-target standard errors (ei 0.022, eps 0.024...)
-- [ ] Single-row leverage calculations
-- [ ] Label-noise bound on Tg (σ=15°C → R²max 0.981; empirical ≈0.92)
-- [ ] Composite ceiling ≈0.93 ± 0.01
-- [ ] Math is CORRECT
-
-**If ANY math is uncertain**: Remove Appendix B entirely or mark as "preliminary estimate" with caveats.
+**Do not edit `00_INDEX.md` until D0–D2 are answered.** Every other edit depends on it.
 
 ---
 
-## 4. PRESENTATION & WEBSITE
+## 2. Codebase + documentation consistency (do after §1)
 
-### 4.1 Website 3D Visualization
-**Current state**: `Website/static/` has only `.gitkeep` - NO actual 3D viz.
+### 2.1 Propagate the canonical score (one pass, in this exact order)
 
-**Requirement analysis**:
-- Demo works (Streamlit app exists, functional)
-- 3D structure viz mentioned in user request but...
-- **RDKit already renders 2D** in `app.py` (mol_png function)
-- Time-constrained hackathon prep
+The discipline (from `Personal/AGENTS.md §6`): **one number, one place — `Personal/docs/00_INDEX.md`
+first**, then every quoter, then re-run the consistency scan.
 
-**Recommendation** (CHOOSE ONE):
+1. Rewrite the `00_INDEX.md` canonical block so the **header, the per-target table, and the
+   CANONICAL NUMBERS block all agree** on the number chosen in D1. Today they disagree: header says
+   0.90680, table shows a per-target row that **sums to 0.90731** (tg 0.9043 + egc 0.9221 + egb
+   0.9310 + ei 0.8711 + eea 0.9270 + nc 0.9097 + eps 0.8860 = 6.3512 ÷ 7), and the canonical block
+   says 0.9023. Fix the per-target table to the **actual** verified rows from
+   `904_submission/logs/score_final_verified.json` (tg 0.9039 · egc 0.9213 · egb 0.9318 · ei 0.8741
+   · eea 0.9253 · nc 0.9101 · eps 0.8864), which self-consistently sum to 0.90755.
+2. Then update, in this order, every file that quotes a score:
+   `Personal/CONTEXT.md` → `Personal/docs/06_results/scores.md` → `score_history.md` →
+   `ceiling_analysis.md` → `Personal/STORY.md` → `Personal/Presentation/PRESENTATION.md` (deck
+   body) → `SLIDE_PLAN.md` → `SPEAKER_NOTES.md` → `EVIDENCE_SHOWCASE.md` →
+   `Personal/Midnight_Report/PROMPT_10PAGE.md` + `REPORT_10PAGE.md` →
+   `codebase/README.md` → `codebase/RESULTS.md` → `codebase/FINDINGS.md` → `codebase/ARCHITECTURE.md`
+   → `codebase/Website/app.py` (footer) + `Website/README.md` → root `README.md` → root `CONTEXT.md`
+   → root `RUN.md`.
+3. Update the **public/private forensics** wherever they appear (`PRESENTATION.md`, `RESULTS.md` §3,
+   `docs/06_results/public_private_analysis.md`): the "predicted private within 0.0004" story was
+   computed off the 0.9023 champion. If D0 submits the Phase-7 file, the private number is an
+   **estimate** (0.8965), not a measured 0.891 — say "estimated" and keep the difficulty-stratified
+   *method* (it is the strong part).
+4. Update the **ceiling appendix** (§6 below) so its worked numbers use the chosen predictions, and
+   the "0.891 private ≈ 96% of ceiling" line becomes the chosen private (e.g. ≈0.8965 ≈ 96.4%).
 
-**Option A** (Quick, Safe):
-- [ ] Keep current 2D RDKit rendering
-- [ ] Add note in `Website/README.md`: "Structure displayed as 2D for compatibility; 3D available via RDKit Chem.MolTo3DBlock if needed"
-- [ ] Focus energy on demo rehearsal
+### 2.2 Known factual fixes (independent of the score decision)
 
-**Option B** (If time allows):
-- [ ] Add 3D.js integration for structure viz
-- [ ] Modify `app.py` to include 3D toggle
-- [ ] Test thoroughly before hackathon
+| # | file | issue | fix |
+|---|---|---|---|
+| 1 | `Personal/docs/00_INDEX.md:65` vs `FINDINGS.md:11` (and `CONTEXT.md` Phase-7 table) | tg quoted as **0.8953** in one place and **0.8954** in another | standardise (the previous-champion tg is 0.8954; the Phase-7 tg is 0.9039). One value per quantity. |
+| 2 | `RESULTS.md` §5 / `docs/09_generalization/generalization_ladder.md` | ladder `random 0.894 → grouped 0.896` is a **rise**, and any doc that calls it a "drop that proves dedup works" is wrong | rewrite as "grouped is within noise of random (dedup costs nothing); the cliff is scaffold 0.825 → low-sim 0.620 → ultra-low 0.562". |
+| 3 | any doc saying "python 3.11.7 is load-bearing" | superseded by the platform-defect finding | rewrite per §0.2. |
+| 4 | any doc saying "no neural architecture won" | false under Phase 7 | rewrite per §0.1. |
+| 5 | `REFINEMENT.md` (this file's predecessor) "MAXIMIZED at 0.90680 / no score work" | stale | superseded by §0/§1 of this file. |
 
-**User decides**: Given time pressure, Option A recommended.
+### 2.3 Release-gate scan (run unchanged, but run it)
 
-### 4.2 Presentation Enhancement with Research
-**Task**: Integrate NeurIPS paper (Grinsztajn et al. 2022) into story as science backing.
-
-**Paper**: https://proceedings.neurips.cc/paper_files/paper/2022/hash/0378c7692da36807bdec87ab043cdadc-Abstract-Datasets_and_Benchmarks.html
-
-**Already cited as G1 in** `Personal/Research/INDEX.md`
-
-**Action**:
-- [ ] Update `Personal/STORY.md` Act 2: Add "...and why: Grinsztajn et al. (NeurIPS 2022) showed trees outperform deep learning on tabular data at our sample sizes"
-- [ ] Slide 4 (Architecture): Add footer citation "Architecture choice grounded in Grinsztajn et al., NeurIPS 2022"
-- [ ] Report §3: Cite G1 when discussing classical ensemble choice
-- [ ] Add to QnA: "Why trees?" → Reference G1
-
----
-
-## 5. DOCUMENTATION & QNA CONSOLIDATION
-
-### 5.1 Master QnA File Creation
-**Current state**: QnA scattered across 10 files in `Personal/docs/11_qna/`
-
-**Task**: Create ONE master file `Personal/docs/11_qna/MASTER_QNA.md` with ALL questions consolidated.
-
-**Structure**:
-```markdown
-# MASTER QNA — Every Question a Judge Might Ask
-
-**Usage**: Read this 30 minutes before presentation. Each answer is 30-60 seconds with the KEY NUMBER.
-
-## SECTION 1: HOSTILE QUESTIONS (from hostile.md)
-[Copy all 10 H-questions with answers]
-
-## SECTION 2: ARCHITECTURE & DESIGN
-[Consolidate from architecture.md]
-
-## SECTION 3: DATA & EDA
-[From data_and_eda.md]
-
-## SECTION 4: EXPLAINABILITY
-[From explainability.md]
-
-## SECTION 5: ROBUSTNESS & INVARIANCE
-[From robustness_invariance.md]
-
-## SECTION 6: GENERALIZATION & UNCERTAINTY
-[From generalization_uncertainty.md]
-
-## SECTION 7: METRICS & STATISTICS
-[From metrics_statistics.md]
-
-## SECTION 8: PHYSICS & DOMAIN
-[From physics_domain.md]
-
-## SECTION 9: PROCESS & TOOLING
-[From process_and_tooling.md]
-
-## SECTION 10: WHY NOT X?
-[From why_not_x.md]
-
-## QUICK REFERENCE: THE NUMBERS
-- Private LB: 0.891
-- Fidelity: 0.851 vs 0.043
-- Physics: R² 0.9716, 0/134 violations
-- [All canonical numbers from 00_INDEX.md]
-```
-
-**Action**:
-- [ ] Create `Personal/docs/11_qna/MASTER_QNA.md`
-- [ ] Consolidate all 10 files
-- [ ] Remove redundancies
-- [ ] Add cross-references: "See Architecture §2 for details"
-- [ ] Update `Personal/QNA.md` to point to MASTER file
-
-### 5.2 Architecture Decision Documentation
-**Task**: Ensure every major decision has clear "why" with measurement.
-
-**Verify in** `Personal/docs/05_architecture/design_decisions.md`:
-- [ ] Per-target lanes: because 98% structure overlap + 12.3% Tg overlap = two problems
-- [ ] Physics identities: measured R² 0.9716, residual LOO −0.82
-- [ ] NNLS assembly: negative weights don't transfer
-- [ ] Calibration layer: diagnosed from parity plots (mid-band compression)
-- [ ] No GNN: ei −0.309, literature crossover argument
-- [ ] No SSL: MLM 0.651 vs 0.708
-
-**If ANY decision lacks measurement backing**: Add reference to experiment log.
+From `RUN.md` §9: no forbidden term (`oracle` / khazana / polyinfo / TgSS / test_answers / vishwa /
+hostname / IP / username path) anywhere in `codebase/`; no agent files in `codebase/`; every figure
+path resolves; experiment ledger ≤ 80. **Do this after every text edit.**
 
 ---
 
-## 6. CHARTS & VISUALIZATION GAPS
+## 3. Charts — they exist, but not where the docs point
 
-### 6.1 Missing Charts Verification
-**Per RUN.md**: Many `outputs/` folders empty until notebook runs.
+This is a "wrong path" problem, not a "missing chart" problem.
 
-**Critical charts needed for presentation/report**:
-```
-outputs/eda/novelty_two_regimes.png (Slide 3)
-outputs/architecture.png (Slide 4, README)
-outputs/explainability/shap_beeswarm_tg.png (Slide 6)
-outputs/robustness/smiles_invariance_boxplot.png (Slide 6)
-outputs/generalization/generalization_ladder_plot.png (Slide 7)
-```
+- `codebase/904_submission/outputs/` has **108 PNGs** (full EDA + training + explainability +
+  robustness + generalization) plus the CSVs behind every claim.
+- `codebase/outputs/` (top level) has **47 PNGs** but `outputs/eda/` is empty (`.gitkeep` only),
+  there is **no** `outputs/architecture*.png`, no `outputs/explainability/*`, no `outputs/training/*`.
+- The report prompt (`PROMPT_10PAGE.md §B,§C`) and the deck (`PRESENTATION.md`, `SLIDE_PLAN.md`)
+  reference figures at **top-level** `outputs/…` paths.
 
-**Action**:
-- [ ] Run notebook (Step 3 in RUN.md) to generate all charts BEFORE hackathon
-- [ ] Verify all presentation slides reference existing charts
-- [ ] Capture demo screenshots (Website/screenshots/)
-- [ ] Generate architecture diagrams (Step 2 in RUN.md)
-
-**Timeline**: Do this 24-48 hours before hackathon, not last minute.
-
----
-
-## 7. STORY & NARRATIVE POLISH
-
-### 7.1 Enhance STORY.md with Research Backing
-**Current**: Good 5-6 min narrative in 4 acts.  
-**Enhancement**: Add scientific grounding per user request.
-
-**File**: `Personal/STORY.md`
-
-**Actions**:
-- [ ] Act 1: After variance trap, add: "This asymmetry is documented in the competition metric design"
-- [ ] Act 2: After GBM choice, add: "Grinsztajn et al. (NeurIPS 2022) showed why: trees preserve feature combinations that deep nets smooth away on tabular data"
-- [ ] Act 2: After physics beats ML, add: "Maxwell's relation for dielectrics, validated on 134 polymers with zero violations"
-- [ ] Act 3: Add forward reference to Flory-Fox: "A 1950 polymer physics relation, emerged without being taught"
-
-### 7.2 Presentation Flow Verification
-**File**: `Personal/Presentation/SLIDE_PLAN.md`
-
-**Verify**:
-- [ ] 9 slides, ~35s each = 5-6 minutes ✓
-- [ ] Slide 1: Title + 3-box (f1/f2/f3) ✓
-- [ ] Slide 2: Problem + gap (invariance measured, not asserted) ✓
-- [ ] Slide 3: TWO-REGIMES finding (THE KEY SLIDE) ✓
-- [ ] Slide 4: Architecture with physics R² on diagram ✓
-- [ ] Slide 5: Experiments + FAILURE STRIP ✓
-- [ ] Slide 6: Explainability (0.851 vs 0.043) ✓
-- [ ] Slide 7: Generalization + private score prediction ✓
-- [ ] Slide 8: DEMO (4 beats: baseline, aromatic, rewrite, out-of-domain) ✓
-- [ ] Slide 9: Results + ceiling + future ✓
-
-**Missing from slides but should add**:
-- [ ] Slide 5: Ensure ML failures (GNN, MLM) are in failure strip
-- [ ] Backup slides: Include ML vs domain knowledge comparison table
+**Action (order matters):**
+1. Copy the needed PNGs from `904_submission/outputs/**` into the top-level `codebase/outputs/**`
+   at the paths the docs already reference (do not rename the docs to point at `904_submission/`,
+   which must stay out of the public narrative). Needed at minimum: the EDA set
+   (`novelty_two_regimes.png`, `variance_share_trap.png`, `physics_identity_*.png`,
+   `target_distributions.png`, `chemical_space_map.png`), the SHAP beeswarms, fidelity curves,
+   linear probes, `smiles_invariance_boxplot.png`, `generalization_ladder_plot.png`,
+   `trustworthiness_radar.png`, and the architecture diagram.
+2. Generate the architecture diagram if its PNG is not already in `904_submission/outputs/` — run
+   `outputs/architecture.py` (RUN.md §2). The deck's slide 1 and 4 are figureless without it.
+3. Confirm `codebase/outputs/scorecard.md` reads **14/18** (or whatever the latest run says) and
+   propagate that ratio if it changed.
 
 ---
 
-## 8. FINAL VERIFICATION CHECKLIST
+## 4. Report — a full draft already exists; it is stale, not missing
 
-### 8.1 Pre-Hackathon Run Checklist
-**From RUN.md, execute in order**:
+`Personal/Midnight_Report/REPORT_10PAGE.md` already contains all ten mandated sections + Appendix A
+(experiment ledger D1–D9) + Appendix B (ceiling). It is **complete but written against the 0.9023
+champion with no GNN blend and no platform finding.**
 
-- [ ] Step 1: Environment setup (setup.sh) - 5 min
-- [ ] Step 2: Architecture diagrams - 10 sec
-- [ ] Step 3: Notebook run - 25 min (DO THIS!)
-- [ ] Step 4: Verify submission.csv - 10 sec
-- [ ] Step 6: Demo screenshots - 20 min
-- [ ] Step 9: Release gate scan (no forbidden terms)
+The mandated skeleton (from `analysis/SAMPLE_REPORT_ANALYSIS.md:19-38`, which analysed the
+organisers' own template) is: 1 Executive Summary → 2 Problem Formulation (phenomena / science gap /
+datasets) → 3 Architecture & Novelty → 4 Quantitative Performance → 5 Salient Visualizations →
+6 Ablations → 7 Scientific Insights & Interpretability → 8 Robustness & Scalability → 9 Limitations
+& Future Roadmap → 10 Contributions & References → appendices → closing declaration. `PROMPT_10PAGE.md`
+already enforces exactly this. **Do not restructure; refresh.**
 
-**DO NOT DO** (optional, time-consuming):
-- [ ] Step 5: Full regeneration (2.5-3h) - only if time allows and needed
+**Report edits needed:**
+1. **§3 Architecture** — add the GNN-blend stage (GINE, 3 seeds, `w = clip((cv−0.80)/0.25, …)`),
+   and state plainly that the GNN helps *only* via decorrelation (its solo tg 0.8987 vs 0.8954).
+2. **§4 / §6** — reconcile "GNN ei −0.309" (the *standalone* D-MPNN failure) with the *blended*
+   GINE win, so a judge cannot accuse you of contradicting yourself. The two are different things:
+   D-MPNN standalone at n=222 fails; a structure-grouped GINE blended at w ≤ 0.60 as a decorrelated
+   second opinion adds +0.0045. Say that explicitly.
+3. **§8 / §9** — add the platform-defect finding and the `beats_092_competitor: false` / 0.92
+   competitor context (honestly framed).
+4. **All score lines** — replace 0.9023 with the D1 canonical number, and mark the private number as
+   measured (0.891) or estimated (0.8965) per the D0 decision.
 
-### 8.2 Documentation Consistency Check
-**Run these greps**:
-```bash
-# Ensure no inconsistent scores
-grep -r "0\.903[0-9]" Personal/ | grep -v "0\.9023"
-grep -r "0\.902[0-9]" Personal/ | grep -v "0\.9023"
+### 4.1 Appendix B ("max cap") — KEEP it, but re-derive it
 
-# Ensure ML story is complete
-grep -r "supervised control" Personal/
-grep -r "0\.651.*0\.708\|0\.708.*0\.651" Personal/
+**Verdict: keep.** The seven parts in `PROMPT_10PAGE.md §E` are mathematically defensible and
+already carry the crucial caveat ("mark clearly which parts are proven and which are estimated").
+`docs/06_results/ceiling_analysis.md` is the source and it is sound:
 
-# Verify all figures referenced exist (after notebook run)
-grep -r "\.png)" Personal/ AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/*.md | \
-  cut -d: -f2 | grep -oE '\(([^)]+\.png)' | sort -u
-```
+- metric identity (0.9023 mean vs 0.9370 pooled; tg = 99.986% of pooled TSS) — **proven**;
+- Tg-alone bound (perfect Tg → 0.9172) — **a one-line theorem**;
+- bootstrap SEs (ei 0.022 · eps 0.024 · nc 0.020 · eea 0.014 · egb 0.012 · tg 0.007 · egc 0.006) — derived;
+- single-row leverage (worst row → ei +0.013) — measured;
+- label-noise bound (σ=15 °C → R²_max 0.981; empirical ≈0.92) — **one derived, one empirical, labelled as such**;
+- composite ≈0.93 ± 0.01 — estimated.
 
-### 8.3 Presentation Readiness
-**Rehearsal checklist**:
-- [ ] Slides generated from PROMPT_PRESENTATION.md
-- [ ] Demo site tested offline (WiFi OFF)
-- [ ] Screenshots captured as backup
-- [ ] Speaker notes reviewed (SPEAKER_NOTES.md)
-- [ ] Demo script practiced (DEMO_SCRIPT.md) - 45 seconds, 4 beats
-- [ ] Hostile questions rehearsed (hostile.md - top 10)
-- [ ] Numbers memorized: 0.891, 0.9023, 0.851 vs 0.043, 0.9716, 0/134, 0.95-0.99
-
----
-
-## 9. PRIORITY IF TIME-CONSTRAINED
-
-**If you have < 4 hours**, do ONLY:
-
-1. **CRITICAL** (2h):
-   - Run notebook (Step 3 RUN.md) - generates all charts
-   - Create MASTER_QNA.md
-   - Verify all scores are 0.9023 (not variants)
-   - Run release gate scan
-
-2. **HIGH** (1h):
-   - Add ML comparison summary to key files
-   - Generate architecture diagrams
-   - Capture demo screenshots
-
-3. **MEDIUM** (1h):
-   - Enhance STORY.md with research citations
-   - Verify max cap appendix or remove
-   - Test demo site
-
-**SKIP IF TIME-PRESSED**:
-- 3D website visualization (current 2D sufficient)
-- Full regeneration (frozen submission valid)
-- New experiments (NONE needed)
+**The one update:** the worked examples use 0.9023. Re-express them against the D1 number, and
+update the "96% of ceiling" line. Do **not** delete the appendix — it is one of the strongest
+"scientific contribution" assets you have, precisely because it derives the ceiling instead of
+asserting it.
 
 ---
 
-## 10. KNOWN ISSUES & WARNINGS
+## 5. Presentation & website
 
-**From PLAN.md and RUN.md**:
-1. **Python 3.11.7 is LOAD-BEARING** - Do NOT run on 3.12
-2. **outputs/** folders empty until notebook runs
-3. **Scorecard may change from 14/18 to 14-15/19** after full run - update everywhere if it does
-4. **No "oracle" term in codebase** - disqualification risk
-5. **Dataset symlink** - points to Consolidation/00_competition/dataset
-6. **ChemBERTa result is OUT-OF-COMPETITION** - always clarify this
+### 5.1 Deck — structurally complete, but it quotes the old score and its figures are missing
 
----
+- `Personal/Presentation/PRESENTATION.md` is the deck body. It uses **0.9023** as the current local
+  score in five places (`:283,:358,:362,:396,:417`) while `SLIDE_PLAN.md` and `PROMPT_PRESENTATION.md`
+  headers say 0.90680. Fix all of them to the D1 number.
+- `PRESENTATION.md:148` notes **410 s total vs the 360 s cap** (`PROMPT_PRESENTATION.md:97`). Rebalance
+  to ≤ 360 s.
+- Slide 5 "failure strip" currently says nothing about the GNN. Add the *corrected* ML story: GNN
+  standalone ei −0.309 · MLM probe 0.651 vs 0.708 · ChemBERTa (out-of-competition) 0.751/0.784 vs
+  0.810 — **and then** the one-line Phase-7 reversal (GINE *blended* adds +0.0045). That juxtaposition
+  is the honest, memorable version.
+- No exported PDF/HTML exists in `Personal/Presentation/`. `PROMPT_PRESENTATION.md:35-36` wants a marp
+  export. Produce it and confirm it opens offline.
 
-## 11. SUCCESS CRITERIA
+### 5.2 Website — no 3D, no architecture view, screenshots missing
 
-**You are DONE when**:
-- [ ] All numbers consistent (0.9023 everywhere)
-- [ ] ML baseline story clear in 3+ places
-- [ ] MASTER_QNA.md exists with all 80+ questions
-- [ ] Notebook has run (charts generated)
-- [ ] Demo rehearsed and screenshots captured
-- [ ] No "oracle" in codebase
-- [ ] Report and presentation prompts validated against sources
-- [ ] All referenced charts exist
-- [ ] User has reviewed and approved
+Verified: `Website/static/` contains only `.gitkeep`; a repo-wide grep for `3d / 3dmol / manim / d3 /
+three.js / molstar` returns nothing. The site renders a **2D RDKit PNG** (`app.py:61-69`,
+`api.py:81-97`) and the architecture is only described in a **text footer** (`app.py:213-220`).
 
----
+The demo is **deliberately offline** (`Website/README.md:21-22`) — a hard constraint, since the
+rehearsal turns wifi off. Therefore any 3D viewer must be **vendored JS (3Dmol.js or py3Dmol bundle
+committed into `static/`)**, not a CDN. Given effort vs. payoff, do it in this order and stop when
+time runs out:
 
-## 12. HANDOFF TO USER
+1. **(cheap, high value)** Put `architecture_simple.png` into `Website/static/` and render it in an
+   "About the model" expander (`st.image`). This alone satisfies "the website shows the architecture".
+2. **(medium)** Add an optional 3D conformer view via vendored 3Dmol.js: generate coordinates with
+   `rdkit Chem.AddHs + AllChem.EmbedMolecule` (a 3D *conformer*, not the raw SMILES) and render the
+   SDF in an iframe. Keep it behind a "3D (experimental)" toggle so the 2D path remains the default.
+3. **(skip unless time is abundant)** SHAP force-plot / live internals — needs a proxy model and
+   SHAP.js; lowest value for the effort.
 
-**After completing this refinement**:
-1. Generate report: `Personal/Midnight_Report/PROMPT_10PAGE.md`
-2. Generate presentation: `Personal/Presentation/PROMPT_PRESENTATION.md`
-3. Final review with user
-4. Execute RUN.md Steps 1-4, 6, 9
-5. Rehearse presentation with DEMO_SCRIPT.md
-6. **Go win the hackathon!**
----
----
-
-# ADDITIONAL COMPREHENSIVE ANALYSIS & REFINEMENT TASKS
-# Added: In-depth gap analysis based on full codebase and documentation review
+**Regardless of 3D, these are mandatory and currently missing:** capture the four demo screenshots
++ `demo.gif` per `Website/screenshots/README.md` and `DEMO_SCRIPT.md:57-60` (they are the fallback
+tab if the live demo stalls), pre-load the site once before presenting, and test it **with wifi off**.
 
 ---
 
-## 13. DEEP CODEBASE ANALYSIS FINDINGS
+## 6. Story, research framing, and QnA
 
-### 13.1 Score Robustness & Invariance - CURRENT STATE ASSESSMENT
+### 6.1 STORY.md — add research framing; the narrative itself is strong
 
-**What You Have (EXCELLENT)**:
-- ✅ SMILES invariance: 500 polymers × 30 spellings, std ≤0.23% of train std
-- ✅ Attribution invariance: SHAP cosine 0.95-0.99 across spellings
-- ✅ Fidelity testing: ROAR-style masking 0.851 vs 0.043
-- ✅ Activation patching: delta exactly 0.0
-- ✅ Fox-Flory recovery: median R² ≈0.99 (emergent physics)
-- ✅ Counterfactuals: 27/40 agreement (67.5%), honest about failures
-- ✅ Linear probes: Tg layer-1 aromaticity R² 0.895
-- ✅ Applicability domain tiers: T1-T4 with measured MAE progression
+`STORY.md` is a clean four-act engineering/trust narrative (setup → two-regimes finding →
+architecture/physics → trust → demo/close) but it carries **no citation, no "cap" argument, and no
+contribution-to-the-field framing** — all three already exist elsewhere and only need weaving in:
 
-**Methodology Verification** ✅ ALL CORRECT:
-- Invariance test uses graph-only features separately tracked
-- Character features acknowledged as breaking invariance (0.20 multiplier)
-- Fidelity uses proper ROAR protocol (Hooker et al., NeurIPS 2019)
-- Attribution computed per-instance then aggregated
-- Conformal intervals: split conformal on calibration set
-- Applicability domain: Tanimoto to nearest training example
+- **Act 0/1** — name the field-level gap: *"polymer-informatics papers report R² and assert
+  SMILES-invariance; none measure whether its explanations are load-bearing, or whether the
+  attributions survive rewriting."* (This is already the §2 science-gap text in
+  `PROMPT_10PAGE.md §G`.)
+- **Act 2** — add the G1 citation: *"Grinsztajn et al. (NeurIPS 2022) showed trees beat deep nets on
+  tabular data at our sizes; we confirmed it extends to chemistry, with one refinement — a GNN earns
+  its place only as a decorrelated second opinion."*
+- **Act 3** — add the **cap** argument: *"Tg is capped near 0.92 by label noise (the thermometer,
+  not the model); the six DFT targets are capped by scarcity (148–224 rows). We derived the
+  practical ceiling at ≈0.93 ± 0.01 and we are at ~96% of it — so we spent the last phase on the
+  uncapped half of the grade: invariance, fidelity, and honesty about what the model doesn't know."*
+- **Act 4** — forward-reference future work honestly (Phase 6: shallow-stack variance fix, tuned GP
+  on ei/eps, fold-consistency promotion gate, physics-constrained joint imputation — from
+  `Score_and_Invariance_Improvement/PLAN.md` and `CEILING_REALITY_CHECK.md:83-93`).
 
-**Status**: Robustness story is PUBLICATION-READY. No methodology issues found.
+### 6.2 QnA — consolidate, and add the one answer that is missing
 
-### 13.2 Generalization Evidence - STRONG BUT ADD CONTEXT
+The QnA bank is 10 topic files + an index (`docs/11_qna/`), ~83 answers, well-structured, with a
+strong `hostile.md`. **There is no single master file and no "what is novel / your contribution to
+the field" answer** — that framing is exactly what the judges will ask.
 
-**What You Have**:
-```
-Random CV:          0.894
-Grouped CV:         0.896  
-Scaffold split:     0.825
-Low similarity:     0.620
-Ultra-low sim:      0.562
-```
+**Do:**
+1. Create `docs/11_qna/MASTER_QNA.md` that inlines (not just links) the top answers, grouped by
+   theme, each answer ≤ 60 s with its key number. Point `Personal/QNA.md` at it.
+2. **Add the missing "contribution to the field" answer.** The source material is already written
+   in `docs/00_My Docs.md` — specifically its §"Core Research Gaps & Difficulties" (line 103),
+   §"How Our Pipeline Directly Addresses These Gaps" (line 121), §"Research Papers and References"
+   (line 380), and the "Scientific Contribution" slide note (line 520). The answer should be the
+   five contributions, corrected for Phase 7:
+   - **measured trust** (ROAR fidelity 0.851 vs 0.043 + attribution invariance cos 0.95–0.99 + patch Δ=0.0) — a verification protocol, not a model;
+   - **physics > ML at small n** (LOO residual −0.82; bare identity beats the correction);
+   - **honest negative results** (4/18 scorecard fails pre-registered with causes; 1,150+ experiments);
+   - **emergent physics** (Flory–Fox recovered unsupervised, median R² ≈ 0.99; aromaticity in the hidden layer, probe R² 0.895);
+   - **decorrelated neural blending** (the GINE blend: +0.0045 from *different errors*, not better errors).
+3. **Add a "local held-out verification panel" explainer** (how it is constructed, why 4,909 of
+   4,940 rows, and why it is post-freeze only) — an expert will ask exactly this, and no file
+   currently answers it in one place.
+4. Preserve the strong QnA additions from the previous REFINEMENT (why-not-pretrained, why-7-models,
+   why-NNLS, why-0.20-character-multiplier, and hostile H11/H12 on the public/private gap and the
+   invariance-vs-char-ngram contradiction) — they are correct and worth keeping verbatim.
 
-**EXCELLENT**: Monotone decay without cliffs (design goal met).
+### 6.3 Docs & research — mine `00_My Docs.md` and `Research/INDEX.md`; do not reinvent
 
-**Enhancement Needed**:
-- [ ] Add interpretation to `Personal/docs/09_generalization/ladder_summary.md`:
-  ```markdown
-  ## What This Ladder Means
-  
-  **0.894 → 0.896** (random → grouped): Minimal drop proves structure-deduplication works.
-  
-  **0.896 → 0.825** (grouped → scaffold): −0.071 is the cost of unseen scaffold families. 
-  This is the "normal" extrapolation regime for drug discovery pipelines.
-  
-  **0.825 → 0.620 → 0.562**: Chemical novelty frontier. At ultra-low similarity 
-  (<0.3 Tanimoto), we're 40% above random but 35% below interpolation. This is the 
-  honest performance boundary.
-  
-  **Key**: We SHOW the frontier. Most papers stop at grouped CV and claim solved.
-  ```
-
-- [ ] Add to presentation backup slide: "Generalization Ladder Interpretation"
-- [ ] QnA add: "What happens on truly novel chemistry?" → "0.562, and we measured it"
-
-### 13.3 Physics Identities - VERIFICATION COMPLETE ✅
-
-**Band-edge identity (Egc = Ei - Eea)**:
-- ✅ R² 0.9716 on n=59 co-measured polymers
-- ✅ MAE 0.0716 eV
-- ✅ Systematic bias +0.0443 eV (exciton binding energy in DFT)
-- ✅ ML residual LOO R² = **−0.82** (overfits noise)
-- ✅ DECISION: Use bare identity, no ML correction
-
-**Maxwell relation (ε = n² + ionic)**:
-- ✅ 0/134 violations of ionic ≥ 0 constraint
-- ✅ Median ionic = 0.6896
-- ✅ σ(ionic) = 0.4088 vs σ(ε) = 1.0697 → **2.62× better conditioned**
-- ✅ Score gain: +0.0666 on ε, +0.0434 on nc
-
-**Bulk bandgap (Egb = 1.1586·Egc − 1.0437)**:
-- ✅ R² 0.9282 on n=175
-- ✅ Affine alone: 0.9205
-- ✅ With ExtraTrees residual: **0.9478** (+0.0273)
-- ✅ DECISION: Residual helps here (real interchain packing physics)
-
-**VERIFICATION**: All physics claims are measurement-backed. No corrections needed.
+- `docs/00_My Docs.md` (758 lines) is the richest unused asset: property physics, the
+  research-gap→solution map, a "Best possible model" section, and a "Summary Defense Matrix for
+  Technical Panels" (line 610). **Pull the report/presentation/QnA language from here.**
+- `Research/INDEX.md` already holds 33 verified/standard citations with a citation→decision map.
+  **G1 (Grinsztajn, NeurIPS 2022) is present and verified** — it is the "cap and limits of ML on
+  tabular data" paper you wanted. M2 (Fox & Flory 1950) backs the Flory–Fox demo. P1/P4/C6 back the
+  "pretrained models didn't reproduce here" contrast. **Cite nothing not in this table.**
 
 ---
 
-## 14. SCIENTIFIC CONTRIBUTION STATEMENT - CRAFT THIS
+## 7. Execution order (work top-to-bottom; stop when time runs out)
 
-### 14.1 What Makes This Research (Not Just Engineering)
+**Tier 0 — the submission (ask the human first, §1):**
+1. Verify `904_submission/submission_final.csv` still satisfies the contract (4,940 rows, ids
+   1..4940, columns `id,target`, all finite) and matches SHA `cd91f278…`.
+2. If D0 = submit, upload it as one of the 2 final slots **before 3 Sep**.
 
-**Current weakness**: Documents describe WHAT was done, not WHY it's a research contribution.
+**Tier 1 — numbers + figures (the trust surface):**
+3. §1 decisions → §2.1 canonical propagation → §2.2 fixes → §2.3 release-gate scan.
+4. §3 chart copying; generate the architecture diagram; verify `scorecard.md`.
 
-**Create new file**: `Personal/docs/00_CONTRIBUTIONS.md`
+**Tier 2 — the three artifacts:**
+5. Refresh the report (§4): GNN stage, platform finding, re-derived ceiling, corrected ML story.
+6. Refresh the deck + export PDF (§5.1); capture demo screenshots (§5.2).
 
-```markdown
-# Scientific Contributions Beyond Leaderboard Score
+**Tier 3 — narrative + QnA:**
+7. §6.1 STORY.md framing; §6.2 MASTER_QNA + the two missing answers.
 
-## 1. Methodological Contribution: Measured Trust
-
-**Problem**: Polymer informatics papers routinely claim SMILES invariance and 
-feature importance without verification. Trust is asserted, not measured.
-
-**Our Contribution**: First polymer property prediction pipeline with:
-- **Load-bearing attribution verification** (ROAR fidelity: 0.851 vs 0.043)
-- **Attribution invariance across representations** (SHAP cosine 0.95-0.99)
-- **Causal representation proof** (activation patching Δ=0.0, linear probes R²>0.89)
-
-**Impact**: Establishes verification protocol for trustworthy polymer ML.
-
-## 2. Empirical Finding: Physics > ML at Small N
-
-**Problem**: Deep learning dominates vision/NLP. Assumed superior for molecules too.
-
-**Our Contribution**: Systematic demonstration that at n<300:
-- Message-passing GNNs collapse (ei: −0.309 on 0/5 folds)
-- Self-supervised pretraining destroys task structure (MLM 0.651 vs random 0.708)
-- Bare physical identities beat learned corrections (LOO R² −0.82)
-- **Domain knowledge + classical ML > neural architectures**
-
-**Alignment**: Confirms Grinsztajn et al. (NeurIPS 2022) extends to chemistry.
-
-## 3. Transparency Contribution: Honest Negative Results
-
-**Problem**: Failed experiments unreported → publication bias → wasted replication effort.
-
-**Our Contribution**: 
-- Pre-registered 18 trustworthiness requirements, **report all 4 failures** with causes
-- Document 1,150+ experiments including spectacular failures (GNN, SSL, multi-task)
-- Quantify public-private gap (0.026) and diagnose cause (assembly depth)
-
-**Impact**: Future work knows what NOT to try.
-
-## 4. Emergent Physics Discovery
-
-**Problem**: Do models learn chemistry or memorize patterns?
-
-**Our Contribution**: 
-- Fox-Flory relation (1950) emerges unsupervised (median R²≈0.99)
-- Aromaticity encoded in hidden layer (probe R² 0.895) despite temperature-only training
-- Counterfactual rigidity predictions align with chemistry (12/13)
-
-**Impact**: Demonstrates learned representations capture real polymer physics.
-
-## 5. Practical Contribution: Applicability Domain
-
-**Problem**: Most models output confidence even out-of-domain.
-
-**Our Contribution**: 
-- Measured error stratification: MAE 14.8°C (T1) → 43.6°C (T4)
-- Every prediction carries tier + interval
-- Demo explicitly warns: "Model is out-of-domain"
-
-**Impact**: Deployable system that knows when to abstain.
-```
-
-**Action Items**:
-- [ ] Create `Personal/docs/00_CONTRIBUTIONS.md` with above content
-- [ ] Add section to report (after Abstract, before Results)
-- [ ] Add slide in backup: "Research Contributions"
-- [ ] Reference in STORY.md Act 3
+**If you have < 4 hours**, do only Tier 0 + Tier 1 + the deck's score fix + the demo screenshots.
+Everything else is additive.
 
 ---
 
-## 15. REPORT STRUCTURE REFINEMENT
+## 8. Acceptance criteria (the human signs off when all are true)
 
-### 15.1 Max Cap Appendix - DECISION FRAMEWORK
-
-**File**: Check `Personal/Midnight_Report/PROMPT_10PAGE.md` Appendix B
-
-**The Math** (verify against `Personal/docs/06_results/ceiling_analysis.md`):
-1. **Metric asymmetry**: Mean R² ≠ pooled R² because targets have different variances
-   - Measured: 0.9023 mean vs 0.9370 pooled
-2. **Perfect Tg bound**: Tg=1.0, others frozen → mean 0.9172 (+0.015)
-3. **Single-row leverage**: On ei (n=148), one row = 1/7 × 1/148 = 0.00096 mean R²
-4. **Label noise floor**: Tg experimental σnoise ≈ 5-15°C → R²max ≈ 0.98 theoretical
-5. **Empirical ceiling**: Difficulty-stratified Tg suggests practical ≈0.92-0.93
-
-**DECISION TREE**:
-```
-Is all math in ceiling_analysis.md verified correct?
-├─ YES → Keep Appendix B, it shows sophistication
-└─ NO or UNSURE → 
-   ├─ Time to verify < 1h → Verify and keep/fix
-   └─ Time to verify > 1h → REMOVE Appendix B entirely
-                           Add note: "Ceiling analysis available upon request"
-```
-
-**Action**:
-- [ ] User decision: Keep or remove Appendix B
-- [ ] If keep: Verify every equation against sklearn R² definition
-- [ ] If remove: Update PROMPT_10PAGE.md to exclude it
-
-### 15.2 Report Structure - Match Sample Reports
-
-**Based on** `Personal/Midnight_Report/Sample Reports/`:
-
-**Mandatory sections** (from template):
-1. Title + Team + Abstract
-2. Introduction (problem + gap)
-3. Methods & Architecture
-4. Results
-5. Explainability & Robustness (NEW in Round 3)
-6. Discussion & Future Work
-7. References
-8. Appendix A: Experiment Ledger
-9. Appendix B: Ceiling Analysis (optional)
-
-**Enhancement needed**:
-- [ ] Ensure §5 (Explainability) is FULL SECTION not subsection
-- [ ] Add Research Contributions before Results
-- [ ] Highlight 4 honest FAILs in Results, not hidden in appendix
-- [ ] Future Work: Reference Phase 6 plan (38 experiments) with specifics
+- [ ] **One canonical score** in `00_INDEX.md`, agreed with the header, the per-target table, and every quoter (§2.1).
+- [ ] The scorecard ratio in `outputs/scorecard.md` matches every doc that quotes it.
+- [ ] No doc says "no neural architecture won" or "0.894 → 0.896 drop proves dedup" or "python 3.11.7 is load-bearing" (§2.2).
+- [ ] Every figure path referenced by report + deck resolves; architecture + EDA + SHAP charts present at top-level `outputs/`.
+- [ ] Report §3 includes the GNN blend and its decorrelation rationale; Appendix B re-derived against the final predictions.
+- [ ] Deck ≤ 360 s and quotes the canonical score; PDF export opens offline.
+- [ ] `MASTER_QNA.md` exists with the "contribution to the field" and "verification panel" answers.
+- [ ] `STORY.md` names G1, the label-noise cap, and a forward future-work line.
+- [ ] Release-gate scan clean (`RUN.md §9`).
+- [ ] Final submission uploaded (if D0 = submit) before the 3 Sep deadline.
 
 ---
 
-## 16. PRESENTATION DEEP ANALYSIS
+## 9. Content pack — paste-ready science for report, deck, and QnA
 
-### 16.1 Current Slide Plan Verification
+**Why trees, not deep nets (G1).** *Grinsztajn, Oyallon, Varoquaux — "Why do tree-based models
+still outperform deep learning on typical tabular data?", NeurIPS 2022. Verified. We confirmed it
+extends to chemistry at n = 222–4,143: standalone D-MPNN scores −0.309 on ei (0/5 folds), and nine
+self-supervised variants all ≤ a matched control (MLM probe 0.651 vs random-init 0.708). The one
+refinement Phase 7 adds: a structure-grouped GINE, blended per target at w ≤ 0.60 as a decorrelated
+second opinion, lifts the mean +0.0045 — not because it is better, but because it errs differently.*
 
-**Read**: `Personal/Presentation/SLIDE_PLAN.md`
+**Why the ceiling, derived not asserted.** *The metric is the unweighted mean of seven per-target
+R². The same predictions score 0.9023 as a mean and 0.9370 pooled, because Tg carries 99.986% of the
+pooled variance. A perfect Tg model with everything else frozen reaches only 0.9172. Tg is capped
+near 0.92 by experimental label noise (σ 5–15 °C against a 109 °C spread), and the six DFT targets
+are bounded by scarcity (148–224 evaluation rows, bootstrap SE 0.012–0.024). The composite practical
+ceiling for a rules-compliant single-run pipeline is ≈0.93 ± 0.01 — we are at ~96% of it.*
 
-**9 slides @ ~35s each** = 5-6 minutes ✅
+**Why physics beats the correction.** *egc = ei − eea holds at R² 0.9716 (n=59); an ML residual on
+top scores leave-one-out R² −0.82, i.e. it overfits noise. eps = n² + ionic has 0/134 violations and
+is 2.62× better conditioned. The textbook won, and we measured it instead of assuming it.*
 
-**Gap found**: Slide 5 (Experiments & Failures) potentially weak.
+**Why we measure trust, not assert it.** *Mask the SHAP-top 10% of features → the model loses 0.851
+R²; mask the same number at random → 0.043. Thirty spellings of the same polymer give the same answer
+and the same attributions (SHAP cosine 0.95–0.99, patch Δ = 0.0). The Flory–Fox relation (1950)
+emerges unsupervised at median R² ≈ 0.99. That is a verification protocol the field can reuse.*
 
-**Current Slide 5 Content**:
-- Ablation waterfall (gains)
-- Failure strip (losses)
-
-**Enhancement needed**:
-```markdown
-## Slide 5: What Worked and What Failed
-
-### Visual: Three-column table
-
-| Domain Knowledge (Winner) | Classical ML (Winner) | Deep Learning (Failed) |
-|:---|:---|:---|
-| Physics identities<br/>R² 0.9716 | Tree ensembles<br/>n>2000 | D-MPNN GNN<br/>**−0.309** |
-| Ionic decomposition<br/>+0.0666 | NNLS assembly<br/>+0.02-0.05 | SSL pretraining<br/>**0.651 vs 0.708** |
-| Per-target design<br/>2 problems | Kernel ridge<br/>n<300 | Multi-task NN<br/>**Tg-only** |
-
-### Narration:
-"Six of nine winners are domain knowledge. Not a single winner is a neural 
-architecture. This aligns with Grinsztajn NeurIPS 2022: trees outperform deep 
-learning on tabular data at our sample sizes."
-```
-
-**Action**:
-- [ ] Update `Personal/Presentation/SLIDE_PLAN.md` Slide 5
-- [ ] Create table graphic `outputs/presentation/ml_vs_domain_table.png`
-- [ ] Add to SPEAKER_NOTES.md: Mention Grinsztajn explicitly
-
-### 16.2 Demo Script - ADD TECHNICAL DEPTH
-
-**Current**: `Personal/Presentation/DEMO_SCRIPT.md` is good (4 beats, 45s)
-
-**Enhancement**: Add technical version for Q&A if judges ask
-
-**Create**: `Personal/Presentation/DEMO_SCRIPT_EXTENDED.md`
-
-```markdown
-# Extended Demo Script (for Q&A if requested)
-
-## Technical Deep Dive (3 minutes)
-
-### Beat 1: Baseline prediction
-- Input: *CCCCCCCC* (octane repeat)
-- Output: Tg = -87.3°C, [−95.2, −79.4], Tier T1, Tanimoto 0.92
-- **Technical**: "T1 means nearest training analogue >0.9 similar. Our measured 
-  MAE for T1 is 14.8°C. The interval is 90% conformal on held-out calibration set."
-
-### Beat 2: Chemical intuition
-- Input: *c1ccc(-c2ccc(*)cc2)cc1* (biphenyl)
-- Output: Tg jumps to +120°C
-- **Technical**: "The model's first hidden layer encodes aromatic fraction at 
-  R² 0.895. We didn't teach it that—it learned rigidity because rigidity predicts 
-  temperature."
-
-### Beat 3: Invariance proof
-- Press "Rewrite this SMILES"
-- Show 5 different strings, same graph, same prediction
-- **Technical**: "We tested 500 polymers across 30 random spellings each. Graph 
-  features have standard deviation ≤0.23% of training spread, with zero 1-sigma 
-  violations. The SHAP attribution vectors agree at cosine 0.95 to 0.99. This is 
-  measured, not asserted."
-
-### Beat 4: Out-of-domain warning
-- Input: Something exotic (fluorinated heterocycle)
-- Orange banner appears: "LOW CONFIDENCE - Model is extrapolating"
-- **Technical**: "Tier T4 means nearest training <0.5 Tanimoto. Our measured Tg 
-  MAE at T4 is 43.6°C—triple the T1 rate. We built this tier system by stratifying 
-  our validation error. The model knows when not to trust itself."
-
-## If they ask to see the code:
-- Open `Website/app.py` and show:
-  1. Prediction pipeline (line ~120)
-  2. Invariance test loop (line ~180)
-  3. Applicability tier logic (line ~90)
-- All runs offline, no black boxes
-```
-
-**Action**:
-- [ ] Create `Personal/Presentation/DEMO_SCRIPT_EXTENDED.md`
-- [ ] Rehearse both versions
-- [ ] Have `Website/app.py` open in editor during Q&A (read-only view)
+**Sources for every sentence above:** `docs/00_INDEX.md`, `docs/06_results/ceiling_analysis.md`,
+`docs/07_explainability/fidelity.md`, `docs/08_robustness/*`, `Research/INDEX.md`,
+`904_submission/RESUME_HERE.md`, `Score_and_Invariance_Improvement/CEILING_REALITY_CHECK.md`.
 
 ---
 
-## 17. WEBSITE ENHANCEMENT ANALYSIS
-
-### 17.1 3D Visualization - REALISTIC ASSESSMENT
-
-**User request**: "3d structure visualization with 3d.js or manim to really show architecture and models"
-
-**Current state**:
-- Website has 2D RDKit mol rendering ✅
-- No 3D molecular visualization
-- No architecture flowchart visualization
-- No model internals visualization
-
-**Options Analysis**:
-
-#### Option 1: 3D Molecular Structure (3Dmol.js)
-**Pros**: 
-- Shows polymer in 3D space
-- Interactive rotation
-- Highlights functional groups
-
-**Cons**:
-- Requires 3D coordinates (RDKit `AllChem.EmbedMolecule`)
-- Adds complexity to web app
-- Not directly related to explainability/robustness theme
-
-**Estimated time**: 3-4 hours (integration + testing)
-
-#### Option 2: Architecture Visualization (Mermaid.js or D3.js)
-**Pros**:
-- Shows 5-stage pipeline interactively
-- Can highlight which path fired for a prediction
-- Directly supports "show the architecture" request
-
-**Cons**:
-- Requires redrawing architecture in web format
-- Static diagrams may be sufficient
-
-**Estimated time**: 4-5 hours
-
-#### Option 3: Live Model Internals (SHAP force plot)
-**Pros**:
-- Shows per-prediction feature contributions
-- Highly interactive
-- Directly demonstrates explainability
-
-**Cons**:
-- Requires SHAP.js integration
-- Proxy model only (not full pipeline)
-
-**Estimated time**: 5-6 hours
-
-#### Option 4: Do Nothing (Recommended)
-**Rationale**:
-- Demo already shows: prediction + interval + tier + invariance
-- 2D structure rendering is sufficient for chemistry verification
-- Architecture diagram exists as static PNG for slides
-- Time better spent on rehearsal and Q&A prep
-
-**Action**:
-- [ ] User decision: Which visualization (if any)?
-- [ ] **Recommendation**: Option 4 (focus on content over fancy viz)
-- [ ] If user insists: Option 2 (architecture flow) is most impactful
-
-### 17.2 Website Robustness Checklist
-
-**Test before hackathon**:
-- [ ] Runs offline (WiFi OFF test)
-- [ ] All sample inputs work (from `Website/sample_inputs.md`)
-- [ ] Invariance button generates 5 valid SMILES
-- [ ] Out-of-domain warning triggers correctly
-- [ ] All 7 properties predict (no crashes)
-- [ ] Screenshot capture complete
-- [ ] Demo loads in <3 seconds after initial cache compile
-
-**Known issues to document**:
-- First load is slow (cache compilation) → Pre-load before demo
-- RDKit warnings in terminal → Normal, doesn't affect output
-- If SMILES invalid → Show error message (not crash)
-
----
-
-## 18. QnA DEEP GAPS - FILL THESE
-
-### 18.1 Missing Critical Questions
-
-**Review**: All 10 files in `Personal/docs/11_qna/`
-
-**Gaps identified** (add to respective files):
-
-#### Add to `why_not_x.md`:
-```markdown
-## Q: Why didn't you use pretrained models like PolyBERT or ChemBERTa?
-
-**A**: We tested ChemBERTa (out-of-competition, research paper):
-- Frozen embeddings: R² 0.751
-- Fine-tuned: R² 0.784
-- Tree baseline: **R² 0.810**
-
-ChemBERTa was trained on small molecules. PolyBERT requires 100M polymer 
-structures and >100× our compute budget. At our scale (n=222-4143), 
-pretraining actively hurt.
-
-We tested 9 self-supervised variants on our data:
-- Decisive test: MLM probe **0.651** vs random-init **0.708**
-- Pretraining optimized string grammar, not task-relevant electronic structure
-
-**Lesson**: Grinsztajn et al. (NeurIPS 2022) showed why—tabular data at 
-n<10K favors trees. We verified this extends to chemistry.
-
-## Q: Why 7 separate models instead of one multi-task network?
-
-**A**: We tried multi-task. It failed:
-- Tg is 99.986% of pooled variance
-- Any unnormalized loss → Tg-only model with 6 decorative heads
-- Z-scored targets didn't help: physics relations are nonlinear
-
-**Data heterogeneity**:
-- Tg: 12.3% partner overlap (extrapolation)
-- DFT: 88-98% partner overlap (imputation)
-- Two different problems → two different model families
-
-Single best decision: per-target design.
-```
-
-#### Add to `architecture.md`:
-```markdown
-## Q: Why NNLS (non-negative least squares) for ensembling?
-
-**A**: We tried unconstrained linear stacking first. It failed on test data.
-
-**Problem**: Negative weights fit validation fold noise:
-- Model A predicts 5.0, Model B predicts 4.8
-- Validation fold: true = 4.9
-- OLS learns: final = 1.5·A − 0.5·B (force exact 4.9)
-- Test: Noise structure different → negative weight destroys performance
-
-**NNLS**: Weights ≥ 0 → models only contribute constructively
-- Acts as regularizer
-- Every target: NNLS blend beats best single model by 0.02-0.05
-- Simple, interpretable, no validation overfitting
-
-## Q: Why 0.20 multiplier on character residual?
-
-**A**: Diagnosed from ablation sweep + residual parity plots:
-- Character n-grams capture sequence motifs graph features miss
-- BUT: reading raw SMILES breaks permutation invariance
-- Trade-off: Take 20% of signal, minimize invariance cost
-
-**Measured cost**: Character features add ±0.5% prediction std
-**Measured gain**: +0.01-0.02 R² on 5/7 targets
-**Net**: Worth it, but conservatively priced
-```
-
-#### Add to `hostile.md`:
-```markdown
-## H11: Your public score was 0.917 but private 0.891. That's a 0.026 gap—huge. Did you overfit?
-
-**A**: We didn't overfit the leaderboard. We predicted this gap internally.
-
-**Diagnosis**: Assembly chain depth
-- V57 engine: 7-arm structure (deep)
-- Sibling model: shallow 4-model stack
-- On fresh standalone run, sibling scored 0.838 vs V57's 0.902
-
-**Variance amplification**: 
-- Chaining Model A→B→C compounds leaf-level errors
-- Public/private split hit different error modes
-
-**Evidence we didn't overfit**:
-1. We predicted private within 0.0004 from difficulty-stratified Tg CV
-2. Local held-out panel (0.9023) closely matches private (0.891)
-3. All architectural choices made on train-only CV, never test
-
-**Future work**: Replace deep chain with shallow 4-6 model stack
-- Expect: Lower public, *higher* private (less variance)
-
-## H12: You claim invariance but use character n-grams. That's contradictory.
-
-**A**: We measure and report the contradiction, not hide it.
-
-**Character features**: 
-- Are NOT invariant (read raw SMILES string)
-- Contribute ±0.5% prediction std across spellings
-
-**Why we kept them**:
-- Add high-frequency motifs graph features miss
-- Gain: +0.01-0.02 R² on 5 targets
-
-**Mitigation**:
-- Conservative 0.20 multiplier (not 1.0)
-- Tested separately: graph-only features have 0.0000 1σ violations
-- Final system: ±0.23% prediction std (dominated by model variance, not strings)
-
-**Claim**: "Prediction std ≤0.23% of train std" (TRUE)
-**NOT claiming**: "100% pure invariance" (would be false)
-
-Transparency > hiding design trade-offs.
-```
-
-**Action**:
-- [ ] Add above 5 questions/answers to respective QnA files
-- [ ] Update MASTER_QNA.md with these additions
-- [ ] Mark these as "HIGH PRIORITY" for rehearsal
-
----
-
-## 19. STORY ENHANCEMENT WITH RESEARCH FRAMING
-
-### 19.1 Current STORY.md is Good - ADD SCIENCE
-
-**File**: `Personal/STORY.md`
-
-**Current**: 4-act narrative, technically accurate, flows well
-
-**Gap**: Doesn't explicitly frame as RESEARCH contribution
-
-**Enhancement**: Add science transition between acts
-
-**New content to insert**:
-
-```markdown
-## ACT 0.5 — The Research Question (add after Act 0, before Act 1)
-
-The Round 3 theme shift: from "prediction" to "trust and generalization."
-
-**The gap in polymer informatics**: Papers report R² and claim invariance. 
-*Nobody measures whether explanations are load-bearing.* Nobody stress-tests 
-with deliberate adversarial rewrites.
-
-**Our research question**: Can we build a system where:
-1. Explanations are provably causal (not decorative)
-2. Invariance is measured across distributions (not assumed)
-3. The model knows when it's extrapolating
-
-If we can, we establish a verification protocol for the field.
-
-> **Transition to Act 1:** *"So we measured the data before we built anything."*
-
----
-
-## Insert between Act 2 and Act 3:
-
-### The Literature Backing
-
-Our architectural choices weren't arbitrary:
-
-**Why trees over deep learning**: Grinsztajn et al. (NeurIPS 2022) showed 
-tree ensembles outperform neural networks on tabular data at n<10K. We 
-verified this extends to chemistry: GNN scored −0.309, trees scored 0.87+.
-
-**Why physics identities**: Maxwell's relation (1861), Flory-Fox law (1950). 
-The science is >70 years old. We measured whether ML could *improve* them. 
-Answer: No. LOO R² −0.82. The textbook won.
-
-**Why measure rather than assert**: ROAR fidelity protocol (Hooker, 2019) 
-proves whether attributions are load-bearing. We adapted it to chemistry.
-
-> **Transition to Act 3:** *"So how do we know the model we did ship is honest?"*
-```
-
-**Action**:
-- [ ] Update `Personal/STORY.md` with research framing
-- [ ] Add corresponding notes to `Personal/Presentation/SPEAKER_NOTES.md`
-- [ ] Ensure slide transitions mention "research question" theme
-
----
-
-## 20. EXECUTION TIMELINE & PRIORITIES
-
-### 20.1 Pre-Hackathon Timeline (48-72 hours before)
-
-**DAY -2 (48h before)**:
-```
-Morning (4h):
-- [ ] Run RUN.md Steps 1-3 (env + diagrams + notebook) → Generates all charts
-- [ ] Verify outputs/ folders populated
-- [ ] Check all presentation figure references exist
-
-Afternoon (3h):
-- [ ] Create MASTER_QNA.md (consolidate all 10 files)
-- [ ] Add 5 missing questions to QnA files
-- [ ] Create Personal/docs/00_CONTRIBUTIONS.md
-
-Evening (2h):
-- [ ] Enhance STORY.md with research framing
-- [ ] Update Presentation/SLIDE_PLAN.md (Slide 5 table)
-- [ ] Verify all scores are 0.9023 (run grep audit)
-```
-
-**DAY -1 (24h before)**:
-```
-Morning (3h):
-- [ ] Generate report from PROMPT_10PAGE.md
-- [ ] Review report, fix any issues
-- [ ] Generate presentation from PROMPT_PRESENTATION.md
-
-Afternoon (3h):
-- [ ] Capture demo screenshots (RUN.md Step 6)
-- [ ] Test demo offline (WiFi OFF)
-- [ ] Create DEMO_SCRIPT_EXTENDED.md
-- [ ] Rehearse demo (standard + extended versions)
-
-Evening (2h):
-- [ ] Run release gate checks (RUN.md Step 9)
-- [ ] Final audit: no "oracle", no paths, no forbidden terms
-- [ ] Rehearse presentation with SPEAKER_NOTES.md (3× run-through)
-```
-
-**DAY 0 (Hackathon day)**:
-```
-Morning:
-- [ ] Review MASTER_QNA.md (focus on hostile.md top 10)
-- [ ] Practice demo one final time
-- [ ] Load demo site, let caches compile
-- [ ] Open backup screenshots in browser tabs
-
-During Event:
-- [ ] Stay calm, refer to numbers in 00_INDEX.md if uncertain
-- [ ] For any question not rehearsed: "Let me walk you through our methodology"
-- [ ] Volunteer 4 honest FAILs early (shows scientific maturity)
-```
-
-### 20.2 If You Have Limited Time
-
-**< 12 hours total**:
-```
-Priority 1 (CRITICAL - 4h):
-- Run notebook (generates charts) 
-- Create MASTER_QNA.md
-- Verify 0.9023 everywhere
-- Run release gate
-
-Priority 2 (HIGH - 3h):
-- Capture demo screenshots
-- Enhance STORY.md
-- Add 5 missing QnA questions
-- Test demo offline
-
-Priority 3 (MEDIUM - 3h):
-- Generate report/presentation
-- Create CONTRIBUTIONS.md
-- Rehearse presentation 2×
-
-Priority 4 (LOW - 2h):
-- DEMO_SCRIPT_EXTENDED.md
-- Slide 5 enhancement
-- Max cap appendix decision
-```
-
-**< 6 hours total**:
-```
-DO ONLY:
-1. Run notebook (charts) - 30 min
-2. Create MASTER_QNA.md - 1.5h
-3. Demo screenshots + test - 1h
-4. Verify scores + release gate - 30 min
-5. Rehearse hostile questions - 1h
-6. Generate presentation - 1h
-7. Practice demo - 30 min
-```
-
----
-
-## 21. VALIDATION CHECKLIST - RUN BEFORE SUBMISSION
-
-### 21.1 Documentation Consistency Scan
-```bash
-#!/bin/bash
-cd "/Users/daver/Desktop/AISEHack 2.0 Polymr Property Prediction Round 3"
-
-echo "=== Checking score consistency ==="
-# Should only find 0.9023, not variants
-grep -rn "0\.90[0-9][0-9]" Personal/ | grep -v "0\.9023\|0\.906" | head -20
-
-echo "=== Checking forbidden terms ==="
-grep -rInw "oracle\|khazana\|polyinfo\|tgss" \
-  "AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/" \
-  --exclude-dir=.git || echo "✓ CLEAN"
-
-echo "=== Checking paths ==="
-grep -rn "/Users/daver\|100\.116\|vishwa" \
-  "AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/" \
-  --exclude-dir=.git || echo "✓ CLEAN"
-
-echo "=== Checking ML story presence ==="
-grep -r "0\.651.*0\.708\|0\.708.*0\.651" Personal/ | wc -l
-# Should be >3 occurrences
-
-grep -r "−0\.309\|-0\.309" Personal/ | wc -l
-# Should be >3 occurrences
-
-echo "=== Checking figure references ==="
-# After notebook run, all should exist
-MISSING=0
-grep -rhoE '\]\(([^)]+\.png)\)' Personal/*.md \
-  AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/*.md | \
-  sed -E 's/^\]\(//; s/\)$//' | sort -u | while read fig; do
-  if [[ ! -f "$fig" && ! -f "AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/$fig" ]]; then
-    echo "MISSING: $fig"
-    MISSING=$((MISSING+1))
-  fi
-done
-
-echo "=== Experiment count ==="
-# Should be ≤80 for 72 curated
-grep -hc "^| D[1-9]-" \
-  "AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/Experiment_Logs/"D*.md | \
-  paste -sd+ - | bc
-
-echo "=== DONE ==="
-```
-
-**Action**:
-- [ ] Save above as `validation_scan.sh`
-- [ ] Run 24h before hackathon
-- [ ] Fix any issues found
-- [ ] Run again right before submission
-
-### 21.2 Presentation Readiness Checklist
-```
-Technical:
-- [ ] Slides generated (PDF + PPTX)
-- [ ] All figures render correctly
-- [ ] No broken links or references
-- [ ] Timing: 5-6 minutes (tested)
-- [ ] Backup slides after slide 9 (not counted)
-
-Content:
-- [ ] All mandatory numbers present (see PROMPT_PRESENTATION.md §F)
-- [ ] Failure strip shows ≥3 named failures
-- [ ] Physics R² values on slide 4
-- [ ] ML baseline story clear
-- [ ] Research contribution stated explicitly
-
-Demo:
-- [ ] Site loads in <3s (after initial compile)
-- [ ] All 4 demo beats rehearsed (45s total)
-- [ ] Screenshots captured as backup
-- [ ] WiFi-OFF test passed
-- [ ] Extended demo script ready (if judges ask for depth)
-
-Q&A:
-- [ ] MASTER_QNA.md read (full)
-- [ ] Hostile.md questions 1-12 memorized
-- [ ] Key numbers memorized (0.891, 0.9023, 0.851 vs 0.043, 0.9716, 0/134)
-- [ ] "I don't know but I can show you our methodology" prepared
-```
-
----
-
-## 22. FINAL RECOMMENDATIONS & DECISION POINTS
-
-### 22.1 Decisions Only User Can Make
-
-**DECISION 1**: 3D Website Visualization
-- [ ] Option A: Keep current 2D, focus on content (RECOMMENDED)
-- [ ] Option B: Add 3Dmol.js molecular viz (3-4h)
-- [ ] Option C: Add architecture flow viz (4-5h)
-- [ ] Option D: Add SHAP live force plot (5-6h)
-
-**DECISION 2**: Max Cap Appendix in Report
-- [ ] Keep Appendix B (verify math first)
-- [ ] Remove Appendix B (less risk, still strong)
-
-**DECISION 3**: Presentation Length
-- [ ] 9 slides, 5-6 minutes (current)
-- [ ] Add 1 backup slide → main deck (ML vs domain table)
-- [ ] Keep as-is
-
-**DECISION 4**: Time Allocation
-- [ ] Full refinement (20-24h total)
-- [ ] Priority 1+2 only (7h, good enough)
-- [ ] Bare minimum (6h, risky but viable)
-
-### 22.2 Risk Assessment
-
-**LOW RISK** (you're in great shape already):
-- ✅ Score maximized (0.90680 Phase 7)
-- ✅ Methodology validated
-- ✅ Documentation complete
-- ✅ All claims measurement-backed
-- ✅ Codebase clean and reproducible
-
-**MEDIUM RISK** (this refinement addresses):
-- ⚠️ ML baseline story scattered (NOW: consolidated)
-- ⚠️ QnA missing key questions (NOW: 5 added)
-- ⚠️ Research contribution implicit (NOW: explicit)
-- ⚠️ Presentation needs punch (NOW: enhanced)
-
-**REMAINING RISKS** (acceptable):
-- Environment sensitivity (python 3.11.7) → Documented everywhere
-- Public/private gap (0.026) → Predicted, diagnosed, honest
-- 4 scorecard FAILs → Pre-registered, explained, fixes proposed
-- Transductive design → Demo serves fallback, performance disclosed
-
-### 22.3 Success Definition
-
-**You NAIL the hackathon if**:
-1. Judges understand: "Two problems, one leaderboard" → per-target design
-2. Judges see: Physics beat ML (−0.82 LOO), backed by literature
-3. Judges trust: Measured invariance (0.0000 violations), not asserted
-4. Judges respect: 4 honest FAILs volunteered, not hidden
-5. Demo shows: Model warns when out-of-domain
-
-**You're ready when**:
-- Numbers consistent everywhere (0.9023)
-- Demo runs flawlessly offline
-- Hostile questions rehearsed
-- Charts all generated
-- Release gate passed
-- Story connects data→design→trust
-
----
-
-## 23. POST-HACKATHON (DO NOT DO BEFORE EVENT)
-
-**After results announced**, if you have time:
-
-### 23.1 Phase 6 Experiments
-- See `Personal/Score_and_Invariance_Improvement/PLAN.md`
-- 38 experiments across 10 workstreams
-- Target: fix 3 failing reliability requirements
-- Explore unexploited corpora (smile_r3 with better protocol)
-
-### 23.2 Publication Path
-- Submit to Scientific Data or Nature Machine Intelligence
-- Emphasize: verification protocol as contribution
-- Dataset: release local held-out panel labels (after competition ends)
-
-### 23.3 Code Release
-- Create public GitHub repo (decision D3 in RUN.md)
-- Add Zenodo DOI for archival
-- Blog post: "When Physics Beats Machine Learning"
-
----
-
-## 24. IMMEDIATE NEXT ACTIONS (START HERE)
-
-**Agent receiving this refinement, do this IN ORDER**:
-
-### Step 1: Audit (1h)
-```bash
-cd "/Users/daver/Desktop/AISEHack 2.0 Polymr Property Prediction Round 3"
-
-# Check current state
-ls -la Personal/docs/00_CONTRIBUTIONS.md  # Should not exist yet
-ls -la Personal/docs/11_qna/MASTER_QNA.md  # Should not exist yet
-grep -r "0\.9023" Personal/ | wc -l  # Should be consistent
-
-# Run validation scan
-bash validation_scan.sh > validation_report.txt 2>&1
-```
-
-### Step 2: Create Missing Files (2h)
-1. `Personal/docs/00_CONTRIBUTIONS.md` (see §14.1)
-2. `Personal/docs/11_qna/MASTER_QNA.md` (see §5.1)
-3. `Personal/Presentation/DEMO_SCRIPT_EXTENDED.md` (see §16.2)
-4. Add 5 questions to QnA files (see §18.1)
-
-### Step 3: Enhance Existing Files (1h)
-1. Update `Personal/STORY.md` with research framing (§19.1)
-2. Update `Personal/Presentation/SLIDE_PLAN.md` Slide 5 (§16.1)
-3. Update `Personal/docs/09_generalization/ladder_summary.md` (§13.2)
-
-### Step 4: Run Technical Steps (2h)
-1. Execute RUN.md Steps 1-3 (environment + notebook)
-2. Capture demo screenshots (RUN.md Step 6)
-3. Generate architecture diagrams (RUN.md Step 2)
-
-### Step 5: Generate Deliverables (2h)
-1. Run `Personal/Midnight_Report/PROMPT_10PAGE.md`
-2. Run `Personal/Presentation/PROMPT_PRESENTATION.md`
-3. Review outputs, iterate if needed
-
-### Step 6: Final Validation (1h)
-1. Run release gate checks (RUN.md Step 9)
-2. Test demo offline
-3. Verify all numbers consistent
-4. Generate validation report
-
-### Step 7: Present to User (30min)
-1. Show validation_report.txt
-2. Show MASTER_QNA.md
-3. Show enhanced STORY.md
-4. Show generated presentation
-5. Get approval to proceed with hackathon
-
----
-
-## END OF REFINEMENT GUIDE
-
-**This document is complete. Execute sections 1-24 in order.**
-
-**Questions? Refer to**:
-- `Personal/AGENTS.md` for routing
-- `RUN.md` for execution steps
-- `CONTEXT.md` for one-page project context
-- `Personal/docs/00_INDEX.md` for all canonical numbers
-
-**Good luck at the hackathon! 🚀**
-
+**Handoff:** after the above, generate the report from `Personal/Midnight_Report/PROMPT_10PAGE.md`
+and the deck from `Personal/Presentation/PROMPT_PRESENTATION.md` (both now refreshed), rehearse
+against `DEMO_SCRIPT.md` (45 s) and `MASTER_QNA.md`, and run the `RUN.md §9` gate one final time.
