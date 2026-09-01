@@ -122,6 +122,8 @@ first**, then every quoter, then re-run the consistency scan.
 | 3 | any doc saying "python 3.11.7 is load-bearing" | superseded by the platform-defect finding | rewrite per §0.2. |
 | 4 | any doc saying "no neural architecture won" | false under Phase 7 | rewrite per §0.1. |
 | 5 | `REFINEMENT.md` (this file's predecessor) "MAXIMIZED at 0.90680 / no score work" | stale | superseded by §0/§1 of this file. |
+| 6 | `RESULTS.md` §3 / `docs/06_results/public_private_analysis.md` | the public→private gap decomposition sums to ~0.012 but the observed gap is **0.0114**, and the "predicted within 0.0004" claim is asserted, not shown | make the four components sum to the observed gap, and show the arithmetic behind the 0.0004 — it is our best methodology line and must close. |
+| 7 | `REPORT_10PAGE.md:238` | labels **0.9066 ± 0.0018** (a Tg out-of-fold *seed-stability* number) as "mean R² on the local panel" | relabel: it is 5-seed Tg OOF stability, **not** a panel score. Keep 0.9066 and 0.90680/0.907551 visually distinct or a judge will read them as contradictory. |
 
 ### 2.3 Release-gate scan (run unchanged, but run it)
 
@@ -182,23 +184,39 @@ already enforces exactly this. **Do not restructure; refresh.**
 4. **All score lines** — replace 0.9023 with the D1 canonical number, and mark the private number as
    measured (0.891) or estimated (0.8965) per the D0 decision.
 
-### 4.1 Appendix B ("max cap") — KEEP it, but re-derive it
+### 4.1 Appendix B ("max cap") — the user's instinct was right: it needs a real pass, or trim it
 
-**Verdict: keep.** The seven parts in `PROMPT_10PAGE.md §E` are mathematically defensible and
-already carry the crucial caveat ("mark clearly which parts are proven and which are estimated").
-`docs/06_results/ceiling_analysis.md` is the source and it is sound:
+**Verdict: keep the two bulletproof pieces, fix or drop the rest.** A recomputation against the
+underlying `Consolidation/` scripts (this is exactly the "verify it, else remove it" the human
+asked for) found the appendix is **mixed**: some parts are pure arithmetic and unattackable, others
+are hand-wavy or internally inconsistent. An expert panel *will* probe the weak ones.
 
-- metric identity (0.9023 mean vs 0.9370 pooled; tg = 99.986% of pooled TSS) — **proven**;
-- Tg-alone bound (perfect Tg → 0.9172) — **a one-line theorem**;
-- bootstrap SEs (ei 0.022 · eps 0.024 · nc 0.020 · eea 0.014 · egb 0.012 · tg 0.007 · egc 0.006) — derived;
-- single-row leverage (worst row → ei +0.013) — measured;
-- label-noise bound (σ=15 °C → R²_max 0.981; empirical ≈0.92) — **one derived, one empirical, labelled as such**;
-- composite ≈0.93 ± 0.01 — estimated.
+**KEEP (defensible, quote with confidence):**
+- **Tg-alone bound** — perfect Tg with the other six frozen gives `(1.000 + 0.9111 + … + 0.8847)/7
+  = 0.9172`. Pure arithmetic; state as a one-line theorem.
+- **Bootstrap standard errors** (ei 0.022 · eps 0.024 · nc 0.020 · eea 0.014 · egb 0.012 · tg 0.007
+  · egc 0.006) — derived, and the corollary "any delta below ~2 SE on a small target is noise".
+- **Single-row leverage** (worst row → ei +0.013) — measured.
+- The **label-noise formula** R²_max = 1 − (σ/109.08)² — algebra, safe. **But** the "σ = 15 °C,
+  literature-typical" figure needs a citation (it is currently uncited).
 
-**The one update:** the worked examples use 0.9023. Re-express them against the D1 number, and
-update the "96% of ceiling" line. Do **not** delete the appendix — it is one of the strongest
-"scientific contribution" assets you have, precisely because it derives the ceiling instead of
-asserting it.
+**FIX OR DROP (these will get you attacked):**
+1. *"tg carries 99.986% of the pooled TSS"* is the **wrong explanation** for the 0.9370 pooled-R²
+   figure. That share implies a pooled R² of ≈0.895 (a tg-only number), not 0.9370; 0.9370 arises
+   from a global-mean denominator with large between-target mean spread. Either derive the pooled-R²
+   comparison correctly or **drop the 0.9370 claim entirely** — the metric-is-a-mean point stands
+   without it.
+2. *"empirical Tg ceiling ≈0.92"* is **hard-coded, not derived** (it is an assumption in the
+   variance-headroom script, not a measurement). Label it as an assumption or remove it.
+3. *"composite ≈0.93 ± 0.01"* **contradicts the script's own 0.9414**. Reconcile the two, or drop
+   the composite and keep only the individually-proven bounds.
+4. *"six DFT targets bounded by scarcity (148–224 rows)"* **miscounts egc (1,352 rows)**. Correct the
+   statement or drop the "six" framing.
+
+**Rule for the implementer:** in Appendix B, only assert what is *proven* (items 1–2 + the algebra).
+Everything else gets either a proper derivation or is deleted. The appendix's value is that it
+*derives* a ceiling; if any step is hand-wavy, the whole thing reads as padding — **an over-claimed
+bound is worse than no bound** (that line is already in `ceiling_analysis.md`, honour it).
 
 ---
 
@@ -258,10 +276,12 @@ contribution-to-the-field framing** — all three already exist elsewhere and on
 - **Act 2** — add the G1 citation: *"Grinsztajn et al. (NeurIPS 2022) showed trees beat deep nets on
   tabular data at our sizes; we confirmed it extends to chemistry, with one refinement — a GNN earns
   its place only as a decorrelated second opinion."*
-- **Act 3** — add the **cap** argument: *"Tg is capped near 0.92 by label noise (the thermometer,
-  not the model); the six DFT targets are capped by scarcity (148–224 rows). We derived the
-  practical ceiling at ≈0.93 ± 0.01 and we are at ~96% of it — so we spent the last phase on the
-  uncapped half of the grade: invariance, fidelity, and honesty about what the model doesn't know."*
+- **Act 3** — add the **cap** argument, but use only the *proven* bounds (see §4.1): *"Tg is capped
+  by label noise — the thermometer, not the model (a perfect Tg model still only reaches 0.9172 for
+  the mean) — and the small DFT targets carry bootstrap standard errors of 0.012–0.024. We derive
+  where the remaining score can live instead of promising a number, and we spent the last phase on
+  the uncapped half of the grade: invariance, fidelity, and honesty about what the model doesn't
+  know."*
 - **Act 4** — forward-reference future work honestly (Phase 6: shallow-stack variance fix, tuned GP
   on ei/eps, fold-consistency promotion gate, physics-constrained joint imputation — from
   `Score_and_Invariance_Improvement/PLAN.md` and `CEILING_REALITY_CHECK.md:83-93`).
@@ -352,11 +372,14 @@ refinement Phase 7 adds: a structure-grouped GINE, blended per target at w ≤ 0
 second opinion, lifts the mean +0.0045 — not because it is better, but because it errs differently.*
 
 **Why the ceiling, derived not asserted.** *The metric is the unweighted mean of seven per-target
-R². The same predictions score 0.9023 as a mean and 0.9370 pooled, because Tg carries 99.986% of the
-pooled variance. A perfect Tg model with everything else frozen reaches only 0.9172. Tg is capped
-near 0.92 by experimental label noise (σ 5–15 °C against a 109 °C spread), and the six DFT targets
-are bounded by scarcity (148–224 evaluation rows, bootstrap SE 0.012–0.024). The composite practical
-ceiling for a rules-compliant single-run pipeline is ≈0.93 ± 0.01 — we are at ~96% of it.*
+R², so one target can never carry the score: a perfect Tg model with everything else frozen reaches
+only **0.9172** (pure arithmetic). Tg is further capped by experimental label noise — with a 109 °C
+spread, a noise floor σ gives R²_max = 1 − (σ/109.08)², so even σ = 10 °C caps Tg near 0.99 and the
+measured difficulty-stratified spread is tighter still — and the small DFT targets carry bootstrap
+standard errors of 0.012–0.024. The takeaway is the **method**: we derive where the remaining score
+can possibly live, instead of promising a number we may miss. (If we quote a composite "≈0.93"
+figure at all, it must first be reconciled with its own source script — see §4.1 — otherwise drop it
+and keep only the two proven bounds.)*
 
 **Why physics beats the correction.** *egc = ei − eea holds at R² 0.9716 (n=59); an ML residual on
 top scores leave-one-out R² −0.82, i.e. it overfits noise. eps = n² + ionic has 0/134 violations and
