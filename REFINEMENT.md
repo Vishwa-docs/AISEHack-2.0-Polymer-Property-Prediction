@@ -153,7 +153,8 @@ This is a "wrong path" problem, not a "missing chart" problem.
    (`novelty_two_regimes.png`, `variance_share_trap.png`, `physics_identity_*.png`,
    `target_distributions.png`, `chemical_space_map.png`), the SHAP beeswarms, fidelity curves,
    linear probes, `smiles_invariance_boxplot.png`, `generalization_ladder_plot.png`,
-   `trustworthiness_radar.png`, and the architecture diagram.
+   `trustworthiness_radar.png`, `robustness/flory_fox_relation.png` (report Figure 7), and the
+   architecture diagram.
 2. Generate the architecture diagram if its PNG is not already in `904_submission/outputs/` — run
    `outputs/architecture.py` (RUN.md §2). The deck's slide 1 and 4 are figureless without it.
 3. Confirm `codebase/outputs/scorecard.md` reads **14/18** (or whatever the latest run says) and
@@ -195,30 +196,58 @@ are hand-wavy or internally inconsistent. An expert panel *will* probe the weak 
 
 **KEEP (defensible, quote with confidence):**
 - **Tg-alone bound** — perfect Tg with the other six frozen gives `(1.000 + 0.9111 + … + 0.8847)/7
-  = 0.9172`. Pure arithmetic; state as a one-line theorem.
+  = 0.9172`. Pure arithmetic. **⚠️ Version trap:** with the Phase-7 per-target values it becomes
+  `(1 + 0.9221 + 0.9310 + 0.8711 + 0.9270 + 0.9097 + 0.8860)/7 = 0.9210`, so the corollary
+  *"Tg alone cannot reach 0.92"* **flips** under Phase 7. Re-state it against whichever pipeline the
+  report describes (and do **not** mix the two sets of per-target values in one table).
 - **Bootstrap standard errors** (ei 0.022 · eps 0.024 · nc 0.020 · eea 0.014 · egb 0.012 · tg 0.007
   · egc 0.006) — derived, and the corollary "any delta below ~2 SE on a small target is noise".
-- **Single-row leverage** (worst row → ei +0.013) — measured.
+- **Single-row leverage** (worst row → ei +0.013) — measured. **⚠️ Wording:** the method is
+  *dropping* the worst row and recomputing, not "fixing" it — say "drop".
 - The **label-noise formula** R²_max = 1 − (σ/109.08)² — algebra, safe. **But** the "σ = 15 °C,
-  literature-typical" figure needs a citation (it is currently uncited).
+  literature-typical" figure needs a citation (it is currently uncited; see §6.3).
 
-**FIX OR DROP (these will get you attacked):**
-1. *"tg carries 99.986% of the pooled TSS"* is the **wrong explanation** for the 0.9370 pooled-R²
-   figure. That share implies a pooled R² of ≈0.895 (a tg-only number), not 0.9370; 0.9370 arises
-   from a global-mean denominator with large between-target mean spread. Either derive the pooled-R²
-   comparison correctly or **drop the 0.9370 claim entirely** — the metric-is-a-mean point stands
-   without it.
-2. *"empirical Tg ceiling ≈0.92"* is **hard-coded, not derived** (it is an assumption in the
-   variance-headroom script, not a measurement). Label it as an assumption or remove it.
-3. *"composite ≈0.93 ± 0.01"* **contradicts the script's own 0.9414**. Reconcile the two, or drop
-   the composite and keep only the individually-proven bounds.
-4. *"six DFT targets bounded by scarcity (148–224 rows)"* **miscounts egc (1,352 rows)**. Correct the
-   statement or drop the "six" framing.
+**FIX OR DROP (these will get you attacked — the exact numbers to reconcile are given):**
+1. *"tg carries 99.986% of the pooled TSS ⇒ pooling makes it a Tg-only problem"* is **backwards**.
+   The 99.986% is the **within-target** TSS share; the within-target pooled R² is **0.8953** (the
+   team's own "variant C"), not 0.9370. The 0.9370 comes from **global-mean centering across seven
+   targets with different units** (°C vs eV vs unitless), which *inflates* the denominator — under
+   it pooled R² 0.9370 **exceeds every per-target R²**. Either state the two pooled-R² definitions
+   explicitly (within-target 0.8953 vs global-mean 0.9370) or drop 0.9370 entirely — the
+   metric-is-a-mean point stands without it.
+2. *"empirical Tg ceiling ≈0.92"* is **hard-coded, not derived** (an assumption in the
+   variance-headroom script). Label it as an assumption or remove it.
+3. *"composite ≈0.93 ± 0.01"* **contradicts the script's own 0.9414** (hitting every assumed ceiling
+   gives 0.9414). Also: with Tg at 0.92 and the other six frozen, the mean is only **0.9058** — so
+   0.93 silently requires +0.028 on *every* other target, which for egc (SE 0.006) and egb (SE 0.012)
+   is 2–4× the file's own "not bankable below 2 SE" rule. Drop the composite or reconcile with the
+   script.
+4. *"six DFT targets bounded by scarcity (148–224 rows)"* — there are only **five** (egb, ei, eea,
+   nc, eps); **egc has 1,352 rows**. Fix the statement.
+5. **Tg difficulty-strata table** sums to **2,759 ≠ 2,763** (off by 4); the archive records medium
+   n = 983 (not 979). And *"estimated true Tg ≈ 0.882"* has **two** derivations in the archive
+   (0.8821 vs 0.8842) that differ in whether unmatched rows count as R² = 0 — the report quotes 0.882
+   with no method. Pick one, show it, and state the zero-contribution assumption.
+6. **"Predicted private within 0.0004"** rests on unshown arithmetic (it is `0.9024 − 0.011 =
+   0.8914` vs the observed 0.891); the rounded gap components sum to 0.012 vs the 0.0114 observed.
+   Either show the exact line or drop the "0.0004" precision claim.
 
-**Rule for the implementer:** in Appendix B, only assert what is *proven* (items 1–2 + the algebra).
-Everything else gets either a proper derivation or is deleted. The appendix's value is that it
-*derives* a ceiling; if any step is hand-wavy, the whole thing reads as padding — **an over-claimed
-bound is worse than no bound** (that line is already in `ceiling_analysis.md`, honour it).
+**Rule for the implementer:** in Appendix B, only assert what is *proven* (the four KEEP bullets,
+with their version/wording caveats). Everything in FIX OR DROP gets either a proper derivation or is
+deleted. The appendix's value is that it *derives* a ceiling; if any step is hand-wavy, the whole
+thing reads as padding — **an over-claimed bound is worse than no bound** (that line is already in
+`ceiling_analysis.md`, honour it).
+
+### 4.2 Prompt-level polish (`PROMPT_10PAGE.md`) — three small gaps
+
+1. **Add "Hyperparameter & training evolution" to the §3 mandate.** The organisers' skeleton requires
+   it (and the current draft has it at `REPORT_10PAGE.md:71`), but `PROMPT_10PAGE.md §C §3` omits it —
+   a future writer wouldn't be forced to include it.
+2. **Add a per-section word budget** to `PROMPT_10PAGE.md` (the 3-page prompt has one; the calibration
+   already exists in `analysis/SAMPLE_REPORT_ANALYSIS.md:87-101`). Prevents unbalanced sections.
+3. **Model-weights front matter must be a URL, not a path.** `REPORT_10PAGE.md:6` has
+   `weights/polymer_weights.joblib`; every sample report gives a clickable link. Resolve to the
+   GitHub raw link (decision D4 in `RUN.md §0`).
 
 ---
 
