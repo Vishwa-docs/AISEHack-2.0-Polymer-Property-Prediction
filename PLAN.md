@@ -1,4 +1,10 @@
 # PLAN.md — Consolidation, Codebase, Docs, Report, Presentation & Website
+
+> **Updated (Phase 7): the current best pipeline scores 0.90680** on the local held-out
+> verification panel - the V57 engine blended with a cross-validation-weighted graph
+> neural network, 0.90230 previously. The 0.9023 figures below refer to the previous
+> champion and are kept for historical comparison. See 904_submission/RESUME_HERE.md.
+
 ## AISEHack 2.0 · Polymer Property Prediction · Round 3 · Final Delivery
 
 **Written:** 2026-08-31 by the planning agent.

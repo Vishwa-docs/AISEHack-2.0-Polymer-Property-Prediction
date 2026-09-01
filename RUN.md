@@ -1,5 +1,11 @@
 # RUN.md — everything that still needs running, in order
 
+> **Updated (Phase 7): the current best pipeline scores 0.90680** on the local held-out
+> verification panel - the V57 engine blended with a cross-validation-weighted graph
+> neural network, 0.90230 previously. The 0.9023 figures below refer to the previous
+> champion and are kept for historical comparison. See 904_submission/RESUME_HERE.md.
+
+
 **Nothing in this delivery has been executed.** Every file was written and syntax-checked; no
 model was fitted, no chart rendered, no screenshot taken. This file is the complete list of what
 to run, in what order, with the expected output and the known failure mode for each step.
