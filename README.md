@@ -1,21 +1,22 @@
 # AISEHack 2.0 · Polymer Property Prediction · Round 3
 
-> ## ⭐ CURRENT BEST ARCHITECTURE — Phase 7 (0.90680)
+> ## ⭐ CURRENT BEST ARCHITECTURE — Phase 7 (0.907551)
 >
-> The best verified pipeline is **the V57 engine blended with a graph neural network**:
-> **mean R² 0.90680** on the local held-out verification panel (0.90813 on the verified
-> sub-panel), against the previous champion's 0.90230 — **+0.0045, every target at or above it**.
+> The best verified pipeline is **the V57 engine blended with a graph neural network**, with the
+> repaired ei/eea leaves: **mean R² 0.907551** on the local held-out verification panel (0.90813
+> on the verified sub-panel), against the previous champion's 0.90230 — **+0.0053, every target
+> at or above it**.
 >
-> | target | previous | **Phase 7** |
+> | target | previous | **Phase 7 (final)** |
 > |---|---:|---:|
-> | tg | 0.8954 | **0.9043** |
-> | egc | 0.9111 | **0.9221** |
-> | egb | 0.9268 | **0.9310** |
-> | ei | 0.8711 | 0.8711 |
-> | eea | 0.9183 | **0.9270** |
-> | nc | 0.9086 | **0.9097** |
-> | eps | 0.8847 | **0.8860** |
-> | **mean** | 0.90230 | **0.90680** |
+> | tg | 0.8954 | **0.9039** |
+> | egc | 0.9111 | **0.9213** |
+> | egb | 0.9268 | **0.9318** |
+> | ei | 0.8711 | **0.8741** |
+> | eea | 0.9183 | **0.9253** |
+> | nc | 0.9086 | **0.9101** |
+> | eps | 0.8847 | **0.8864** |
+> | **mean** | 0.90230 | **0.907551** |
 >
 > **Mechanism:** a GINE message-passing network (3 seeds/target, structure-grouped CV) blended
 > per target at `w = clip((cv − 0.80)/0.25, 0.10, 0.60)` — weights derived from **cross-validation
@@ -47,11 +48,12 @@ portable context), `AGENTS.md` (router for agents), `PLAN.md` (the contract this
 
 | | |
 |---|---|
-| private LB | **0.891** |
+| private LB (measured, 0.9023 champion) | **0.891** |
 | public LB | 0.917 |
-| local held-out verification panel | 0.9023 |
+| local held-out verification panel (final file) | **0.907551** |
+| est. private for the final file | ≈0.89655 |
 | evidence scorecard | **14 / 18 requirement groups PASS** |
-| submission file | frozen and shipped — `<codebase>/submission.csv` |
+| submission file | `904_submission/submission_final.csv` (copied to `<codebase>/submission.csv`) |
 | deadline | **3 September 2026** |
 
 ## What to do next, in order

@@ -55,18 +55,19 @@ methodology, and proven generalization.
 
 | code | property | unit | origin | train n | test n | our R² |
 |---|---|---|---|---:|---:|---:|
-| tg | glass transition temperature | °C | experimental | 4,143 | 2,763 | 0.8953 |
-| egc | chain bandgap | eV | DFT | 2,028 | 1,352 | 0.9111 |
-| egb | bulk bandgap | eV | DFT | 337 | 224 | 0.9268 |
-| ei | ionisation energy | eV | DFT | 222 | 148 | 0.8711 |
-| eea | electron affinity | eV | DFT | 221 | 147 | 0.9183 |
-| nc | refractive index | – | DFT | 229 | 153 | 0.9086 |
-| eps | dielectric constant | – | DFT | 229 | 153 | 0.8847 |
+| tg | glass transition temperature | °C | experimental | 4,143 | 2,763 | 0.9039 |
+| egc | chain bandgap | eV | DFT | 2,028 | 1,352 | 0.9213 |
+| egb | bulk bandgap | eV | DFT | 337 | 224 | 0.9318 |
+| ei | ionisation energy | eV | DFT | 222 | 148 | 0.8741 |
+| eea | electron affinity | eV | DFT | 221 | 147 | 0.9253 |
+| nc | refractive index | – | DFT | 229 | 153 | 0.9101 |
+| eps | dielectric constant | – | DFT | 229 | 153 | 0.8864 |
 
 ## Our result
 
-**private LB 0.891** · public LB 0.917 · local held-out verification panel **0.9023** ·
-evidence scorecard **14/18 groups PASS**. Practical ceiling ≈0.93 ± 0.01, so we are at ~96%.
+**private LB 0.891** (measured, old 0.9023 champion) · public LB 0.917 · local held-out
+verification panel **0.907551** · evidence scorecard **14/18 groups PASS**. Est. private for the
+final file **≈0.89655**. Tg-alone ceiling (everything else frozen) **0.9213**.
 
 ## The constraints
 
@@ -92,8 +93,8 @@ reliability and generalization bundle.
    train for all six DFT targets, but 88–99% of those polymers *are* in train under a different
    property; Tg only 12.3%. Two problems — imputation and extrapolation — one leaderboard.
    **This is why the pipeline is per-target.**
-2. **Tg owns 99.986% of the pooled variance but 1/7 of the score.** A perfect Tg model still caps
-   the mean at **0.9172**.
+2. **Tg owns 99.986% of the pooled variance but 1/7 of the score.** A perfect Tg model alone still caps
+   the mean at **0.9213**.
 3. **The physics is real and beats the model that corrects it.** `egc = ei − eea` holds at
    R² 0.9716 (n=59); adding an ML residual scores leave-one-out **R² −0.82**.
    `eps = n² + ionic` has **0/134 violations** and is 2.62× better conditioned (+0.0666 on eps).
@@ -112,12 +113,14 @@ cross-model explanation agreement ρ **0.471** (bar 0.60) · conformal coverage 
 ## Vocabulary rules
 
 Say **"local held-out verification panel"**, never "oracle". Tg is in **°C**. Standardise on
-**0.9023**. Always state whether a similarity/overlap figure is on a *same-property* or
-*any-property* basis.
+**0.907551** (0.90230 is the previous champion). Always state whether a similarity/overlap figure is on a
+*same-property* or *any-property* basis.
 
 ## Environment (load-bearing)
 
 `python 3.11.7 · rdkit 2026.03.5 · numpy 2.4.6 · pandas 3.0.5 · scikit-learn 1.9.0 ·
-lightgbm 4.7.0 · xgboost 3.2.0`. On **python 3.12** the ei leaf models collapse 0.871 → 0.512
-*regardless of package versions*. A far-below-0.90 score with identical code and data is an
-**environment mismatch, not a model regression**.
+lightgbm 4.7.0 · xgboost 3.2.0`. The ei/eea leaves depend on RDKit's `rdEHTTools.RunMol`, which
+**segfaults on linux-x86_64** (Kaggle runs Linux) with identical pins. On **python 3.12** the ei leaf
+models collapse 0.871 → 0.512 *regardless of package versions* — the root cause is this **platform**
+defect, not the python version. A far-below-0.90 score with identical code and data is an
+**environment/platform mismatch, not a model regression**.

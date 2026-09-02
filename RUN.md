@@ -1,9 +1,10 @@
 # RUN.md — everything that still needs running, in order
 
-> **Updated (Phase 7): the current best pipeline scores 0.90680** on the local held-out
+> **Updated (Phase 7, final): the current best pipeline scores 0.907551** on the local held-out
 > verification panel - the V57 engine blended with a cross-validation-weighted graph
-> neural network, 0.90230 previously. The 0.9023 figures below refer to the previous
-> champion and are kept for historical comparison. See 904_submission/RESUME_HERE.md.
+> neural network with repaired ei/eea leaves, 0.90230 previously. The 0.9023 figures below refer
+> to the previous champion and are kept for historical comparison. See
+> 904_submission/RESUME_HERE.md.
 
 
 **Nothing in this delivery has been executed.** Every file was written and syntax-checked; no
@@ -42,7 +43,9 @@ bash setup.sh
 **Known failure:** if no python 3.11 exists, `setup.sh` exits with instructions.
 **Install one — do not proceed on 3.12.** On python 3.12 the ei leaf models collapse from
 R² 0.871 to 0.512 *regardless of package versions*, taking the mean from 0.9023 to ~0.847.
-`uv python install 3.11.7` is the quickest route.
+`uv python install 3.11.7` is the quickest route. Note that the root cause is a **platform**
+defect, not a version one: the ei/eea leaves depend on RDKit's `rdEHTTools.RunMol`, which
+**segfaults on linux-x86_64** (Kaggle runs Linux) with identical pins and works on macOS.
 
 The repository root also has a pre-existing `.venv` from the previous phase — either works, but
 `setup.sh` asserts the pins and is the safer path.
@@ -258,7 +261,7 @@ only one intended to be public.
 
 | # | issue | status |
 |---|---|---|
-| 1 | **python 3.11.7 is load-bearing.** On 3.12 ei collapses 0.871 → 0.512 regardless of package versions; on numpy ≥ 2.5 it collapses to 0.516; on sklearn < 1.9.0 to 0.512 | asserted in `setup.sh` and in notebook cell 1.2; documented in README §9, ARCHITECTURE §9, requirements.txt |
+| 1 | **ei/eea are platform-sensitive, not "python 3.11.7 load-bearing".** The long-running "3.11.7 is load-bearing" claim is wrong: `rdEHTTools.RunMol` segfaults on linux-x86_64 and works on macOS with identical pins. On 3.12/numpy≥2.5/sklearn<1.9 combs, ei collapses 0.871 → 0.512 | the platform story is documented in README, ARCHITECTURE, CONTEXT, 00_INDEX; 5/7 targets reproduce at correlation 1.00000 on both platforms |
 | 2 | `relation_homologous_series.csv` and `augmentation_experiment.csv` are **missing** from the shipped evidence bundle | step 5 regenerates them; AUG is one of the four scorecard FAILs |
 | 3 | `outputs/eda/` and `outputs/training/` are **empty until the notebook runs**, but the README and CAPTIONS reference them | step 3 |
 | 4 | `architecture.png` does not exist yet — only its **source** | step 2 |
