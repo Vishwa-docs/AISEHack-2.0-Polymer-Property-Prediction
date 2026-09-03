@@ -1,36 +1,30 @@
-# OS cruft
-.DS_Store
-Thumbs.db
+# Large files / caches
+fixes/experiments/tabpfn/pip_cache/
+Dataset/smile_r3.csv
+Dataset/PI1M.csv
+*.pkl
+*.npy
 
-# Python cruft
+# Python
 __pycache__/
 *.pyc
-*.pyo
 .venv/
 venv/
+*.egg-info/
+
+# OS
+.DS_Store
+*.swp
+
+# Jupyter
 .ipynb_checkpoints/
+*.ipynb_checkpoints
 
-# Large run artifacts (keep per-experiment decisions/metrics in git, not predictions blobs)
-*.npz
-*.npy
-*.pkl
-*.joblib
-*.parquet
-experiments/**/oof_predictions.csv
-experiments/**/predictions.csv
-experiments/**/*.zip
+# Large model files
+*.h5
+*.pt
+*.pth
+*.ckpt
 
-# Secrets
-.env
-kaggle.json
-
-Oracle/
-
-# --- consolidation delivery ---
-# The two publishable repositories are their own git repos (see RUN.md step 10).
-/Personal/
-/AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/
-# Held-out verification data: never committed.
-Consolidation/06_oracle_QUARANTINE/
-# Build staging
-.build/
+# BACKUPS (submodule - already excluded)
+BACKUPS/
