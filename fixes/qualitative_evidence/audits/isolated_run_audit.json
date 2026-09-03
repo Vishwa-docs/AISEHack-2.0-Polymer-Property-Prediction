@@ -1,0 +1,27 @@
+{
+  "source": "/Users/daver/Desktop/AISEHack 2.0 Polymer Property Prediction Round 3/fixes/isolated_runs/outputs",
+  "file_count": 58,
+  "latest_observed_artifact": "2026-09-02T15:21:52+05:30",
+  "present_standard_artifacts": [
+    "eda/novelty_two_regimes.png",
+    "training/parity_plots.png",
+    "explainability/fidelity_curves.png",
+    "robustness/smiles_invariance.png",
+    "generalization/generalization_ladder.png",
+    "generalization/applicability_domain.png"
+  ],
+  "missing_standard_artifacts": [],
+  "present_release_artifacts": [],
+  "missing_release_artifacts": [
+    "explanation_agreement.csv",
+    "attribution_invariance_per_target.csv",
+    "smiles_invariance_graph_violation_summary.csv",
+    "fidelity_table.csv",
+    "generalization_ladder.csv",
+    "conformal_coverage_table.csv",
+    "error_uncertainty_correlation.csv",
+    "augmentation_experiment.csv",
+    "scorecard.md"
+  ],
+  "promotion_ready": false
+}

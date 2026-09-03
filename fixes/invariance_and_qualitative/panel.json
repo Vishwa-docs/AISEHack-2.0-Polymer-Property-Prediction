@@ -1,0 +1,10 @@
+{
+  "family": "poly(ethylene oxide) / polyethylene glycol linear repeat",
+  "expected_primitive": "*CCO*",
+  "variants": [
+    {"label": "monomer", "kind": "repeat", "smiles": "*CCO*"},
+    {"label": "translated cut-point", "kind": "translation", "smiles": "*OCC*"},
+    {"label": "dimer", "kind": "repetition", "smiles": "*CCOCCO*"},
+    {"label": "trimer", "kind": "repetition", "smiles": "*CCOCCOCCO*"}
+  ]
+}

@@ -1,0 +1,6 @@
+egb: grouped-CV R2=0.8861
+ei: grouped-CV R2=0.8008
+eea: grouped-CV R2=0.8701
+nc: grouped-CV R2=0.8263
+eps: grouped-CV R2=0.7831
+mean scarce-target R2=0.8333

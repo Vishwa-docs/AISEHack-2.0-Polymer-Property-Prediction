@@ -1,0 +1,9 @@
+Validation interpreter
+======================
+
+../isolated_runs/.venv/bin/python
+Python 3.11.7
+
+This workstream uses that already-pinned environment read-only because the user-operated
+notebook depends on it. No package was installed, upgraded or removed. All workstream source,
+logs and validation outputs remain inside `fixes/invariance_and_qualitative/`.

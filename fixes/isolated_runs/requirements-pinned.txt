@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------------------
+# Environment validated for this pipeline.  READ THIS BEFORE YOU "UPGRADE".
+#
+# The submission spine's ei/eea leaf models (MLPRegressor, GaussianProcessRegressor,
+# rdEHT, RDKit Descriptors3D) are PYTHON-BUILD + PACKAGE-VERSION sensitive:
+#
+#   * python 3.12.x (any numpy/rdkit combination) -> severe ei regression
+#   * numpy >= 2.5                                -> severe ei regression
+#   * scikit-learn < 1.9.0                        -> severe ei regression
+#
+# ONLY python 3.11.7 with these EXACT pins reproduces the reported score.
+# python 3.11.7 is load-bearing (root-caused 2026-08-31: two different python-3.12
+# environments with different numpy/rdkit versions collapsed ei identically).
+#
+# A run that scores far below 0.90 with identical code and data is an ENVIRONMENT
+# MISMATCH, not a model regression.
+#
+# The Round-3 evidence/analysis suite is version-robust; only the submission path
+# is python-build sensitive.
+# ---------------------------------------------------------------------------
+# python==3.11.7   (enforced by setup.sh, not installable by pip)
+rdkit==2026.03.5
+numpy==2.4.6
+pandas==3.0.5
+scikit-learn==1.9.0
+lightgbm==4.7.0
+xgboost==3.2.0
+scipy==1.17.1
+joblib
+matplotlib
+shap

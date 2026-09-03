@@ -1,0 +1,70 @@
+{
+  "artifact_path": "/home/vishwa/Desktop/r3_runtime/gnn_model/gnn_offload/artifacts/gnn_models.pkl",
+  "artifact_sha256": "dc0ded79d17fb9163380d7b67fa88a722d9433bc15eee6e748e4aa491b39dd0f",
+  "command": "/home/vishwa/Desktop/r3_runtime/gnn_model/gnn_offload/.venv/bin/python /home/vishwa/Desktop/r3_runtime/gnn_model/gnn_offload/run_gnn_stage.py",
+  "copied_input_hashes": {
+    "test.csv": "d8a0da2669b2ec41275f0fb42f08e29f1100220874464f23c129a76ab811cf2d",
+    "train.csv": "609b0f48a95fb5151a8e7fbf0d90755e42216a931d71bb31b5d2263f660f9ba2"
+  },
+  "runtime_seconds": 900.7303729057312,
+  "seeds": {
+    "eea": [
+      2026,
+      7,
+      99
+    ],
+    "egb": [
+      2026,
+      7,
+      99
+    ],
+    "egc": [
+      2026,
+      7,
+      99
+    ],
+    "ei": [
+      2026,
+      7,
+      99
+    ],
+    "eps": [
+      2026,
+      7,
+      99
+    ],
+    "nc": [
+      2026,
+      7,
+      99
+    ],
+    "tg": [
+      2026,
+      7,
+      99
+    ]
+  },
+  "source_notebook_sha256": "d5bf6031281b5a634bcd34a75ef71a45a19ae26c4e91dabc5a8e43b9a7db94cf",
+  "target_cv_r2": {
+    "eea": 0.9240114957127152,
+    "egb": 0.9227343808049043,
+    "egc": 0.9183881669539424,
+    "ei": 0.795141491286835,
+    "eps": 0.7447281269889899,
+    "nc": 0.8557388935731594,
+    "tg": 0.9103788488205136
+  },
+  "validation": "clean_unpickle_schema_ok",
+  "versions": {
+    "cuda_available": true,
+    "cuda_version": "13.0",
+    "device_name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "platform": "Linux-6.17.0-23-generic-x86_64-with-glibc2.39",
+    "python": "3.11.7 (main, Jan  8 2024, 05:55:31) [Clang 17.0.6 ]",
+    "rdkit": "2026.03.5",
+    "torch": "2.14.0+cu130",
+    "torch_geometric": "2.8.0.post1"
+  }
+}

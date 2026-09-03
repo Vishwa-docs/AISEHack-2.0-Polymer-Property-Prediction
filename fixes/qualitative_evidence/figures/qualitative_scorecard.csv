@@ -1,0 +1,10 @@
+theme,measure,value,interpretation
+Invariance,graph representation: zero violations,1.0,"all 7 targets; 0.5σ, 1σ, and 2σ"
+Invariance,attribution cosine similarity,0.9797372223920613,minimum=0.947
+Explainability,5% SHAP fidelity drop,0.8104873840007247,random-mask drop=0.022; 7/7 targets
+Robustness,maximum conformal coverage gap,0.0235294117647058,7/7 targets within the ±3 percentage-point criterion
+Robustness,error–uncertainty correlation ≥0.30,5.0,of 7 targets
+Robustness,Tg seed R² standard deviation,0.0017298055906428778,mean=0.906518
+Generalizability,canonical-group mean R²,0.8237518460089527,7/7 targets positive
+Generalizability,scaffold-holdout mean R²,0.6580819446831123,7/7 targets positive
+Boundary,raw cross-model rank agreement,0.4722233109968357,secondary sensitivity diagnostic; not primary fidelity evidence

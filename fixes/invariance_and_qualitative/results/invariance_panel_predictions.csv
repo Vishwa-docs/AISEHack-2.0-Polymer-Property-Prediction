@@ -1,0 +1,29 @@
+family,variant,kind,input_psmiles,normalized_psmiles,repeat_count,target,prediction,unit,applicability
+poly(ethylene oxide) / polyethylene glycol linear repeat,monomer,repeat,*CCO*,*CCO*,1,tg,-57.28729484957768,degC,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,monomer,repeat,*CCO*,*CCO*,1,egc,6.044051418707866,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,monomer,repeat,*CCO*,*CCO*,1,egb,7.543088097608664,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,monomer,repeat,*CCO*,*CCO*,1,ei,6.670360895990808,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,monomer,repeat,*CCO*,*CCO*,1,eea,0.43720388958335676,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,monomer,repeat,*CCO*,*CCO*,1,nc,1.6492338659403405,-,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,monomer,repeat,*CCO*,*CCO*,1,eps,3.202406221126645,-,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,translated cut-point,translation,*OCC*,*CCO*,1,tg,-57.28729484957768,degC,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,translated cut-point,translation,*OCC*,*CCO*,1,egc,6.044051418707866,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,translated cut-point,translation,*OCC*,*CCO*,1,egb,7.543088097608664,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,translated cut-point,translation,*OCC*,*CCO*,1,ei,6.670360895990808,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,translated cut-point,translation,*OCC*,*CCO*,1,eea,0.43720388958335676,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,translated cut-point,translation,*OCC*,*CCO*,1,nc,1.6492338659403405,-,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,translated cut-point,translation,*OCC*,*CCO*,1,eps,3.202406221126645,-,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,dimer,repetition,*CCOCCO*,*CCO*,2,tg,-57.28729484957768,degC,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,dimer,repetition,*CCOCCO*,*CCO*,2,egc,6.044051418707866,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,dimer,repetition,*CCOCCO*,*CCO*,2,egb,7.543088097608664,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,dimer,repetition,*CCOCCO*,*CCO*,2,ei,6.670360895990808,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,dimer,repetition,*CCOCCO*,*CCO*,2,eea,0.43720388958335676,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,dimer,repetition,*CCOCCO*,*CCO*,2,nc,1.6492338659403405,-,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,dimer,repetition,*CCOCCO*,*CCO*,2,eps,3.202406221126645,-,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,trimer,repetition,*CCOCCOCCO*,*CCO*,3,tg,-57.28729484957768,degC,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,trimer,repetition,*CCOCCOCCO*,*CCO*,3,egc,6.044051418707866,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,trimer,repetition,*CCOCCOCCO*,*CCO*,3,egb,7.543088097608664,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,trimer,repetition,*CCOCCOCCO*,*CCO*,3,ei,6.670360895990808,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,trimer,repetition,*CCOCCOCCO*,*CCO*,3,eea,0.43720388958335676,eV,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,trimer,repetition,*CCOCCOCCO*,*CCO*,3,nc,1.6492338659403405,-,T1_high
+poly(ethylene oxide) / polyethylene glycol linear repeat,trimer,repetition,*CCOCCOCCO*,*CCO*,3,eps,3.202406221126645,-,T1_high

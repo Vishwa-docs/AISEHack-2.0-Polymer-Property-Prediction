@@ -1,5 +1,16 @@
 # AISEHack 2.0 · Polymer Property Prediction · Round 3
 
+## ⭐ FOLLOW THIS NOTEBOOK — it's the best one
+
+**`AISEHack-2.0-Sandman-Polymer-Property-Prediction-Codebase/904_submission/final_notebook/Sandman_Polymer_Property_Prediction_2_906_completed.ipynb`**
+
+This notebook scored **0.906** on the private leaderboard using OOF improvement alone — no external data, no pretrained weights, no oracle contamination. Follow this notebook for the best results.
+
+---
+
+
+# AISEHack 2.0 · Polymer Property Prediction · Round 3
+
 > ## ⭐ CURRENT BEST ARCHITECTURE — Phase 7 (0.907551)
 >
 > The best verified pipeline is **the V57 engine blended with a graph neural network**, with the

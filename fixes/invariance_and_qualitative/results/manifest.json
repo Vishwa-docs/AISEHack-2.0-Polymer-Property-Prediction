@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "panel": {
+    "family": "poly(ethylene oxide) / polyethylene glycol linear repeat",
+    "expected_primitive": "*CCO*",
+    "variants": [
+      {
+        "label": "monomer",
+        "kind": "repeat",
+        "smiles": "*CCO*"
+      },
+      {
+        "label": "translated cut-point",
+        "kind": "translation",
+        "smiles": "*OCC*"
+      },
+      {
+        "label": "dimer",
+        "kind": "repetition",
+        "smiles": "*CCOCCO*"
+      },
+      {
+        "label": "trimer",
+        "kind": "repetition",
+        "smiles": "*CCOCCOCCO*"
+      }
+    ]
+  },
+  "targets": [
+    "tg",
+    "egc",
+    "egb",
+    "ei",
+    "eea",
+    "nc",
+    "eps"
+  ],
+  "prediction_csv_sha256": "bf8e8a53c329b1958690ce379b6bd65456e141024b1ee3f72571cab0e30736e6",
+  "max_prediction_range": 0.0,
+  "scope": "validated unbranched terminal-star linear PSMILES grammar"
+}

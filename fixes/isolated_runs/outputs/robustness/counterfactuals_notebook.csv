@@ -1,0 +1,53 @@
+edit,target,expected_sign,delta,agrees
+add pendant phenyl,tg,1,33.12076377237014,True
+add pendant phenyl,tg,1,-70.9918582190196,False
+add pendant phenyl,tg,1,17.617948556414763,True
+add pendant phenyl,tg,1,14.904485401313252,True
+add pendant phenyl,tg,1,115.69354516219488,True
+add pendant phenyl,tg,1,-1.786050565426521,False
+add pendant phenyl,tg,1,7.2161243360891305,True
+add pendant phenyl,tg,1,21.91536994917476,True
+add pendant phenyl,tg,1,14.059980004011237,True
+add pendant phenyl,tg,1,23.68054728612141,True
+add pendant phenyl,tg,1,30.66029366050404,True
+add pendant phenyl,tg,1,4.508576080409625,True
+add pendant phenyl,tg,1,18.564170295988212,True
+add pendant phenyl,tg,1,48.16829508632024,True
+insert ether linkage,tg,-1,-20.050911138075264,True
+insert ether linkage,tg,-1,-63.02080335048791,True
+insert ether linkage,tg,-1,-7.258924163842401,True
+insert ether linkage,tg,-1,-6.663530367697263,True
+insert ether linkage,tg,-1,27.592458634985245,False
+insert ether linkage,tg,-1,5.954461486596983,False
+insert ether linkage,tg,-1,-5.108963399043262,True
+insert ether linkage,tg,-1,-6.298536458193809,True
+insert ether linkage,tg,-1,-23.653899654780446,True
+insert ether linkage,tg,-1,3.1761755589135987,False
+insert ether linkage,tg,-1,-13.763902369594447,True
+insert ether linkage,tg,-1,-15.99201541893224,True
+insert ether linkage,tg,-1,16.239165541714023,False
+insert ether linkage,tg,-1,6.029784922985144,False
+add unsaturation,egc,-1,-0.49334191859270327,True
+add unsaturation,egc,-1,-0.728558181527569,True
+add unsaturation,egc,-1,-2.4949494311556677,True
+add unsaturation,egc,-1,-0.7143981194771998,True
+add unsaturation,egc,-1,-2.136797015634489,True
+add unsaturation,egc,-1,-0.5663217965130736,True
+add unsaturation,egc,-1,-0.03737492691625066,True
+add unsaturation,egc,-1,-0.20715054334607697,True
+add unsaturation,egc,-1,-0.5125174150865615,True
+add unsaturation,egc,-1,-0.7766484493503825,True
+add unsaturation,egc,-1,-0.2292607854070452,True
+add unsaturation,egc,-1,-0.26568503737193705,True
+add unsaturation,egc,-1,-0.5015068885324148,True
+add unsaturation,egc,-1,-0.7709978882020243,True
+add unsaturation,egc,-1,-2.257490552367812,True
+add unsaturation,egc,-1,-1.3136454583916035,True
+add unsaturation,egc,-1,-0.2211620121452036,True
+fluorinate,ei,1,0.63262926624662,True
+fluorinate,ei,1,1.125544025309675,True
+fluorinate,ei,1,-0.21893319921400334,False
+fluorinate,ei,1,2.1319364188470225,True
+fluorinate,ei,1,0.1390728669905812,True
+fluorinate,ei,1,0.9807223844658015,True
+fluorinate,ei,1,0.04705399131948873,True
